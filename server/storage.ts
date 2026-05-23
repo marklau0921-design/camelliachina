@@ -1,24 +1,26 @@
-// Preconfigured storage helpers for Manus WebDev templates
-// Uploads via Forge Server presigned URL to S3 (PUT direct).
-// Downloads return /manus-storage/{key} paths served via 307 redirect.
+/**
+ * Local Disk Storage
+ *
+ * 所有上传文件保存在项目根目录的 `uploads/` 文件夹下。
+ * 文件通过 Express 静态服务以 `/uploads/xxx` URL 对外提供访问。
+ *
+ * 迁移时只需带走：
+ *   1. 项目代码
+ *   2. 数据库
+ *   3. uploads/ 文件夹
+ */
 
-import { ENV } from "./_core/env";
+import crypto from "crypto";
+import fs from "fs";
+import path from "path";
 
-function getForgeConfig() {
-  const forgeUrl = ENV.forgeApiUrl;
-  const forgeKey = ENV.forgeApiKey;
+// uploads 目录位于项目根目录（process.cwd()）
+export const UPLOADS_ROOT = path.join(process.cwd(), "uploads");
 
-  if (!forgeUrl || !forgeKey) {
-    throw new Error(
-      "Storage config missing: set BUILT_IN_FORGE_API_URL and BUILT_IN_FORGE_API_KEY",
-    );
+function ensureDir(dirPath: string): void {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
   }
-
-  return { forgeUrl: forgeUrl.replace(/\/+$/, ""), forgeKey };
-}
-
-function normalizeKey(relKey: string): string {
-  return relKey.replace(/^\/+/, "");
 }
 
 function appendHashSuffix(relKey: string): string {
@@ -28,70 +30,57 @@ function appendHashSuffix(relKey: string): string {
   return `${relKey.slice(0, lastDot)}_${hash}${relKey.slice(lastDot)}`;
 }
 
+function normalizeKey(relKey: string): string {
+  return relKey.replace(/^\/+/, "");
+}
+
+/**
+ * 将文件写入本地 uploads 目录
+ * @param relKey  相对路径，例如 "media/photo.jpg" 或 "banner/home.jpg"
+ * @returns { key, url }  key = 相对路径, url = "/uploads/media/photo_a1b2c3d4.jpg"
+ */
 export async function storagePut(
   relKey: string,
   data: Buffer | Uint8Array | string,
-  contentType = "application/octet-stream",
+  _contentType = "application/octet-stream",
 ): Promise<{ key: string; url: string }> {
-  const { forgeUrl, forgeKey } = getForgeConfig();
   const key = appendHashSuffix(normalizeKey(relKey));
+  const filePath = path.join(UPLOADS_ROOT, key);
 
-  // 1. Get presigned PUT URL from Forge
-  const presignUrl = new URL("v1/storage/presign/put", forgeUrl + "/");
-  presignUrl.searchParams.set("path", key);
+  ensureDir(path.dirname(filePath));
 
-  const presignResp = await fetch(presignUrl, {
-    headers: { Authorization: `Bearer ${forgeKey}` },
-  });
-
-  if (!presignResp.ok) {
-    const msg = await presignResp.text().catch(() => presignResp.statusText);
-    throw new Error(`Storage presign failed (${presignResp.status}): ${msg}`);
-  }
-
-  const { url: s3Url } = (await presignResp.json()) as { url: string };
-  if (!s3Url) throw new Error("Forge returned empty presign URL");
-
-  // 2. PUT file directly to S3
-  const blob =
+  const buffer =
     typeof data === "string"
-      ? new Blob([data], { type: contentType })
-      : new Blob([data as any], { type: contentType });
+      ? Buffer.from(data, "utf-8")
+      : Buffer.from(data as Uint8Array);
+  fs.writeFileSync(filePath, buffer);
 
-  const uploadResp = await fetch(s3Url, {
-    method: "PUT",
-    headers: { "Content-Type": contentType },
-    body: blob,
-  });
-
-  if (!uploadResp.ok) {
-    throw new Error(`Storage upload to S3 failed (${uploadResp.status})`);
-  }
-
-  return { key, url: `/manus-storage/${key}` };
+  return { key, url: `/uploads/${key}` };
 }
 
+/**
+ * 根据 key 获取文件的本地访问 URL
+ */
 export async function storageGet(relKey: string): Promise<{ key: string; url: string }> {
   const key = normalizeKey(relKey);
-  return { key, url: `/manus-storage/${key}` };
+  return { key, url: `/uploads/${key}` };
 }
 
+/**
+ * 兼容旧接口：本地存储无需签名，直接返回 URL
+ */
 export async function storageGetSignedUrl(relKey: string): Promise<string> {
-  const { forgeUrl, forgeKey } = getForgeConfig();
   const key = normalizeKey(relKey);
+  return `/uploads/${key}`;
+}
 
-  const getUrl = new URL("v1/storage/presign/get", forgeUrl + "/");
-  getUrl.searchParams.set("path", key);
-
-  const resp = await fetch(getUrl, {
-    headers: { Authorization: `Bearer ${forgeKey}` },
-  });
-
-  if (!resp.ok) {
-    const msg = await resp.text().catch(() => resp.statusText);
-    throw new Error(`Storage signed URL failed (${resp.status}): ${msg}`);
+/**
+ * 删除本地文件
+ */
+export function storageDelete(relKey: string): void {
+  const key = normalizeKey(relKey);
+  const filePath = path.join(UPLOADS_ROOT, key);
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
   }
-
-  const { url } = (await resp.json()) as { url: string };
-  return url;
 }

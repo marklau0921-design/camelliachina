@@ -1,0 +1,24 @@
+/* 620px 临界值媒体查询 */
+@media (min-width: 620px) {
+  .plan-your-trip-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  .plan-your-trip-grid > div {
+    height: 250px;
+  }
+}
+
+@media (max-width: 619px) {
+  .plan-your-trip-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .plan-your-trip-grid > div {
+    aspect-ratio: 16 / 4;
+  }
+}
