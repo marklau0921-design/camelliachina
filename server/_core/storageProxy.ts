@@ -1,7 +1,39 @@
 import type { Express } from "express";
+import path from "path";
+import fs from "fs";
 import { ENV } from "./env";
 
 export function registerStorageProxy(app: Express) {
+  // 本地文件存储路由
+  app.get("/uploads/*", (req, res) => {
+    const key = (req.params as Record<string, string>)[0];
+    if (!key) {
+      res.status(400).send("Missing file key");
+      return;
+    }
+
+    // 构建本地文件路径
+    const uploadsDir = path.join(process.cwd(), "uploads");
+    const filePath = path.join(uploadsDir, key);
+
+    // 安全检查：防止路径遍历攻击
+    if (!filePath.startsWith(uploadsDir)) {
+      res.status(403).send("Access denied");
+      return;
+    }
+
+    // 检查文件是否存在
+    if (!fs.existsSync(filePath)) {
+      res.status(404).send("File not found");
+      return;
+    }
+
+    // 发送文件
+    res.set("Cache-Control", "public, max-age=31536000");
+    res.sendFile(filePath);
+  });
+
+  // 保留 manus-storage 代理以支持云存储（如果需要）
   app.get("/manus-storage/*", async (req, res) => {
     const key = (req.params as Record<string, string>)[0];
     if (!key) {
