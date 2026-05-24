@@ -32,6 +32,28 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+
+  // ── Ensure uploads directory exists on startup ────────────────────────────
+  // Hostinger does not create this directory automatically.
+  // uploads/ is in .gitignore so it must be created at runtime.
+  const uploadsRoot = path.join(process.cwd(), "uploads");
+  const uploadSubDirs = ["images", "media", "banners"];
+  try {
+    if (!fs.existsSync(uploadsRoot)) {
+      fs.mkdirSync(uploadsRoot, { recursive: true });
+      console.log(`[Startup] Created uploads directory: ${uploadsRoot}`);
+    }
+    for (const sub of uploadSubDirs) {
+      const subDir = path.join(uploadsRoot, sub);
+      if (!fs.existsSync(subDir)) {
+        fs.mkdirSync(subDir, { recursive: true });
+      }
+    }
+  } catch (err) {
+    console.error(`[Startup] Warning: Could not create uploads directory: ${err}`);
+    console.error(`[Startup] Image uploads may fail. Check server write permissions.`);
+  }
+
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -42,7 +64,7 @@ async function startServer() {
   // Admin and API routes always bypass this and use dynamic handling
   const staticCacheDir = path.resolve(process.cwd(), "static-cache");
   app.use((req, res, next) => {
-    if (req.path.startsWith("/admin") || req.path.startsWith("/api") || req.path.startsWith("/manus-storage")) {
+    if (req.path.startsWith("/admin") || req.path.startsWith("/api") || req.path.startsWith("/manus-storage") || req.path.startsWith("/uploads")) {
       return next();
     }
     const routePath = req.path === "/" ? "/index.html" : `${req.path.replace(/\/$/, "")}/index.html`;

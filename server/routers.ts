@@ -240,11 +240,15 @@ export const appRouter = router({
         }
         // Create in-memory session (no JWT, no localStorage)
         const sessionId = createAdminSession();
-        const cookieOpts = getSessionCookieOptions(ctx.req);
+        // Build cookie options: always httpOnly, secure on HTTPS, SameSite=Lax for same-site Hostinger
+        const isHttps = ctx.req.protocol === "https" ||
+          (ctx.req.headers["x-forwarded-proto"] as string || "").includes("https");
         ctx.res.cookie(ADMIN_COOKIE, sessionId, {
-          ...cookieOpts,
           httpOnly: true,
+          path: "/",
           maxAge: SESSION_TTL_MS,
+          sameSite: isHttps ? "none" : "lax",
+          secure: isHttps,
         });
         return { success: true };
       }),
@@ -252,8 +256,14 @@ export const appRouter = router({
     logout: publicProcedure.mutation(({ ctx }) => {
       const sessionId = getAdminSessionId(ctx.req as any);
       if (sessionId) adminSessions.delete(sessionId);
-      const cookieOpts = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(ADMIN_COOKIE, { ...cookieOpts, maxAge: -1 });
+      const isHttps = ctx.req.protocol === "https" ||
+        (ctx.req.headers["x-forwarded-proto"] as string || "").includes("https");
+      ctx.res.clearCookie(ADMIN_COOKIE, {
+        httpOnly: true,
+        path: "/",
+        sameSite: isHttps ? "none" : "lax",
+        secure: isHttps,
+      });
       return { success: true };
     }),
 
