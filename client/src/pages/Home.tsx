@@ -392,7 +392,9 @@ export default function Home() {
       <CarouselSection />
 
       {/* Partner Logos Section */}
-      <PartnerLogos />
+      <div style={{ marginTop: '48px' }}>
+        <PartnerLogos />
+      </div>
 
       {/* Why Into China Section */}
       <WhyIntoChinaSection />

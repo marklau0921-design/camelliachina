@@ -110,7 +110,7 @@ export default function PartnerLogos() {
   };
 
   return (
-    <section className="bg-white" style={{ paddingTop: '96px', paddingBottom: '48px', overflow: 'hidden' }}>
+    <section className="bg-white" style={{ paddingTop: '48px', paddingBottom: '48px', overflow: 'hidden' }}>
       {/* Outer wrapper: clips overflow */}
       <div style={{ width: '100%', overflow: 'hidden' }}>
         {/* Scrollable track */}
