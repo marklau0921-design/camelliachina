@@ -497,15 +497,19 @@ export default function ItineraryDetail() {
       {/* ── ENQUIRE CTA ── */}
       <section style={{ position: 'relative', width: '100%', height: 'clamp(260px, 30vw, 275px)', backgroundColor: '#a84900', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/manus-storage/texture-buried_038ce46e.png)', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '28px', textAlign: 'center', padding: '0 24px' }}>
-          <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, color: '#fff', letterSpacing: '0.05em', textTransform: 'uppercase', margin: 0, lineHeight: 1.1 }}>
-            Ready to start your journey?
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '28px', textAlign: 'center', padding: '0 24px' }}>
+          <h2 style={{ fontFamily: 'AlternateGotNo1D', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, color: '#ffffff', letterSpacing: '0.05em', textTransform: 'uppercase', margin: 0, lineHeight: 1.1 }}>
+            So, ready to start?
           </h2>
           <a href="/make-an-enquiry">
-            <button style={{ padding: '14px 40px', fontSize: '13px', letterSpacing: '0.15em', textTransform: 'uppercase',               background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.6)', cursor: 'pointer', fontFamily: 'var(--font-sans)', transition: 'background 0.2s, border-color 0.2s' }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.borderColor = '#fff'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}>
-              Enquire Now
+            <button
+              style={{ backgroundColor: '#111111', color: '#ffffff', fontFamily: 'Lato, sans-serif', fontSize: '13px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '14px 36px', border: '2px solid #111111', cursor: 'pointer', transition: 'background-color 0.2s, color 0.2s, transform 0.1s' }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#111111'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#111111'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.transform = 'scale(1)'; }}
+              onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.95)')}
+              onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
+            >
+              Get in Touch
             </button>
           </a>
         </div>
