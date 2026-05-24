@@ -329,11 +329,6 @@ export default function CarouselSection() {
             showPlayButton={false}
           />
         </div>
-        <div className="w-full flex justify-center" style={{ backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '64px' }}>
-          <button className="px-8 py-3 bg-black text-white text-sm font-normal tracking-wider uppercase rounded border-2 border-black hover:bg-white hover:text-black transition-all duration-300 active:scale-95 active:shadow-lg">
-            View Gallery
-          </button>
-        </div>
       </section>
 
       {/* ── Section 2: Video Stories (with play button) ── */}
