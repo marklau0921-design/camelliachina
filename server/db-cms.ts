@@ -5,6 +5,7 @@ import {
   teamMembers, itineraries, itineraryTags, stories, storyTags,
   videos, videoTags, images, cityExperiences, cityWhatToSee,
   homepageHero, homepageIntro, homepageStories, homepageSponsors, homepageStorySections,
+  aboutSections, whyUsSections,
   type InsertCity, type InsertTag, type InsertExperience, type InsertExperienceType,
   type InsertExperienceDetail, type InsertTeamMember,
   type InsertItinerary, type InsertStory, type InsertVideo, type InsertImage,
@@ -12,6 +13,8 @@ import {
   type HomepageHero, type HomepageIntro, type HomepageStory, type HomepageSponsor,
   type HomepageStorySection,
   type InsertHomepageStory, type InsertHomepageSponsor, type InsertHomepageStorySection,
+  type AboutSection, type InsertAboutSection,
+  type WhyUsSection, type InsertWhyUsSection,
 } from "../drizzle/schema";
 
 // ─── Slug helper ─────────────────────────────────────────────────────────────
@@ -822,4 +825,61 @@ export async function listHomepageStoriesByType(type: "image" | "video") {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(homepageStories).where(eq(homepageStories.type, type)).orderBy(homepageStories.sortOrder);
+}
+
+// ─── About Page Management ────────────────────────────────────────────────────
+export async function listAboutSections() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(aboutSections).orderBy(aboutSections.sortOrder);
+}
+
+export async function createAboutSection(data: Omit<InsertAboutSection, "id" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  const slug = data.slug || toSlug(data.name);
+  const [result] = await db.insert(aboutSections).values({ ...data, slug });
+  return { id: (result as any).insertId, slug };
+}
+
+export async function updateAboutSection(id: number, data: Partial<InsertAboutSection>) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.update(aboutSections).set({ ...data, updatedAt: new Date() }).where(eq(aboutSections.id, id));
+  const rows = await db.select().from(aboutSections).where(eq(aboutSections.id, id)).limit(1);
+  return rows[0] ?? null;
+}
+
+export async function deleteAboutSection(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.delete(aboutSections).where(eq(aboutSections.id, id));
+}
+
+// ─── Why Us Sections ─────────────────────────────────────────────────────────
+export async function listWhyUsSections() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(whyUsSections).orderBy(whyUsSections.sortOrder);
+}
+
+export async function createWhyUsSection(data: Omit<InsertWhyUsSection, "id" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  const [result] = await db.insert(whyUsSections).values(data);
+  return { id: (result as any).insertId };
+}
+
+export async function updateWhyUsSection(id: number, data: Partial<InsertWhyUsSection>) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.update(whyUsSections).set({ ...data, updatedAt: new Date() }).where(eq(whyUsSections.id, id));
+  const rows = await db.select().from(whyUsSections).where(eq(whyUsSections.id, id)).limit(1);
+  return rows[0] ?? null;
+}
+
+export async function deleteWhyUsSection(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.delete(whyUsSections).where(eq(whyUsSections.id, id));
 }

@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import {
-  LayoutDashboard, MapPin, Compass, Map, BookOpen, Video, Tag, Mail, LogOut, Menu, X, ChevronRight, Images, UsersRound, Home,
+  LayoutDashboard, MapPin, Compass, Map, BookOpen, Video, Tag, Mail, LogOut, Menu, X, ChevronRight, Images, Info, Home,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -16,7 +16,7 @@ const NAV_ITEMS = [
   { label: "Stories",      path: "/admin/stories",      icon: BookOpen },
   { label: "Videos",       path: "/admin/videos",       icon: Video },
   { label: "Tags",         path: "/admin/tags",         icon: Tag },
-  { label: "Team",         path: "/admin/team-members", icon: UsersRound },
+  { label: "About",        path: "/admin/about",        icon: Info },
 ];
 
 const ACCENT = "#F5569B";

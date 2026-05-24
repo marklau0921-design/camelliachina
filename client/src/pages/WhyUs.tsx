@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Navigation from '@/components/Navigation';
+import { trpc } from '@/lib/trpc';
 
 /**
  * WhyUs Page — Full-screen paged layout
@@ -28,7 +29,7 @@ interface Slide {
   isCover?: boolean;
 }
 
-const SLIDES: Slide[] = [
+const STATIC_SLIDES: Slide[] = [
   {
     isCover: true,
     title: 'WHY US?',
@@ -90,8 +91,8 @@ function animName(panel: 'left' | 'right', role: AnimRole, dir: Direction) {
 }
 
 // Preload all slide images so they are cached before the user navigates
-function preloadImages() {
-  SLIDES.forEach(slide => {
+function preloadImages(slides: Slide[]) {
+  slides.forEach(slide => {
     if (slide.image) {
       const img = new Image();
       img.src = slide.image;
@@ -100,11 +101,26 @@ function preloadImages() {
 }
 
 export default function WhyUs() {
+  const { data: dbSections } = trpc.about.listWhyUsSections.useQuery();
+
+  // Build slides: cover slide + DB sections (or static fallback)
+  const SLIDES: Slide[] = [
+    { isCover: true, title: 'WHY US?', subtitle: 'What sets us apart', description: `${dbSections && dbSections.length > 0 ? dbSections.length : STATIC_SLIDES.length - 1} reasons to travel with Wayseek` },
+    ...(dbSections && dbSections.length > 0
+      ? dbSections.map((s, i) => ({
+          num: String(i + 1).padStart(2, '0'),
+          title: s.title,
+          description: s.content,
+          image: s.image ?? undefined,
+        }))
+      : STATIC_SLIDES.slice(1)),
+  ];
+
   const [current, setCurrent] = useState<SlideState>({ index: 0, role: 'idle', direction: 'forward' });
   const [prev, setPrev] = useState<SlideState | null>(null);
 
   // Preload all images on mount
-  useEffect(() => { preloadImages(); }, []);
+  useEffect(() => { preloadImages(SLIDES); }, [SLIDES.length]);
   const lockRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -163,7 +179,7 @@ export default function WhyUs() {
 
   // ── Render a single slide ─────────────────────────────────────────────────
   const renderSlide = (state: SlideState) => {
-    const slide = SLIDES[state.index];
+    const slide = SLIDES[state.index] ?? SLIDES[0];
     const { role, direction } = state;
 
     // Odd slide index (1,3,5) = text left / image right
@@ -204,7 +220,7 @@ export default function WhyUs() {
         ) : (
           <>
             <p style={{ fontFamily: 'sans-serif', fontSize: 'clamp(10px,1vw,13px)', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#c8b89a', margin: '0 0 20px 0' }}>
-              {slide.num} / 05
+              {slide.num} / {String(SLIDES.length - 1).padStart(2, '0')}
             </p>
             <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(26px,3.2vw,48px)', fontWeight: 400, color: '#fff', lineHeight: 1.2, margin: '0 0 28px 0', textTransform: 'uppercase' }}>
               {slide.title}

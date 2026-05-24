@@ -44,6 +44,8 @@ import {
   listHomepageStories, listHomepageStoriesByType, createHomepageStory, updateHomepageStory, deleteHomepageStory,
   listHomepageSponsors, createHomepageSponsor, updateHomepageSponsor, deleteHomepageSponsor,
   getHomepageStorySection, upsertHomepageStorySection,
+  listAboutSections, createAboutSection, updateAboutSection, deleteAboutSection,
+  listWhyUsSections, createWhyUsSection, updateWhyUsSection, deleteWhyUsSection,
 } from "./db-cms";
 
 const ADMIN_COOKIE = "admin_session";
@@ -1398,6 +1400,95 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);
         await deleteHomepageSponsor(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // ─── About Page Management ───────────────────────────────────────────────────
+  about: router({
+    // Public: list visible sections for frontend
+    listPublicSections: publicProcedure.query(async () => {
+      const sections = await listAboutSections();
+      return sections.filter(s => s.isVisible);
+    }),
+
+    // Admin: list all sections
+    listSections: publicProcedure.query(async ({ ctx }) => {
+      await requireAdmin(ctx);
+      return listAboutSections();
+    }),
+
+    createSection: publicProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        slug: z.string().optional(),
+        isVisible: z.boolean().default(true),
+        sortOrder: z.number().default(0),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        const { slug, ...rest } = input;
+        return createAboutSection({ ...rest, slug: slug ?? '' });
+      }),
+
+    updateSection: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        slug: z.string().optional(),
+        isVisible: z.boolean().optional(),
+        sortOrder: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        const { id, ...data } = input;
+        return updateAboutSection(id, data);
+      }),
+
+    deleteSection: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        await deleteAboutSection(input.id);
+        return { success: true };
+      }),
+
+    // Why Us sections
+    listWhyUsSections: publicProcedure.query(async () => {
+      return listWhyUsSections();
+    }),
+
+    createWhyUsSection: publicProcedure
+      .input(z.object({
+        title: z.string().min(1),
+        content: z.string().min(1),
+        image: z.string().optional(),
+        sortOrder: z.number().default(0),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        return createWhyUsSection(input);
+      }),
+
+    updateWhyUsSection: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().optional(),
+        content: z.string().optional(),
+        image: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        const { id, ...data } = input;
+        return updateWhyUsSection(id, data);
+      }),
+
+    deleteWhyUsSection: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        await deleteWhyUsSection(input.id);
         return { success: true };
       }),
   }),

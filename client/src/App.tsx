@@ -30,7 +30,9 @@ import AdminStories from "./pages/AdminStories";
 import AdminVideos from "./pages/AdminVideos";
 import AdminTags from "./pages/AdminTags";
 import AdminMediaLibrary from "./pages/AdminMediaLibrary";
-import AdminTeamMembers from "./pages/AdminTeamMembers";
+import AdminAbout from "./pages/AdminAbout";
+import AdminAboutOurTeam from "./pages/AdminAboutOurTeam";
+import AdminAboutWhyUs from "./pages/AdminAboutWhyUs";
 import AdminExperiencesByType from "./pages/AdminExperiencesByType";
 import AdminExperiencesByCity from "./pages/AdminExperiencesByCity";
 import AdminExperienceEdit from "./pages/AdminExperienceEdit";
@@ -92,7 +94,9 @@ function Router() {
       <Route path="/admin/videos" component={AdminVideos} />
       <Route path="/admin/tags" component={AdminTags} />
       <Route path="/admin/media" component={AdminMediaLibrary} />
-      <Route path="/admin/team-members" component={AdminTeamMembers} />
+      <Route path="/admin/about" component={AdminAbout} />
+      <Route path="/admin/about/our-team" component={AdminAboutOurTeam} />
+      <Route path="/admin/about/why-us" component={AdminAboutWhyUs} />
       <Route path="/admin/homepage" component={AdminHomepage} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}

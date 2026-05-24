@@ -386,3 +386,30 @@ export const homepageSponsors = mysqlTable("homepage_sponsors", {
 });
 export type HomepageSponsor = typeof homepageSponsors.$inferSelect;
 export type InsertHomepageSponsor = typeof homepageSponsors.$inferInsert;
+
+// ─── About Page Management ────────────────────────────────────────────────────
+// About 子板块目录（可增删，控制显示/隐藏）
+export const aboutSections = mysqlTable("about_sections", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 200 }).notNull(),         // 板块名称，如 "Our Team"
+  slug: varchar("slug", { length: 100 }).notNull().unique(), // 路由标识，如 "our-team"
+  isVisible: boolean("isVisible").default(true).notNull(),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type AboutSection = typeof aboutSections.$inferSelect;
+export type InsertAboutSection = typeof aboutSections.$inferInsert;
+
+// Why Us 板块内容（多行，可增删排序）
+export const whyUsSections = mysqlTable("why_us_sections", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 300 }).notNull(),
+  content: text("content").notNull(),
+  image: varchar("image", { length: 512 }),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type WhyUsSection = typeof whyUsSections.$inferSelect;
+export type InsertWhyUsSection = typeof whyUsSections.$inferInsert;
