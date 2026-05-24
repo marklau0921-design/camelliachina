@@ -46,7 +46,8 @@ function GalleryStrip({ images }: { images: string[] }) {
       oneSectionWidth.current = totalWidth / 3;
       track.scrollLeft = totalWidth / 3;
     });
-  }, []);
+  }, [images]);
+
   const checkLoop = () => {
     const track = trackRef.current;
     if (!track || oneSectionWidth.current === 0) return;
@@ -100,10 +101,7 @@ function GalleryStrip({ images }: { images: string[] }) {
     const walk = (x - startX.current) * 1.0;
     velocity.current = e.pageX - lastX.current;
     lastX.current = e.pageX;
-    if (trackRef.current) {
-      trackRef.current.scrollLeft = scrollLeftStart.current - walk;
-      checkLoop();
-    }
+    if (trackRef.current) { trackRef.current.scrollLeft = scrollLeftStart.current - walk; }
   };
 
   const scrollBy = (delta: number) => {
