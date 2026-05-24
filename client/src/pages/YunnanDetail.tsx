@@ -812,7 +812,7 @@ function SimilarExperiencesSection() {
             </div>
           ))}
           {/* View More */}
-          <div className="flex-shrink-0" style={{ width: '155px', height: '550px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+          <div className="flex-shrink-0" style={{ width: '155px', height: '550px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <button
               style={{
                 backgroundColor: '#111111',
