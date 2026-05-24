@@ -308,6 +308,10 @@ export default function CarouselSection() {
   const videoSectionTitle = homepageData?.videoSection?.title ?? 'Stories From the Road';
   const videoSectionSubtitle = homepageData?.videoSection?.subtitle ?? 'Real stories. Meaningful journeys.';
 
+  // Section visibility (default true if not yet set in DB)
+  const showImageSection = homepageData ? (homepageData.imageSection?.isVisible !== false) : true;
+  const showVideoSection = homepageData ? (homepageData.videoSection?.isVisible !== false) : true;
+
   useEffect(() => {
     if (selectedVideoId) {
       document.body.style.overflow = 'hidden';
@@ -320,6 +324,7 @@ export default function CarouselSection() {
   return (
     <>
       {/* ── Section 1: Image Stories (no play button) ── */}
+      {showImageSection && (
       <section style={{ backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '0' }}>
         <div className="flex flex-col h-auto w-full">
           <SectionHeader title={imageSectionTitle} subtitle={imageSectionSubtitle} />
@@ -330,8 +335,10 @@ export default function CarouselSection() {
           />
         </div>
       </section>
+      )}
 
       {/* ── Section 2: Video Stories (with play button) ── */}
+      {showVideoSection && (
       <section style={{ backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '0' }}>
         <div className="flex flex-col h-auto w-full">
           <SectionHeader title={videoSectionTitle} subtitle={videoSectionSubtitle} />
@@ -348,6 +355,7 @@ export default function CarouselSection() {
           </button>
         </div>
       </section>
+      )}
 
       {/* Video modal */}
       {selectedVideoId && (

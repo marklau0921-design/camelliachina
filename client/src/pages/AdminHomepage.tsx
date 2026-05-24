@@ -219,10 +219,10 @@ export default function AdminHomepage() {
   // ── Image Stories Section ─────────────────────────────────────────────────
   const imageSectionQuery = trpc.homepage.getStorySection.useQuery({ sectionType: "image" });
   const updateImageSection = trpc.homepage.updateStorySection.useMutation({ onSuccess: () => { imageSectionQuery.refetch(); toast.success("Image section saved"); } });
-  const [imageSectionForm, setImageSectionForm] = useState<{ title: string; subtitle: string } | null>(null);
+  const [imageSectionForm, setImageSectionForm] = useState<{ title: string; subtitle: string; isVisible: boolean } | null>(null);
 
   const imageSection = imageSectionQuery.data;
-  const imageSectionEdit = imageSectionForm ?? { title: imageSection?.title ?? "Stories From the Road", subtitle: imageSection?.subtitle ?? "Real stories. Meaningful journeys." };
+  const imageSectionEdit = imageSectionForm ?? { title: imageSection?.title ?? "Stories From the Road", subtitle: imageSection?.subtitle ?? "Real stories. Meaningful journeys.", isVisible: imageSection?.isVisible ?? true };
   const setImageSection = (k: string, v: any) => setImageSectionForm(f => ({ ...(f ?? imageSectionEdit), [k]: v }));
 
   const imageStoriesQuery = trpc.homepage.listStoriesByType.useQuery({ type: "image" });
@@ -276,10 +276,10 @@ export default function AdminHomepage() {
   // ── Video Stories Section ─────────────────────────────────────────────────
   const videoSectionQuery = trpc.homepage.getStorySection.useQuery({ sectionType: "video" });
   const updateVideoSection = trpc.homepage.updateStorySection.useMutation({ onSuccess: () => { videoSectionQuery.refetch(); toast.success("Video section saved"); } });
-  const [videoSectionForm, setVideoSectionForm] = useState<{ title: string; subtitle: string } | null>(null);
+  const [videoSectionForm, setVideoSectionForm] = useState<{ title: string; subtitle: string; isVisible: boolean } | null>(null);
 
   const videoSection = videoSectionQuery.data;
-  const videoSectionEdit = videoSectionForm ?? { title: videoSection?.title ?? "Stories From the Road", subtitle: videoSection?.subtitle ?? "Real stories. Meaningful journeys." };
+  const videoSectionEdit = videoSectionForm ?? { title: videoSection?.title ?? "Stories From the Road", subtitle: videoSection?.subtitle ?? "Real stories. Meaningful journeys.", isVisible: videoSection?.isVisible ?? true };
   const setVideoSection = (k: string, v: any) => setVideoSectionForm(f => ({ ...(f ?? videoSectionEdit), [k]: v }));
 
   const videoStoriesQuery = trpc.homepage.listStoriesByType.useQuery({ type: "video" });
@@ -364,14 +364,18 @@ export default function AdminHomepage() {
 
       {/* ── Section 1: Image Stories ─────────────────────────────────────────── */}
       <div style={{ ...cardStyle, marginBottom: 32 }}>
-        <div style={{ marginBottom: 20 }}>
-          <h2 style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#1a1a1a", textTransform: "uppercase", margin: "0 0 4px 0" }}>
-            Section 1 — Image Stories
-          </h2>
-          <p style={{ fontFamily: "Lato, sans-serif", fontSize: 12, color: "#888", margin: 0 }}>
-            Pure image carousel. No play button. Drag to scroll.
-          </p>
-        </div>
+        <SectionHeader
+          title="Section 1 — Image Stories"
+          visible={imageSectionEdit.isVisible}
+          onToggle={() => {
+            const next = !imageSectionEdit.isVisible;
+            setImageSection("isVisible", next);
+            updateImageSection.mutate({ sectionType: "image", title: imageSectionEdit.title, subtitle: imageSectionEdit.subtitle, isVisible: next });
+          }}
+        />
+        <p style={{ fontFamily: "Lato, sans-serif", fontSize: 12, color: "#888", margin: "-12px 0 20px 0" }}>
+          Pure image carousel. No play button. Drag to scroll.
+        </p>
 
         {/* Section title/subtitle edit */}
         <div style={{ background: "#f9f9f9", border: "1px solid #eee", borderRadius: 6, padding: 16, marginBottom: 20 }}>
@@ -467,14 +471,18 @@ export default function AdminHomepage() {
 
       {/* ── Section 2: Video Stories ─────────────────────────────────────────── */}
       <div style={{ ...cardStyle, marginBottom: 32 }}>
-        <div style={{ marginBottom: 20 }}>
-          <h2 style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#1a1a1a", textTransform: "uppercase", margin: "0 0 4px 0" }}>
-            Section 2 — Video Stories
-          </h2>
-          <p style={{ fontFamily: "Lato, sans-serif", fontSize: 12, color: "#888", margin: 0 }}>
-            YouTube video carousel. Click to play. Auto-fetches cover from YouTube.
-          </p>
-        </div>
+        <SectionHeader
+          title="Section 2 — Video Stories"
+          visible={videoSectionEdit.isVisible}
+          onToggle={() => {
+            const next = !videoSectionEdit.isVisible;
+            setVideoSection("isVisible", next);
+            updateVideoSection.mutate({ sectionType: "video", title: videoSectionEdit.title, subtitle: videoSectionEdit.subtitle, isVisible: next });
+          }}
+        />
+        <p style={{ fontFamily: "Lato, sans-serif", fontSize: 12, color: "#888", margin: "-12px 0 20px 0" }}>
+          YouTube video carousel. Click to play. Auto-fetches cover from YouTube.
+        </p>
 
         {/* Section title/subtitle edit */}
         <div style={{ background: "#f9f9f9", border: "1px solid #eee", borderRadius: 6, padding: 16, marginBottom: 20 }}>
