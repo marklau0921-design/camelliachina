@@ -787,30 +787,22 @@ function SimilarExperiencesSection() {
                 <div>
                   <h3 className="text-base font-bold uppercase tracking-wider mb-4 leading-tight opacity-85" style={{fontWeight: '300'}}>{trip.title}</h3>
                   <button
-                    style={{
-                      backgroundColor: '#111111',
-                      color: '#ffffff',
-                      fontFamily: 'Lato, sans-serif',
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      letterSpacing: '0.15em',
-                      textTransform: 'uppercase',
-                      padding: '14px 36px',
-                      border: '2px solid #111111',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s, color 0.2s, transform 0.1s',
+                    className="trip-btn px-4 py-2 text-white text-xs font-bold uppercase tracking-widest transition-all duration-200 opacity-85 relative overflow-hidden active:scale-95"
+                    style={{ pointerEvents: 'auto', cursor: 'pointer', background: 'rgba(20,20,20,0.55)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,1)'; e.currentTarget.style.color = '#111'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(20,20,20,0.55)'; e.currentTarget.style.color = '#fff'; }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      // ripple effect
+                      const btn = e.currentTarget;
+                      const circle = document.createElement('span');
+                      const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+                      const radius = diameter / 2;
+                      const rect = btn.getBoundingClientRect();
+                      circle.style.cssText = `position:absolute;width:${diameter}px;height:${diameter}px;left:${e.clientX - rect.left - radius}px;top:${e.clientY - rect.top - radius}px;background:rgba(255,255,255,0.35);border-radius:50%;transform:scale(0);animation:ripple 0.5s linear;pointer-events:none;`;
+                      btn.appendChild(circle);
+                      setTimeout(() => circle.remove(), 600);
                     }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.backgroundColor = '#ffffff';
-                      e.currentTarget.style.color = '#111111';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.backgroundColor = '#111111';
-                      e.currentTarget.style.color = '#ffffff';
-                      e.currentTarget.style.transform = 'scale(1)';
-                    }}
-                    onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.95)')}
-                    onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
                     onClick={(e) => { e.stopPropagation(); navigate(`/itinerary/${trip.id}`); }}
                   >
                     {trip.buttonText}
