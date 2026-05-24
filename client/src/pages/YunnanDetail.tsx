@@ -826,6 +826,7 @@ function SimilarExperiencesSection() {
                 border: '2px solid #111111',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s, color 0.2s, transform 0.1s',
+                whiteSpace: 'nowrap',
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.backgroundColor = '#ffffff';
