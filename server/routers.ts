@@ -19,6 +19,7 @@ import {
   setAssetActive, updateAssetSortOrder, replaceMediaAsset, deleteMediaAsset, getMediaAsset,
 } from "./db-media";
 import { storagePut, UPLOADS_ROOT } from "./storage";
+import { generateStaticPages, generateNavData, clearStaticCache, STATIC_CACHE_DIR } from "./staticGenerator";
 import {
   listTags, createTag, updateTag, deleteTag,
   listCities, getCityById, createCity, updateCity, deleteCity, listCitiesWithExperiences,
@@ -869,6 +870,68 @@ export const appRouter = router({
   }),
 
   // ─── Public CMS queries (for frontend) ──────────────────────────────────
+  // ─── Static page generation ─────────────────────────────────────────────
+  staticGen: router({
+    generate: publicProcedure
+      .input(z.object({ adminToken: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const valid = await verifyAdminToken(input.adminToken);
+        if (!valid) throw new TRPCError({ code: "UNAUTHORIZED", message: "Admin access required" });
+        const protocol = (ctx.req.headers["x-forwarded-proto"] as string) || "http";
+        const host = (ctx.req.headers["x-forwarded-host"] as string) || (ctx.req.headers["host"] as string) || "localhost:3000";
+        const baseUrl = `${protocol}://${host}`;
+        console.log(`[StaticGen] Starting generation for ${baseUrl}`);
+        const result = await generateStaticPages(baseUrl);
+        console.log(`[StaticGen] Done: ${result.pagesGenerated} pages in ${result.durationMs}ms`);
+        return result;
+      }),
+
+    generateNavOnly: publicProcedure
+      .input(z.object({ adminToken: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const valid = await verifyAdminToken(input.adminToken);
+        if (!valid) throw new TRPCError({ code: "UNAUTHORIZED", message: "Admin access required" });
+        const success = await generateNavData();
+        return { success };
+      }),
+
+    clearCache: publicProcedure
+      .input(z.object({ adminToken: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const valid = await verifyAdminToken(input.adminToken);
+        if (!valid) throw new TRPCError({ code: "UNAUTHORIZED", message: "Admin access required" });
+        clearStaticCache();
+        return { success: true };
+      }),
+
+    status: publicProcedure
+      .input(z.object({ adminToken: z.string() }))
+      .query(async ({ ctx, input }) => {
+        const valid = await verifyAdminToken(input.adminToken);
+        if (!valid) throw new TRPCError({ code: "UNAUTHORIZED", message: "Admin access required" });
+        const navDataPath = path.join(STATIC_CACHE_DIR, "nav-data.json");
+        let lastGenerated: string | null = null;
+        let pageCount = 0;
+        try {
+          if (fs.existsSync(navDataPath)) {
+            const data = JSON.parse(fs.readFileSync(navDataPath, "utf-8"));
+            lastGenerated = data.generatedAt || null;
+          }
+          const countHtml = (dir: string): number => {
+            if (!fs.existsSync(dir)) return 0;
+            let count = 0;
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              if (entry.isDirectory()) count += countHtml(path.join(dir, entry.name));
+              else if (entry.name.endsWith(".html")) count++;
+            }
+            return count;
+          };
+          pageCount = countHtml(STATIC_CACHE_DIR);
+        } catch { /* ignore */ }
+        return { lastGenerated, pageCount };
+      }),
+  }),
+
   cms: router({
     listTags: publicProcedure.query(() => listTags()),
 

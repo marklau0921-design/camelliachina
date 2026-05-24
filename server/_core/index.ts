@@ -2,6 +2,8 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import fs from "fs";
+import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
@@ -36,6 +38,22 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+
+  // Serve pre-generated static pages from static-cache/ with priority over SPA
+  // Admin and API routes always bypass this and use dynamic handling
+  const staticCacheDir = path.resolve(process.cwd(), "static-cache");
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/admin") || req.path.startsWith("/api") || req.path.startsWith("/manus-storage")) {
+      return next();
+    }
+    const routePath = req.path === "/" ? "/index.html" : `${req.path.replace(/\/$/, "")}/index.html`;
+    const filePath = path.join(staticCacheDir, routePath);
+    if (fs.existsSync(filePath)) {
+      return res.sendFile(filePath);
+    }
+    next();
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",
