@@ -70,7 +70,7 @@ export default function WhyIntoChinaSection() {
               </div>
 
               {/* Title */}
-              <h3 className="font-sans mb-3 font-semibold tracking-wide" style={{color: '#666666', fontSize: '12px'}}>
+              <h3 className="font-sans mb-3 font-semibold tracking-wide" style={{color: '#666666', fontSize: '14px'}}>
                 {feature.title}
               </h3>
 
