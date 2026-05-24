@@ -100,7 +100,10 @@ function GalleryStrip({ images }: { images: string[] }) {
     const walk = (x - startX.current) * 1.0;
     velocity.current = e.pageX - lastX.current;
     lastX.current = e.pageX;
-    if (trackRef.current) { trackRef.current.scrollLeft = scrollLeftStart.current - walk; }
+    if (trackRef.current) {
+      trackRef.current.scrollLeft = scrollLeftStart.current - walk;
+      checkLoop();
+    }
   };
 
   const scrollBy = (delta: number) => {
