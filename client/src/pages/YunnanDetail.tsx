@@ -866,6 +866,26 @@ export default function YunnanDetail() {
       {/* ── TRIP SECTION NAV ── */}
       {/* Wrapper: in normal flow; when stickyFixed, inner nav becomes fixed at top */}
       <div ref={tripNavRef} style={{ height: '48px', position: 'relative', zIndex: 39 }}>
+        <style>{`
+          .trip-tab-underline {
+            position: relative;
+            padding-bottom: 2px;
+          }
+          .trip-tab-underline::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #F5569B;
+            transition: width 0.25s ease;
+          }
+          .trip-tab-underline:hover::after,
+          .trip-tab-underline.trip-tab-active::after {
+            width: 100%;
+          }
+        `}</style>
         <div
           className="w-full"
           style={{
@@ -874,27 +894,23 @@ export default function YunnanDetail() {
             left: 0,
             right: 0,
             zIndex: 39,
-            background: 'rgba(245,245,245,0.97)',
+            background: '#F3F3F3',
           }}
         >
-          <div className="flex items-center justify-center px-2 md:px-16">
-            {sections.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => scrollToSection(s.id)}
-                className="relative px-2 md:px-5 py-3 uppercase transition-colors"
-                style={{
-                  fontFamily: 'sans-serif',
-                  fontSize: 'clamp(8px, 2vw, 12px)',
-                  letterSpacing: '0.1em',
-                  whiteSpace: 'nowrap',
-                  color: activeSection === s.id ? '#111' : '#888',
-                  borderBottom: activeSection === s.id ? '2px solid #111' : '2px solid transparent',
-                }}
-              >
-                {s.label}
-              </button>
-            ))}
+          <div className="h-full flex items-center justify-center px-4 md:px-0">
+            <nav className="flex gap-3 md:gap-12 h-full items-center flex-wrap md:flex-nowrap justify-center">
+              {sections.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => scrollToSection(s.id)}
+                  className={`trip-tab-underline text-xs font-semibold uppercase tracking-wider text-black flex-shrink-0 ${
+                    activeSection === s.id ? 'trip-tab-active' : ''
+                  }`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </nav>
           </div>
         </div>
       </div>
