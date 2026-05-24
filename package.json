@@ -11,7 +11,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
-    "postinstall": "patch -p1 -d node_modules/wouter < patches/wouter@3.7.1.patch || true"
+    "postinstall": "patch --forward -p1 -d node_modules/wouter < patches/wouter@3.7.1.patch; exit 0"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
