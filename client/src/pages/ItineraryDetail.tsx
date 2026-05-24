@@ -408,20 +408,20 @@ export default function ItineraryDetail() {
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px', borderTop: '1px solid #eee', paddingTop: '40px' }}>
             {itin.when && (
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#f49e0b', marginBottom: '10px', fontFamily: 'var(--font-sans)' }}>WHEN</p>
-                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5, fontFamily: 'var(--font-serif)' }}>{itin.when}</p>
+                <p style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#f49e0b', marginBottom: '10px', fontFamily: 'var(--font-sans)' }}>WHEN</p>
+                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5, fontFamily: 'var(--font-sans)' }}>{itin.when}</p>
               </div>
             )}
             {itin.price && (
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#1d902b', marginBottom: '10px', fontFamily: 'var(--font-sans)' }}>PRICE</p>
-                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5, fontFamily: 'var(--font-serif)' }}>{itin.price}</p>
+                <p style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#1d902b', marginBottom: '10px', fontFamily: 'var(--font-sans)' }}>PRICE</p>
+                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5, fontFamily: 'var(--font-sans)' }}>{itin.price}</p>
               </div>
             )}
             {itin.howLong && (
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#2c6faa', marginBottom: '10px', fontFamily: 'var(--font-sans)' }}>HOW LONG</p>
-                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5, fontFamily: 'var(--font-serif)' }}>{itin.howLong}</p>
+                <p style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#2c6faa', marginBottom: '10px', fontFamily: 'var(--font-sans)' }}>HOW LONG</p>
+                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5, fontFamily: 'var(--font-sans)' }}>{itin.howLong}</p>
               </div>
             )}
           </div>
