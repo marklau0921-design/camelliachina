@@ -1,13 +1,50 @@
 import React from 'react';
+import { useLocation } from 'wouter';
 import AdminLayout from '@/components/AdminLayout';
 import { trpc } from '@/lib/trpc';
+import { Plus, Edit2, Trash2, ArrowRight } from 'lucide-react';
+
+const ACCENT = '#F5569B';
 
 const SLUG_TO_EDIT_PATH: Record<string, string> = {
   'our-team': '/admin/about/our-team',
   'why-us': '/admin/about/why-us',
 };
 
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: '11px',
+  letterSpacing: '0.12em',
+  textTransform: 'uppercase',
+  color: '#888',
+  marginBottom: '8px',
+};
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '9px 12px',
+  fontSize: '13px',
+  background: '#f2f2f2',
+  border: '1px solid #ddd',
+  outline: 'none',
+  color: '#2d2d2d',
+  boxSizing: 'border-box',
+};
+
+const iconBtnStyle = (color: string): React.CSSProperties => ({
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color,
+  padding: '4px',
+  display: 'flex',
+  alignItems: 'center',
+  opacity: 0.7,
+  transition: 'opacity 0.15s',
+});
+
 export default function AdminAbout() {
+  const [, navigate] = useLocation();
   const utils = trpc.useUtils();
   const { data: sections = [], isLoading } = trpc.about.listSections.useQuery();
   const [showAdd, setShowAdd] = React.useState(false);
@@ -35,130 +72,181 @@ export default function AdminAbout() {
 
   return (
     <AdminLayout title="About">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
-        <div>
-          <h1 style={{ margin: 0, fontFamily: 'Georgia, serif', fontWeight: 400 }}>About Page</h1>
-          <p style={{ color: '#777', marginTop: '6px' }}>
-            Manage the sections shown in the About menu. Toggle visibility and click Edit to update content.
-          </p>
-        </div>
-        <button
-          onClick={() => setShowAdd(true)}
-          style={{ background: '#F5569B', color: '#fff', border: 0, padding: '11px 18px', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '12px' }}
-        >
-          + Add Section
-        </button>
-      </div>
-
-      {/* Add section form */}
-      {showAdd && (
-        <div style={{ background: '#fff', border: '1px solid #e5e5e5', padding: '20px', marginBottom: '20px' }}>
-          <p style={{ margin: '0 0 12px', fontSize: '13px', color: '#555' }}>Enter the name for the new About section:</p>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <input
-              value={newName}
-              onChange={e => setNewName(e.target.value)}
-              placeholder="e.g. Our Story"
-              style={{ flex: 1, padding: '10px 12px', border: '1px solid #ddd', fontSize: '14px' }}
-              onKeyDown={e => { if (e.key === 'Enter' && newName.trim()) createMutation.mutate({ name: newName.trim(), slug: slugify(newName.trim()) }); }}
-            />
-            <button
-              onClick={() => { if (newName.trim()) createMutation.mutate({ name: newName.trim(), slug: slugify(newName.trim()) }); }}
-              disabled={createMutation.isPending || !newName.trim()}
-              style={{ background: '#111', color: '#fff', border: 0, padding: '10px 18px', cursor: 'pointer' }}
-            >
-              {createMutation.isPending ? 'Adding...' : 'Add'}
-            </button>
-            <button
-              onClick={() => { setShowAdd(false); setNewName(''); }}
-              style={{ background: '#f3f3f3', color: '#333', border: '1px solid #ddd', padding: '10px 18px', cursor: 'pointer' }}
-            >
-              Cancel
-            </button>
+      <div style={{ padding: '32px' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+          <div>
+            <h1 style={{ fontSize: '22px', fontWeight: '300', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#1a1a1a', margin: 0 }}>
+              About
+            </h1>
+            <p style={{ fontSize: '13px', color: '#888', marginTop: '4px' }}>
+              {sections.length} section{sections.length !== 1 ? 's' : ''}
+            </p>
           </div>
-        </div>
-      )}
-
-      {isLoading ? (
-        <p style={{ color: '#999' }}>Loading...</p>
-      ) : (
-        <div>
-          {sections.map(section => {
-            const editPath = getEditPath(section);
-            return (
-              <div
-                key={section.id}
-                style={{ background: '#fff', border: '1px solid #e5e5e5', marginBottom: '12px', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}
-              >
-                {/* Drag handle placeholder */}
-                <span style={{ color: '#ccc', fontSize: '18px', cursor: 'grab', userSelect: 'none' }}>⠿</span>
-
-                {/* Section name */}
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ margin: 0, fontSize: '16px', fontFamily: 'Georgia, serif', fontWeight: 400 }}>{section.name}</h3>
-                  {section.slug && (
-                    <span style={{ fontSize: '11px', color: '#bbb', letterSpacing: '0.08em' }}>/about/{section.slug}</span>
-                  )}
-                </div>
-
-                {/* Show on page toggle */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '12px', color: '#777' }}>Show on page</span>
-                  <button
-                    onClick={() => toggleVisible(section.id, section.isVisible ?? true)}
-                    style={{
-                      width: '44px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-                      background: section.isVisible ? '#F5569B' : '#ddd',
-                      position: 'relative', transition: 'background 0.2s',
-                      flexShrink: 0,
-                    }}
-                    title={section.isVisible ? 'Hide from page' : 'Show on page'}
-                  >
-                    <span style={{
-                      position: 'absolute', top: '3px',
-                      left: section.isVisible ? '23px' : '3px',
-                      width: '18px', height: '18px', borderRadius: '50%',
-                      background: '#fff', transition: 'left 0.2s',
-                    }} />
-                  </button>
-                </div>
-
-                {/* Edit button */}
-                {editPath ? (
-                  <a
-                    href={editPath}
-                    style={{ border: '1px solid #ddd', background: '#fff', padding: '8px 14px', cursor: 'pointer', fontSize: '13px', textDecoration: 'none', color: '#333', display: 'inline-block' }}
-                  >
-                    Edit
-                  </a>
-                ) : (
-                  <button
-                    disabled
-                    style={{ border: '1px solid #eee', background: '#fafafa', padding: '8px 14px', fontSize: '13px', color: '#bbb', cursor: 'not-allowed' }}
-                    title="No editor available for this section yet"
-                  >
-                    Edit
-                  </button>
-                )}
-
-                {/* Delete button */}
-                <button
-                  onClick={() => { if (confirm(`Delete "${section.name}"?`)) deleteMutation.mutate({ id: section.id }); }}
-                  style={{ border: '1px solid #f1c5c5', color: '#b00020', background: '#fff', padding: '8px 12px', cursor: 'pointer', fontSize: '13px' }}
-                >
-                  Delete
-                </button>
-              </div>
-            );
-          })}
-
-          {sections.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '60px 0', color: '#aaa' }}>
-              <p style={{ fontSize: '14px' }}>No sections yet. Click "+ Add Section" to get started.</p>
-            </div>
+          {!showAdd && (
+            <button
+              onClick={() => setShowAdd(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '10px 20px', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase',
+                background: ACCENT, color: '#fff', border: 'none', cursor: 'pointer',
+              }}
+            >
+              <Plus size={14} /> Add Section
+            </button>
           )}
         </div>
-      )}
+
+        {/* Add section form */}
+        {showAdd && (
+          <div style={{ background: '#fff', border: '1px solid #eee', padding: '28px', marginBottom: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={labelStyle}>Section Name *</label>
+                <input
+                  value={newName}
+                  onChange={e => setNewName(e.target.value)}
+                  placeholder="e.g. Our Story"
+                  style={inputStyle}
+                  onFocus={e => { e.target.style.borderColor = ACCENT; }}
+                  onBlur={e => { e.target.style.borderColor = '#ddd'; }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && newName.trim())
+                      createMutation.mutate({ name: newName.trim(), slug: slugify(newName.trim()) });
+                  }}
+                />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+              <button
+                onClick={() => {
+                  if (newName.trim())
+                    createMutation.mutate({ name: newName.trim(), slug: slugify(newName.trim()) });
+                }}
+                disabled={createMutation.isPending || !newName.trim()}
+                style={{
+                  padding: '10px 24px', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase',
+                  background: createMutation.isPending || !newName.trim() ? '#ccc' : ACCENT,
+                  color: '#fff', border: 'none', cursor: createMutation.isPending || !newName.trim() ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {createMutation.isPending ? 'Adding...' : 'Add Section'}
+              </button>
+              <button
+                onClick={() => { setShowAdd(false); setNewName(''); }}
+                style={{
+                  padding: '10px 24px', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase',
+                  background: 'transparent', color: '#888', border: '1px solid #ddd', cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* List */}
+        {isLoading ? (
+          <div style={{ textAlign: 'center', padding: '48px', color: '#888', fontSize: '13px' }}>Loading...</div>
+        ) : sections.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '48px', color: '#888' }}>
+            <p style={{ fontSize: '13px', marginTop: '12px' }}>No sections yet. Add your first section above.</p>
+          </div>
+        ) : (
+          <div style={{ background: '#fff', border: '1px solid #eee' }}>
+            {/* Header row */}
+            <div style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', background: '#e8e8e8', borderBottom: '1px solid #d8d8d8' }}>
+              <span style={{ flex: 1, fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#888' }}>Section</span>
+              <span style={{ width: '120px', fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#888', textAlign: 'center' }}>Visibility</span>
+              <span style={{ width: '120px' }} />
+            </div>
+
+            {sections.map((section, idx) => {
+              const bg = idx % 2 === 0 ? '#f2f2f2' : '#e8e8e8';
+              const editPath = getEditPath(section);
+              return (
+                <div
+                  key={section.id}
+                  style={{ display: 'flex', alignItems: 'center', padding: '14px 20px', background: bg, borderBottom: '1px solid rgba(0,0,0,0.04)' }}
+                >
+                  {/* Info */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '14px', color: '#1a1a1a' }}>{section.name}</div>
+                    {section.slug && (
+                      <div style={{ fontSize: '11px', color: '#aaa', marginTop: '2px' }}>/about/{section.slug}</div>
+                    )}
+                  </div>
+
+                  {/* Show on page toggle */}
+                  <div style={{ width: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '11px', color: '#888' }}>
+                      {section.isVisible ? 'Visible' : 'Hidden'}
+                    </span>
+                    <button
+                      onClick={() => toggleVisible(section.id, section.isVisible ?? true)}
+                      style={{
+                        width: '40px', height: '22px', borderRadius: '11px', border: 'none', cursor: 'pointer',
+                        background: section.isVisible ? ACCENT : '#ccc',
+                        position: 'relative', transition: 'background 0.2s',
+                        flexShrink: 0,
+                      }}
+                      title={section.isVisible ? 'Hide from page' : 'Show on page'}
+                    >
+                      <span style={{
+                        position: 'absolute', top: '3px',
+                        left: section.isVisible ? '21px' : '3px',
+                        width: '16px', height: '16px', borderRadius: '50%',
+                        background: '#fff', transition: 'left 0.2s',
+                      }} />
+                    </button>
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ width: '120px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+                    {editPath ? (
+                      <button
+                        onClick={() => navigate(editPath)}
+                        style={{
+                          background: 'none', border: 'none', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', gap: '4px',
+                          color: '#888', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase',
+                          padding: '4px 8px', transition: 'color 0.15s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.color = ACCENT; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = '#888'; }}
+                      >
+                        Edit <ArrowRight size={12} />
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        style={{
+                          background: 'none', border: 'none',
+                          display: 'flex', alignItems: 'center', gap: '4px',
+                          color: '#ccc', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase',
+                          padding: '4px 8px', cursor: 'not-allowed',
+                        }}
+                        title="No editor available for this section yet"
+                      >
+                        Edit <ArrowRight size={12} />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => { if (confirm(`Delete "${section.name}"?`)) deleteMutation.mutate({ id: section.id }); }}
+                      style={iconBtnStyle('#b00020')}
+                      title="Delete section"
+                      onMouseEnter={e => { e.currentTarget.style.opacity = '1'; }}
+                      onMouseLeave={e => { e.currentTarget.style.opacity = '0.7'; }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </AdminLayout>
   );
 }
