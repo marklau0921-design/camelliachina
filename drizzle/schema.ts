@@ -349,6 +349,8 @@ export const homepageStories = mysqlTable("homepage_stories", {
   id: int("id").autoincrement().primaryKey(),
   isVisible: boolean("isVisible").default(true).notNull(),
   name: varchar("name", { length: 200 }).notNull(),
+  // type: 'image' = 图片板块, 'video' = 视频板块
+  type: mysqlEnum("type", ["image", "video"]).default("video").notNull(),
   videoId: varchar("videoId", { length: 50 }),
   image: varchar("image", { length: 512 }),
   sortOrder: int("sortOrder").default(0).notNull(),
@@ -357,6 +359,19 @@ export const homepageStories = mysqlTable("homepage_stories", {
 });
 export type HomepageStory = typeof homepageStories.$inferSelect;
 export type InsertHomepageStory = typeof homepageStories.$inferInsert;
+
+// Stories 板块标题/简述（每个板块独立配置）
+export const homepageStorySections = mysqlTable("homepage_story_sections", {
+  id: int("id").autoincrement().primaryKey(),
+  // sectionType: 'image' = 图片板块, 'video' = 视频板块
+  sectionType: mysqlEnum("sectionType", ["image", "video"]).notNull().unique(),
+  title: varchar("title", { length: 300 }).notNull().default("Stories From the Road"),
+  subtitle: varchar("subtitle", { length: 500 }).notNull().default("Real stories. Meaningful journeys."),
+  isVisible: boolean("isVisible").default(true).notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type HomepageStorySection = typeof homepageStorySections.$inferSelect;
+export type InsertHomepageStorySection = typeof homepageStorySections.$inferInsert;
 
 // 赞助商 Logo（多行，可排序）
 export const homepageSponsors = mysqlTable("homepage_sponsors", {

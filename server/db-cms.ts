@@ -4,13 +4,14 @@ import {
   cities, tags, experiences, experienceTags, experienceTypes, experienceDetails, experienceLabels,
   teamMembers, itineraries, itineraryTags, stories, storyTags,
   videos, videoTags, images, cityExperiences, cityWhatToSee,
-  homepageHero, homepageIntro, homepageStories, homepageSponsors,
+  homepageHero, homepageIntro, homepageStories, homepageSponsors, homepageStorySections,
   type InsertCity, type InsertTag, type InsertExperience, type InsertExperienceType,
   type InsertExperienceDetail, type InsertTeamMember,
   type InsertItinerary, type InsertStory, type InsertVideo, type InsertImage,
   type InsertCityExperience, type InsertCityWhatToSee,
   type HomepageHero, type HomepageIntro, type HomepageStory, type HomepageSponsor,
-  type InsertHomepageStory, type InsertHomepageSponsor,
+  type HomepageStorySection,
+  type InsertHomepageStory, type InsertHomepageSponsor, type InsertHomepageStorySection,
 } from "../drizzle/schema";
 
 // ─── Slug helper ─────────────────────────────────────────────────────────────
@@ -794,4 +795,31 @@ export async function deleteHomepageSponsor(id: number) {
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");
   await db.delete(homepageSponsors).where(eq(homepageSponsors.id, id));
+}
+
+// Story Sections (板块标题/简述)
+export async function getHomepageStorySection(sectionType: "image" | "video"): Promise<HomepageStorySection | null> {
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db.select().from(homepageStorySections).where(eq(homepageStorySections.sectionType, sectionType)).limit(1);
+  return rows[0] ?? null;
+}
+export async function upsertHomepageStorySection(sectionType: "image" | "video", data: Partial<InsertHomepageStorySection>) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  const existing = await getHomepageStorySection(sectionType);
+  if (existing) {
+    await db.update(homepageStorySections).set(data).where(eq(homepageStorySections.sectionType, sectionType));
+    const rows = await db.select().from(homepageStorySections).where(eq(homepageStorySections.sectionType, sectionType)).limit(1);
+    return rows[0] ?? null;
+  } else {
+    await db.insert(homepageStorySections).values({ sectionType, title: "Stories From the Road", subtitle: "Real stories. Meaningful journeys.", ...data });
+    const rows = await db.select().from(homepageStorySections).where(eq(homepageStorySections.sectionType, sectionType)).limit(1);
+    return rows[0] ?? null;
+  }
+}
+export async function listHomepageStoriesByType(type: "image" | "video") {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(homepageStories).where(eq(homepageStories.type, type)).orderBy(homepageStories.sortOrder);
 }

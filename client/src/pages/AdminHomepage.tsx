@@ -5,7 +5,14 @@ import ImageUploader from "@/components/ImageUploader";
 import AdminLayout from "@/components/AdminLayout";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-interface StoryForm {
+interface ImageStoryForm {
+  title: string;
+  thumbnailUrl: string;
+  isVisible: boolean;
+  sortOrder: number;
+}
+
+interface VideoStoryForm {
   title: string;
   youtubeId: string;
   thumbnailUrl: string;
@@ -21,7 +28,8 @@ interface SponsorForm {
   sortOrder: number;
 }
 
-const emptyStory: StoryForm = { title: "", youtubeId: "", thumbnailUrl: "", isVisible: true, sortOrder: 0 };
+const emptyImageStory: ImageStoryForm = { title: "", thumbnailUrl: "", isVisible: true, sortOrder: 0 };
+const emptyVideoStory: VideoStoryForm = { title: "", youtubeId: "", thumbnailUrl: "", isVisible: true, sortOrder: 0 };
 const emptySponsor: SponsorForm = { name: "", logoUrl: "", websiteUrl: "", isVisible: true, sortOrder: 0 };
 
 // ─── Section Header ───────────────────────────────────────────────────────────
@@ -94,30 +102,90 @@ const cardStyle: React.CSSProperties = {
   background: "#fff", border: "1px solid #f0f0f0", borderRadius: 8, padding: 20, marginBottom: 12,
 };
 
-// ─── Story Modal ──────────────────────────────────────────────────────────────
-function StoryModal({ initial, onSave, onClose }: { initial?: StoryForm & { id?: number }; onSave: (data: StoryForm & { id?: number }) => void; onClose: () => void }) {
-  const [form, setForm] = useState<StoryForm>(initial ?? emptyStory);
-  const set = (k: keyof StoryForm, v: any) => setForm(f => ({ ...f, [k]: v }));
+// ─── Image Story Modal ────────────────────────────────────────────────────────
+function ImageStoryModal({ initial, onSave, onClose }: {
+  initial?: ImageStoryForm & { id?: number };
+  onSave: (data: ImageStoryForm & { id?: number }) => void;
+  onClose: () => void;
+}) {
+  const [form, setForm] = useState<ImageStoryForm>(initial ?? emptyImageStory);
+  const set = (k: keyof ImageStoryForm, v: any) => setForm(f => ({ ...f, [k]: v }));
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ background: "#fff", borderRadius: 8, padding: 32, width: 480, maxWidth: "90vw", maxHeight: "80vh", overflowY: "auto" }}>
         <h3 style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 24, color: "#1a1a1a" }}>
-          {initial?.id ? "Edit Story" : "Add Story"}
+          {initial?.id ? "Edit Image Card" : "Add Image Card"}
         </h3>
-        <Field label="Title">
-          <input style={inputStyle} value={form.title} onChange={e => set("title", e.target.value)} placeholder="Story title" />
+        <Field label="Title (internal label)">
+          <input style={inputStyle} value={form.title} onChange={e => set("title", e.target.value)} placeholder="e.g. Guilin Landscape" />
+        </Field>
+        <Field label="Image">
+          <ImageUploader value={form.thumbnailUrl} onChange={v => set("thumbnailUrl", v ?? "")} category="homepage" />
+        </Field>
+        <Field label="Sort Order">
+          <input style={inputStyle} type="number" value={form.sortOrder} onChange={e => set("sortOrder", Number(e.target.value))} />
+        </Field>
+        <Field label="Visible">
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <input type="checkbox" checked={form.isVisible} onChange={e => set("isVisible", e.target.checked)} />
+            <span style={{ fontFamily: "Lato, sans-serif", fontSize: 13 }}>Show on homepage</span>
+          </label>
+        </Field>
+        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 8 }}>
+          <button style={btnSecondary} onClick={onClose}>Cancel</button>
+          <button style={btnPrimary} onClick={() => { if (!form.title) return; onSave({ ...form, id: initial?.id }); }}>Save</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Video Story Modal ────────────────────────────────────────────────────────
+function VideoStoryModal({ initial, onSave, onClose }: {
+  initial?: VideoStoryForm & { id?: number };
+  onSave: (data: VideoStoryForm & { id?: number }) => void;
+  onClose: () => void;
+}) {
+  const [form, setForm] = useState<VideoStoryForm>(initial ?? emptyVideoStory);
+  const set = (k: keyof VideoStoryForm, v: any) => setForm(f => ({ ...f, [k]: v }));
+
+  // Auto-derive YouTube thumbnail when youtubeId changes
+  const youtubeThumbnail = form.youtubeId
+    ? `https://img.youtube.com/vi/${form.youtubeId}/maxresdefault.jpg`
+    : "";
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ background: "#fff", borderRadius: 8, padding: 32, width: 480, maxWidth: "90vw", maxHeight: "80vh", overflowY: "auto" }}>
+        <h3 style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 24, color: "#1a1a1a" }}>
+          {initial?.id ? "Edit Video Card" : "Add Video Card"}
+        </h3>
+        <Field label="Title (internal label)">
+          <input style={inputStyle} value={form.title} onChange={e => set("title", e.target.value)} placeholder="e.g. Guilin Journey" />
         </Field>
         <Field label="YouTube Video ID">
-          <input style={inputStyle} value={form.youtubeId} onChange={e => set("youtubeId", e.target.value)} placeholder="e.g. dQw4w9WgXcQ" />
+          <input
+            style={inputStyle}
+            value={form.youtubeId}
+            onChange={e => set("youtubeId", e.target.value)}
+            placeholder="e.g. dQw4w9WgXcQ"
+          />
           {form.youtubeId && (
-            <div style={{ marginTop: 8, fontSize: 12, color: "#888", fontFamily: "Lato, sans-serif" }}>
-              Preview: https://www.youtube.com/watch?v={form.youtubeId}
+            <div style={{ marginTop: 8 }}>
+              <div style={{ fontSize: 12, color: "#888", fontFamily: "Lato, sans-serif", marginBottom: 6 }}>
+                Auto-fetched cover:
+              </div>
+              <img
+                src={youtubeThumbnail}
+                alt="YouTube thumbnail"
+                style={{ width: "100%", maxWidth: 320, height: "auto", borderRadius: 4, border: "1px solid #eee" }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${form.youtubeId}/hqdefault.jpg`;
+                }}
+              />
             </div>
           )}
-        </Field>
-        <Field label="Thumbnail Image">
-          <ImageUploader value={form.thumbnailUrl} onChange={v => set("thumbnailUrl", v ?? "")} category="homepage" />
         </Field>
         <Field label="Sort Order">
           <input style={inputStyle} type="number" value={form.sortOrder} onChange={e => set("sortOrder", Number(e.target.value))} />
@@ -195,12 +263,35 @@ export default function AdminHomepage() {
   const introEdit = introForm ?? { title: intro?.title ?? "", content: intro?.content ?? "", isVisible: intro?.isVisible ?? true };
   const setIntro = (k: string, v: any) => setIntroForm(f => ({ ...(f ?? introEdit), [k]: v }));
 
-  // ── Stories ───────────────────────────────────────────────────────────────
-  const storiesQuery = trpc.homepage.listStories.useQuery();
-  const createStory = trpc.homepage.createStory.useMutation({ onSuccess: () => { storiesQuery.refetch(); setStoryModal(null); toast.success("Story added"); } });
-  const updateStory = trpc.homepage.updateStory.useMutation({ onSuccess: () => { storiesQuery.refetch(); setStoryModal(null); toast.success("Story updated"); } });
-  const deleteStory = trpc.homepage.deleteStory.useMutation({ onSuccess: () => { storiesQuery.refetch(); toast.success("Story deleted"); } });
-  const [storyModal, setStoryModal] = useState<(StoryForm & { id?: number }) | null>(null);
+  // ── Image Stories Section ─────────────────────────────────────────────────
+  const imageSectionQuery = trpc.homepage.getStorySection.useQuery({ sectionType: "image" });
+  const updateImageSection = trpc.homepage.updateStorySection.useMutation({ onSuccess: () => { imageSectionQuery.refetch(); toast.success("Image section saved"); } });
+  const [imageSectionForm, setImageSectionForm] = useState<{ title: string; subtitle: string } | null>(null);
+
+  const imageSection = imageSectionQuery.data;
+  const imageSectionEdit = imageSectionForm ?? { title: imageSection?.title ?? "Stories From the Road", subtitle: imageSection?.subtitle ?? "Real stories. Meaningful journeys." };
+  const setImageSection = (k: string, v: any) => setImageSectionForm(f => ({ ...(f ?? imageSectionEdit), [k]: v }));
+
+  const imageStoriesQuery = trpc.homepage.listStoriesByType.useQuery({ type: "image" });
+  const createImageStory = trpc.homepage.createStory.useMutation({ onSuccess: () => { imageStoriesQuery.refetch(); setImageStoryModal(null); toast.success("Image card added"); } });
+  const updateImageStory = trpc.homepage.updateStory.useMutation({ onSuccess: () => { imageStoriesQuery.refetch(); setImageStoryModal(null); toast.success("Image card updated"); } });
+  const deleteImageStory = trpc.homepage.deleteStory.useMutation({ onSuccess: () => { imageStoriesQuery.refetch(); toast.success("Image card deleted"); } });
+  const [imageStoryModal, setImageStoryModal] = useState<(ImageStoryForm & { id?: number }) | null>(null);
+
+  // ── Video Stories Section ─────────────────────────────────────────────────
+  const videoSectionQuery = trpc.homepage.getStorySection.useQuery({ sectionType: "video" });
+  const updateVideoSection = trpc.homepage.updateStorySection.useMutation({ onSuccess: () => { videoSectionQuery.refetch(); toast.success("Video section saved"); } });
+  const [videoSectionForm, setVideoSectionForm] = useState<{ title: string; subtitle: string } | null>(null);
+
+  const videoSection = videoSectionQuery.data;
+  const videoSectionEdit = videoSectionForm ?? { title: videoSection?.title ?? "Stories From the Road", subtitle: videoSection?.subtitle ?? "Real stories. Meaningful journeys." };
+  const setVideoSection = (k: string, v: any) => setVideoSectionForm(f => ({ ...(f ?? videoSectionEdit), [k]: v }));
+
+  const videoStoriesQuery = trpc.homepage.listStoriesByType.useQuery({ type: "video" });
+  const createVideoStory = trpc.homepage.createStory.useMutation({ onSuccess: () => { videoStoriesQuery.refetch(); setVideoStoryModal(null); toast.success("Video card added"); } });
+  const updateVideoStory = trpc.homepage.updateStory.useMutation({ onSuccess: () => { videoStoriesQuery.refetch(); setVideoStoryModal(null); toast.success("Video card updated"); } });
+  const deleteVideoStory = trpc.homepage.deleteStory.useMutation({ onSuccess: () => { videoStoriesQuery.refetch(); toast.success("Video card deleted"); } });
+  const [videoStoryModal, setVideoStoryModal] = useState<(VideoStoryForm & { id?: number }) | null>(null);
 
   // ── Sponsors ──────────────────────────────────────────────────────────────
   const sponsorsQuery = trpc.homepage.listSponsors.useQuery();
@@ -209,14 +300,23 @@ export default function AdminHomepage() {
   const deleteSponsor = trpc.homepage.deleteSponsor.useMutation({ onSuccess: () => { sponsorsQuery.refetch(); toast.success("Sponsor deleted"); } });
   const [sponsorModal, setSponsorModal] = useState<(SponsorForm & { id?: number }) | null>(null);
 
-  const stories = storiesQuery.data ?? [];
+  const imageStories = imageStoriesQuery.data ?? [];
+  const videoStories = videoStoriesQuery.data ?? [];
   const sponsors = sponsorsQuery.data ?? [];
 
-  const handleStorySave = (data: StoryForm & { id?: number }) => {
+  const handleImageStorySave = (data: ImageStoryForm & { id?: number }) => {
     if (data.id) {
-      updateStory.mutate({ id: data.id, title: data.title, youtubeId: data.youtubeId || undefined, thumbnailUrl: data.thumbnailUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
+      updateImageStory.mutate({ id: data.id, title: data.title, thumbnailUrl: data.thumbnailUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
     } else {
-      createStory.mutate({ title: data.title, youtubeId: data.youtubeId || undefined, thumbnailUrl: data.thumbnailUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
+      createImageStory.mutate({ title: data.title, type: "image", thumbnailUrl: data.thumbnailUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
+    }
+  };
+
+  const handleVideoStorySave = (data: VideoStoryForm & { id?: number }) => {
+    if (data.id) {
+      updateVideoStory.mutate({ id: data.id, title: data.title, youtubeId: data.youtubeId || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
+    } else {
+      createVideoStory.mutate({ title: data.title, type: "video", youtubeId: data.youtubeId || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
     }
   };
 
@@ -275,22 +375,114 @@ export default function AdminHomepage() {
         </div>
       </div>
 
-      {/* ── Stories from the Road ────────────────────────────────────────────── */}
+      {/* ── Section 1: Image Stories ─────────────────────────────────────────── */}
       <div style={{ ...cardStyle, marginBottom: 32 }}>
-        <SectionHeader title="Stories from the Road" visible={true} onToggle={() => {}} />
+        <div style={{ marginBottom: 20 }}>
+          <h2 style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#1a1a1a", textTransform: "uppercase", margin: "0 0 4px 0" }}>
+            Section 1 — Image Stories
+          </h2>
+          <p style={{ fontFamily: "Lato, sans-serif", fontSize: 12, color: "#888", margin: 0 }}>
+            Pure image carousel. No play button. Drag to scroll.
+          </p>
+        </div>
+
+        {/* Section title/subtitle edit */}
+        <div style={{ background: "#f9f9f9", border: "1px solid #eee", borderRadius: 6, padding: 16, marginBottom: 20 }}>
+          <div style={{ fontFamily: "Lato, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: "#888", textTransform: "uppercase", marginBottom: 12 }}>
+            Section Heading
+          </div>
+          <Field label="Section Title">
+            <input style={inputStyle} value={imageSectionEdit.title} onChange={e => setImageSection("title", e.target.value)} placeholder="Stories From the Road" />
+          </Field>
+          <Field label="Section Subtitle">
+            <input style={inputStyle} value={imageSectionEdit.subtitle} onChange={e => setImageSection("subtitle", e.target.value)} placeholder="Real stories. Meaningful journeys." />
+          </Field>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <button style={btnPrimary} onClick={() => updateImageSection.mutate({ sectionType: "image", title: imageSectionEdit.title, subtitle: imageSectionEdit.subtitle })}>
+              Save Heading
+            </button>
+          </div>
+        </div>
+
+        {/* Image cards list */}
+        <div style={{ fontFamily: "Lato, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: "#888", textTransform: "uppercase", marginBottom: 10 }}>
+          Image Cards
+        </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
-          {stories.length === 0 && (
+          {imageStories.length === 0 && (
             <div style={{ color: "#aaa", fontFamily: "Lato, sans-serif", fontSize: 13, padding: "20px 0", textAlign: "center" }}>
-              No stories yet. Add one below.
+              No image cards yet. Add one below.
             </div>
           )}
-          {stories.map(s => (
+          {imageStories.map(s => (
             <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", border: "1px solid #f0f0f0", borderRadius: 6, background: "#fafafa" }}>
               {s.image && (
-                <img src={s.image} alt={s.name} style={{ width: 56, height: 40, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} />
+                <img src={s.image} alt={s.name} style={{ width: 80, height: 50, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} />
               )}
-              {!s.image && s.videoId && (
-                <img src={`https://img.youtube.com/vi/${s.videoId}/mqdefault.jpg`} alt={s.name} style={{ width: 56, height: 40, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 600, color: "#1a1a1a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.name}</div>
+                <div style={{ fontFamily: "Lato, sans-serif", fontSize: 11, color: "#aaa", marginTop: 2 }}>Image card</div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                <span style={{ fontSize: 11, color: s.isVisible ? "#F5569B" : "#aaa", fontFamily: "Lato, sans-serif", fontWeight: 600 }}>
+                  {s.isVisible ? "Visible" : "Hidden"}
+                </span>
+                <button style={btnSecondary} onClick={() => setImageStoryModal({ id: s.id, title: s.name, thumbnailUrl: s.image ?? "", isVisible: s.isVisible ?? true, sortOrder: s.sortOrder ?? 0 })}>Edit</button>
+                <button style={btnDanger} onClick={() => { if (confirm("Delete this image card?")) deleteImageStory.mutate({ id: s.id }); }}>Delete</button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <button style={btnPrimary} onClick={() => setImageStoryModal(emptyImageStory)}>+ Add Image Card</button>
+      </div>
+
+      {/* ── Section 2: Video Stories ─────────────────────────────────────────── */}
+      <div style={{ ...cardStyle, marginBottom: 32 }}>
+        <div style={{ marginBottom: 20 }}>
+          <h2 style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#1a1a1a", textTransform: "uppercase", margin: "0 0 4px 0" }}>
+            Section 2 — Video Stories
+          </h2>
+          <p style={{ fontFamily: "Lato, sans-serif", fontSize: 12, color: "#888", margin: 0 }}>
+            YouTube video carousel. Click to play. Auto-fetches cover from YouTube.
+          </p>
+        </div>
+
+        {/* Section title/subtitle edit */}
+        <div style={{ background: "#f9f9f9", border: "1px solid #eee", borderRadius: 6, padding: 16, marginBottom: 20 }}>
+          <div style={{ fontFamily: "Lato, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: "#888", textTransform: "uppercase", marginBottom: 12 }}>
+            Section Heading
+          </div>
+          <Field label="Section Title">
+            <input style={inputStyle} value={videoSectionEdit.title} onChange={e => setVideoSection("title", e.target.value)} placeholder="Stories From the Road" />
+          </Field>
+          <Field label="Section Subtitle">
+            <input style={inputStyle} value={videoSectionEdit.subtitle} onChange={e => setVideoSection("subtitle", e.target.value)} placeholder="Real stories. Meaningful journeys." />
+          </Field>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <button style={btnPrimary} onClick={() => updateVideoSection.mutate({ sectionType: "video", title: videoSectionEdit.title, subtitle: videoSectionEdit.subtitle })}>
+              Save Heading
+            </button>
+          </div>
+        </div>
+
+        {/* Video cards list */}
+        <div style={{ fontFamily: "Lato, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: "#888", textTransform: "uppercase", marginBottom: 10 }}>
+          Video Cards
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
+          {videoStories.length === 0 && (
+            <div style={{ color: "#aaa", fontFamily: "Lato, sans-serif", fontSize: 13, padding: "20px 0", textAlign: "center" }}>
+              No video cards yet. Add one below.
+            </div>
+          )}
+          {videoStories.map(s => (
+            <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", border: "1px solid #f0f0f0", borderRadius: 6, background: "#fafafa" }}>
+              {s.videoId && (
+                <img
+                  src={`https://img.youtube.com/vi/${s.videoId}/mqdefault.jpg`}
+                  alt={s.name}
+                  style={{ width: 80, height: 50, objectFit: "cover", borderRadius: 4, flexShrink: 0 }}
+                />
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 600, color: "#1a1a1a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.name}</div>
@@ -300,13 +492,13 @@ export default function AdminHomepage() {
                 <span style={{ fontSize: 11, color: s.isVisible ? "#F5569B" : "#aaa", fontFamily: "Lato, sans-serif", fontWeight: 600 }}>
                   {s.isVisible ? "Visible" : "Hidden"}
                 </span>
-                <button style={btnSecondary} onClick={() => setStoryModal({ id: s.id, title: s.name, youtubeId: s.videoId ?? "", thumbnailUrl: s.image ?? "", isVisible: s.isVisible ?? true, sortOrder: s.sortOrder ?? 0 })}>Edit</button>
-                <button style={btnDanger} onClick={() => { if (confirm("Delete this story?")) deleteStory.mutate({ id: s.id }); }}>Delete</button>
+                <button style={btnSecondary} onClick={() => setVideoStoryModal({ id: s.id, title: s.name, youtubeId: s.videoId ?? "", thumbnailUrl: s.image ?? "", isVisible: s.isVisible ?? true, sortOrder: s.sortOrder ?? 0 })}>Edit</button>
+                <button style={btnDanger} onClick={() => { if (confirm("Delete this video card?")) deleteVideoStory.mutate({ id: s.id }); }}>Delete</button>
               </div>
             </div>
           ))}
         </div>
-        <button style={btnPrimary} onClick={() => setStoryModal(emptyStory)}>+ Add Story</button>
+        <button style={btnPrimary} onClick={() => setVideoStoryModal(emptyVideoStory)}>+ Add Video Card</button>
       </div>
 
       {/* ── Sponsors ────────────────────────────────────────────────────────── */}
@@ -333,8 +525,11 @@ export default function AdminHomepage() {
       </div>
 
       {/* ── Modals ────────────────────────────────────────────────────────────── */}
-      {storyModal !== null && (
-        <StoryModal initial={storyModal} onSave={handleStorySave} onClose={() => setStoryModal(null)} />
+      {imageStoryModal !== null && (
+        <ImageStoryModal initial={imageStoryModal} onSave={handleImageStorySave} onClose={() => setImageStoryModal(null)} />
+      )}
+      {videoStoryModal !== null && (
+        <VideoStoryModal initial={videoStoryModal} onSave={handleVideoStorySave} onClose={() => setVideoStoryModal(null)} />
       )}
       {sponsorModal !== null && (
         <SponsorModal initial={sponsorModal} onSave={handleSponsorSave} onClose={() => setSponsorModal(null)} />

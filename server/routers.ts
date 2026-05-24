@@ -41,8 +41,9 @@ import {
   getRecommendedExperiences,
   getHomepageHero, upsertHomepageHero,
   getHomepageIntro, upsertHomepageIntro,
-  listHomepageStories, createHomepageStory, updateHomepageStory, deleteHomepageStory,
+  listHomepageStories, listHomepageStoriesByType, createHomepageStory, updateHomepageStory, deleteHomepageStory,
   listHomepageSponsors, createHomepageSponsor, updateHomepageSponsor, deleteHomepageSponsor,
+  getHomepageStorySection, upsertHomepageStorySection,
 } from "./db-cms";
 
 const ADMIN_COOKIE = "admin_session";
@@ -1219,28 +1220,38 @@ export const appRouter = router({
   homepage: router({
     // Public: get all homepage data for frontend rendering
     getAll: publicProcedure.query(async () => {
-      const [hero, intro, stories, sponsors] = await Promise.all([
+      const [hero, intro, stories, sponsors, imageSection, videoSection] = await Promise.all([
         getHomepageHero(),
         getHomepageIntro(),
         listHomepageStories(),
         listHomepageSponsors(),
+        getHomepageStorySection("image"),
+        getHomepageStorySection("video"),
       ]);
-      return { hero, intro, stories, sponsors };
+      return { hero, intro, stories, sponsors, imageSection, videoSection };
     }),
 
     // Public: Homepage data for frontend
     getPublicData: publicProcedure.query(async () => {
-      const [hero, intro, stories, sponsors] = await Promise.all([
+      const [hero, intro, allStories, sponsors, imageSection, videoSection] = await Promise.all([
         getHomepageHero(),
         getHomepageIntro(),
         listHomepageStories(),
         listHomepageSponsors(),
+        getHomepageStorySection("image"),
+        getHomepageStorySection("video"),
       ]);
+      const visibleStories = allStories.filter(s => s.isVisible);
       return {
         hero,
         intro,
-        stories: stories.filter(s => s.isVisible),
+        imageStories: visibleStories.filter(s => s.type === "image"),
+        videoStories: visibleStories.filter(s => s.type === "video"),
+        // legacy: keep stories for backward compat
+        stories: visibleStories,
         sponsors: sponsors.filter(s => s.isVisible),
+        imageSection,
+        videoSection,
       };
     }),
 
@@ -1282,9 +1293,16 @@ export const appRouter = router({
       await requireAdmin(ctx);
       return listHomepageStories();
     }),
+    listStoriesByType: publicProcedure
+      .input(z.object({ type: z.enum(["image", "video"]) }))
+      .query(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        return listHomepageStoriesByType(input.type);
+      }),
     createStory: publicProcedure
       .input(z.object({
         title: z.string().min(1),
+        type: z.enum(["image", "video"]).default("video"),
         youtubeId: z.string().optional(),
         thumbnailUrl: z.string().optional(),
         isVisible: z.boolean().default(true),
@@ -1292,12 +1310,13 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);
-        return createHomepageStory({ name: input.title, videoId: input.youtubeId, image: input.thumbnailUrl, isVisible: input.isVisible, sortOrder: input.sortOrder });
+        return createHomepageStory({ name: input.title, type: input.type, videoId: input.youtubeId, image: input.thumbnailUrl, isVisible: input.isVisible, sortOrder: input.sortOrder });
       }),
     updateStory: publicProcedure
       .input(z.object({
         id: z.number(),
         title: z.string().optional(),
+        type: z.enum(["image", "video"]).optional(),
         youtubeId: z.string().optional(),
         thumbnailUrl: z.string().optional(),
         isVisible: z.boolean().optional(),
@@ -1318,6 +1337,26 @@ export const appRouter = router({
         await requireAdmin(ctx);
         await deleteHomepageStory(input.id);
         return { success: true };
+      }),
+
+    // Admin: Story Sections (板块标题/简述)
+    getStorySection: publicProcedure
+      .input(z.object({ sectionType: z.enum(["image", "video"]) }))
+      .query(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        return getHomepageStorySection(input.sectionType);
+      }),
+    updateStorySection: publicProcedure
+      .input(z.object({
+        sectionType: z.enum(["image", "video"]),
+        title: z.string().optional(),
+        subtitle: z.string().optional(),
+        isVisible: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        const { sectionType, ...data } = input;
+        return upsertHomepageStorySection(sectionType, data);
       }),
 
     // Admin: Sponsors

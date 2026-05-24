@@ -10,7 +10,34 @@ interface CarouselItem {
   videoId?: string;
 }
 
-const fallbackCarouselData: CarouselItem[] = [
+const fallbackImageItems: CarouselItem[] = [
+  {
+    id: 1,
+    name: 'GUILIN',
+    description: 'Misty karst mountains and serene rivers.',
+    image: 'https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/aGetsU6WzDik5Fd30KgLRf-img-1_1770122853000_na1fn_Z3VpbGluLWJlbG92ZWQ.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600'
+  },
+  {
+    id: 2,
+    name: 'ZHANGJIAJIE',
+    description: 'Towering stone pillars pierce the clouds.',
+    image: 'https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/aGetsU6WzDik5Fd30KgLRf-img-2_1770122861000_na1fn_emhhbmdqaWFqaWUtYmVsb3ZlZA.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600'
+  },
+  {
+    id: 3,
+    name: 'YUNNAN',
+    description: 'Terraced rice fields cascade down mountainsides.',
+    image: 'https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/aGetsU6WzDik5Fd30KgLRf-img-3_1770122854000_na1fn_eXVubmFuLWJlbG92ZWQ.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600'
+  },
+  {
+    id: 4,
+    name: 'TIBET',
+    description: 'Stand at the roof of the world.',
+    image: 'https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/aGetsU6WzDik5Fd30KgLRf-img-4_1770122859000_na1fn_dGliZXQtYmVsb3ZlZA.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600'
+  }
+];
+
+const fallbackVideoItems: CarouselItem[] = [
   {
     id: 1,
     name: 'GUILIN',
@@ -41,11 +68,17 @@ const fallbackCarouselData: CarouselItem[] = [
   }
 ];
 
-// ── Reusable Stories carousel strip ──────────────────────────────────────────
-function StoriesStrip({ onPlayVideo, didDragRef, items }: {
-  onPlayVideo: (videoId: string) => void;
+// ── Shared drag/scroll logic ──────────────────────────────────────────────────
+function StoriesStrip({
+  onPlayVideo,
+  didDragRef,
+  items,
+  showPlayButton = true,
+}: {
+  onPlayVideo?: (videoId: string) => void;
   didDragRef: React.MutableRefObject<boolean>;
   items: CarouselItem[];
+  showPlayButton?: boolean;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
@@ -168,7 +201,7 @@ function StoriesStrip({ onPlayVideo, didDragRef, items }: {
             className="relative group overflow-hidden flex-shrink-0"
             style={{ width: '600px', aspectRatio: '16/9', userSelect: 'none' }}
           >
-            {item.videoId ? (
+            {showPlayButton && item.videoId ? (
               <>
                 <img
                   src={`https://img.youtube.com/vi/${item.videoId}/maxresdefault.jpg`}
@@ -185,7 +218,7 @@ function StoriesStrip({ onPlayVideo, didDragRef, items }: {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <button
                     onClick={() => {
-                      if (!localDragRef.current && item.videoId) onPlayVideo(item.videoId);
+                      if (!localDragRef.current && item.videoId && onPlayVideo) onPlayVideo(item.videoId);
                     }}
                     className="w-16 h-16 rounded-full bg-[#F5F3EF]/90 group-hover:bg-[#F5F3EF] transition-all duration-300 flex items-center justify-center cursor-pointer hover:scale-110"
                   >
@@ -196,11 +229,17 @@ function StoriesStrip({ onPlayVideo, didDragRef, items }: {
                 </div>
               </>
             ) : (
+              /* Image-only card: no overlay, no play button */
               <img
-                src={item.image}
+                src={item.videoId
+                  ? `https://img.youtube.com/vi/${item.videoId}/maxresdefault.jpg`
+                  : item.image}
                 alt={item.name}
                 className="w-full h-full object-cover select-none"
                 draggable={false}
+                onError={item.videoId ? (e) => {
+                  (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg`;
+                } : undefined}
               />
             )}
           </div>
@@ -210,21 +249,64 @@ function StoriesStrip({ onPlayVideo, didDragRef, items }: {
   );
 }
 
+// ── Section header ────────────────────────────────────────────────────────────
+function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="w-full flex flex-col justify-start flex-shrink-0 select-none" style={{ backgroundColor: '#ffffff', paddingLeft: '24px', paddingRight: '24px' }}>
+      <h2
+        className="text-left text-black"
+        style={{
+          fontFamily: "'Barlow Condensed', 'Arial Narrow', 'Impact', sans-serif",
+          fontWeight: '700',
+          fontSize: '35px',
+          letterSpacing: '0.04em',
+          lineHeight: 1,
+          textTransform: 'uppercase',
+          marginBottom: '12px',
+        }}
+      >
+        {title}
+      </h2>
+      <p className="text-sm leading-relaxed mb-10 text-gray-700 font-light" style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif' }}>
+        {subtitle}
+      </p>
+    </div>
+  );
+}
+
 export default function CarouselSection() {
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
-  const didDragRef = useRef(false);
+  const didDragRefImage = useRef(false);
+  const didDragRefVideo = useRef(false);
   const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
 
-  // 将 DB stories 转换为 CarouselItem 格式，若无 DB 数据则使用 fallback
-  const carouselItems: CarouselItem[] = (homepageData?.stories && homepageData.stories.length > 0)
-    ? homepageData.stories.map(s => ({
+  // Image section items
+  const imageItems: CarouselItem[] = (homepageData?.imageStories && homepageData.imageStories.length > 0)
+    ? homepageData.imageStories.map(s => ({
+        id: s.id,
+        name: s.name,
+        description: '',
+        image: s.image || '',
+        videoId: undefined,
+      }))
+    : fallbackImageItems;
+
+  // Video section items
+  const videoItems: CarouselItem[] = (homepageData?.videoStories && homepageData.videoStories.length > 0)
+    ? homepageData.videoStories.map(s => ({
         id: s.id,
         name: s.name,
         description: '',
         image: s.image || '',
         videoId: s.videoId || undefined,
       }))
-    : fallbackCarouselData;
+    : fallbackVideoItems;
+
+  // Section titles/subtitles from DB, fallback to defaults
+  const imageSectionTitle = homepageData?.imageSection?.title ?? 'Stories From the Road';
+  const imageSectionSubtitle = homepageData?.imageSection?.subtitle ?? 'Real stories. Meaningful journeys.';
+  const videoSectionTitle = homepageData?.videoSection?.title ?? 'Stories From the Road';
+  const videoSectionSubtitle = homepageData?.videoSection?.subtitle ?? 'Real stories. Meaningful journeys.';
 
   useEffect(() => {
     if (selectedVideoId) {
@@ -237,72 +319,35 @@ export default function CarouselSection() {
 
   return (
     <>
-      {/* ── First Stories section ── */}
-      <section style={{backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '0'}}>
+      {/* ── Section 1: Image Stories (no play button) ── */}
+      <section style={{ backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '0' }}>
         <div className="flex flex-col h-auto w-full">
-          {/* Header */}
-          <div className="w-full flex flex-col justify-start flex-shrink-0 select-none" style={{backgroundColor: '#ffffff', paddingLeft: '24px', paddingRight: '24px'}}>
-            <h2
-              className="text-left text-black"
-              style={{
-                fontFamily: "'Barlow Condensed', 'Arial Narrow', 'Impact', sans-serif",
-                fontWeight: '700',
-                fontSize: '35px',
-                letterSpacing: '0.04em',
-                lineHeight: 1,
-                textTransform: 'uppercase',
-                marginBottom: '12px',
-              }}
-            >
-              Stories From the Road
-            </h2>
-            <p className="text-sm leading-relaxed mb-10 text-gray-700 font-light" style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif' }}>
-              Real stories. Meaningful journeys.
-            </p>
-          </div>
-
-          {/* Scroll track */}
-          <StoriesStrip onPlayVideo={setSelectedVideoId} didDragRef={didDragRef} items={carouselItems} />
+          <SectionHeader title={imageSectionTitle} subtitle={imageSectionSubtitle} />
+          <StoriesStrip
+            didDragRef={didDragRefImage}
+            items={imageItems}
+            showPlayButton={false}
+          />
         </div>
-
-        {/* View our channel button */}
-        <div className="w-full flex justify-center" style={{backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '64px'}}>
+        <div className="w-full flex justify-center" style={{ backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '64px' }}>
           <button className="px-8 py-3 bg-black text-white text-sm font-normal tracking-wider uppercase rounded border-2 border-black hover:bg-white hover:text-black transition-all duration-300 active:scale-95 active:shadow-lg">
-            View our channel
+            View Gallery
           </button>
         </div>
       </section>
 
-      {/* ── Second Stories section (identical) ── */}
-      <section style={{backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '0'}}>
+      {/* ── Section 2: Video Stories (with play button) ── */}
+      <section style={{ backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '0' }}>
         <div className="flex flex-col h-auto w-full">
-          {/* Header */}
-          <div className="w-full flex flex-col justify-start flex-shrink-0 select-none" style={{backgroundColor: '#ffffff', paddingLeft: '24px', paddingRight: '24px'}}>
-            <h2
-              className="text-left text-black"
-              style={{
-                fontFamily: "'Barlow Condensed', 'Arial Narrow', 'Impact', sans-serif",
-                fontWeight: '700',
-                fontSize: '35px',
-                letterSpacing: '0.04em',
-                lineHeight: 1,
-                textTransform: 'uppercase',
-                marginBottom: '12px',
-              }}
-            >
-              Stories From the Road
-            </h2>
-            <p className="text-sm leading-relaxed mb-10 text-gray-700 font-light" style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif' }}>
-              Real stories. Meaningful journeys.
-            </p>
-          </div>
-
-          {/* Scroll track */}
-          <StoriesStrip onPlayVideo={setSelectedVideoId} didDragRef={didDragRef} items={carouselItems} />
+          <SectionHeader title={videoSectionTitle} subtitle={videoSectionSubtitle} />
+          <StoriesStrip
+            onPlayVideo={setSelectedVideoId}
+            didDragRef={didDragRefVideo}
+            items={videoItems}
+            showPlayButton={true}
+          />
         </div>
-
-        {/* View our channel button */}
-        <div className="w-full flex justify-center" style={{backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '64px'}}>
+        <div className="w-full flex justify-center" style={{ backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '64px' }}>
           <button className="px-8 py-3 bg-black text-white text-sm font-normal tracking-wider uppercase rounded border-2 border-black hover:bg-white hover:text-black transition-all duration-300 active:scale-95 active:shadow-lg">
             View our channel
           </button>
