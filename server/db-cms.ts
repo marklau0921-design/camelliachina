@@ -4,10 +4,13 @@ import {
   cities, tags, experiences, experienceTags, experienceTypes, experienceDetails, experienceLabels,
   teamMembers, itineraries, itineraryTags, stories, storyTags,
   videos, videoTags, images, cityExperiences, cityWhatToSee,
+  homepageHero, homepageIntro, homepageStories, homepageSponsors,
   type InsertCity, type InsertTag, type InsertExperience, type InsertExperienceType,
   type InsertExperienceDetail, type InsertTeamMember,
   type InsertItinerary, type InsertStory, type InsertVideo, type InsertImage,
   type InsertCityExperience, type InsertCityWhatToSee,
+  type HomepageHero, type HomepageIntro, type HomepageStory, type HomepageSponsor,
+  type InsertHomepageStory, type InsertHomepageSponsor,
 } from "../drizzle/schema";
 
 // ─── Slug helper ─────────────────────────────────────────────────────────────
@@ -690,4 +693,105 @@ export async function deleteImageRecord(id: number) {
   const rows = await db.select().from(images).where(eq(images.id, id)).limit(1);
   await db.delete(images).where(eq(images.id, id));
   return rows[0] ?? null;
+}
+
+// ─── Homepage Management ──────────────────────────────────────────────────────
+
+// Hero
+export async function getHomepageHero() {
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db.select().from(homepageHero).limit(1);
+  return rows[0] ?? null;
+}
+export async function upsertHomepageHero(data: Partial<HomepageHero>) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  const existing = await db.select().from(homepageHero).limit(1);
+  if (existing.length === 0) {
+    await db.insert(homepageHero).values({
+      isVisible: data.isVisible ?? true,
+      backgroundImage: data.backgroundImage ?? null,
+      title: data.title ?? "THE LUXURY TRAVEL EXPERTS",
+      subtitle: data.subtitle ?? "TAILOR-MADE TRIPS, AWARD WINNING SERVICE. EST. 2005.",
+    });
+  } else {
+    await db.update(homepageHero).set(data).where(eq(homepageHero.id, existing[0].id));
+  }
+  const rows = await db.select().from(homepageHero).limit(1);
+  return rows[0];
+}
+
+// Intro
+export async function getHomepageIntro() {
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db.select().from(homepageIntro).limit(1);
+  return rows[0] ?? null;
+}
+export async function upsertHomepageIntro(data: Partial<HomepageIntro>) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  const existing = await db.select().from(homepageIntro).limit(1);
+  if (existing.length === 0) {
+    await db.insert(homepageIntro).values({
+      isVisible: data.isVisible ?? true,
+      title: data.title ?? "THE LUXURY TRAVEL EXPERTS",
+      content: data.content ?? "",
+    });
+  } else {
+    await db.update(homepageIntro).set(data).where(eq(homepageIntro.id, existing[0].id));
+  }
+  const rows = await db.select().from(homepageIntro).limit(1);
+  return rows[0];
+}
+
+// Stories
+export async function listHomepageStories() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(homepageStories).orderBy(homepageStories.sortOrder);
+}
+export async function createHomepageStory(data: InsertHomepageStory) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  const [result] = await db.insert(homepageStories).values(data);
+  return { id: (result as any).insertId };
+}
+export async function updateHomepageStory(id: number, data: Partial<HomepageStory>) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.update(homepageStories).set(data).where(eq(homepageStories.id, id));
+  const rows = await db.select().from(homepageStories).where(eq(homepageStories.id, id)).limit(1);
+  return rows[0] ?? null;
+}
+export async function deleteHomepageStory(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.delete(homepageStories).where(eq(homepageStories.id, id));
+}
+
+// Sponsors
+export async function listHomepageSponsors() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(homepageSponsors).orderBy(homepageSponsors.sortOrder);
+}
+export async function createHomepageSponsor(data: InsertHomepageSponsor) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  const [result] = await db.insert(homepageSponsors).values(data);
+  return { id: (result as any).insertId };
+}
+export async function updateHomepageSponsor(id: number, data: Partial<HomepageSponsor>) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.update(homepageSponsors).set(data).where(eq(homepageSponsors.id, id));
+  const rows = await db.select().from(homepageSponsors).where(eq(homepageSponsors.id, id)).limit(1);
+  return rows[0] ?? null;
+}
+export async function deleteHomepageSponsor(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.delete(homepageSponsors).where(eq(homepageSponsors.id, id));
 }

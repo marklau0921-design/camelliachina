@@ -318,3 +318,56 @@ export const mediaAssets = mysqlTable("media_assets", {
 
 export type MediaAsset = typeof mediaAssets.$inferSelect;
 export type InsertMediaAsset = typeof mediaAssets.$inferInsert;
+
+// ─── Homepage Management ──────────────────────────────────────────────────────
+
+// Hero Banner 设置（单行配置）
+export const homepageHero = mysqlTable("homepage_hero", {
+  id: int("id").autoincrement().primaryKey(),
+  isVisible: boolean("isVisible").default(true).notNull(),
+  backgroundImage: varchar("backgroundImage", { length: 512 }),
+  title: varchar("title", { length: 300 }).notNull().default("THE LUXURY TRAVEL EXPERTS"),
+  subtitle: varchar("subtitle", { length: 500 }).notNull().default("TAILOR-MADE TRIPS, AWARD WINNING SERVICE. EST. 2005."),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type HomepageHero = typeof homepageHero.$inferSelect;
+export type InsertHomepageHero = typeof homepageHero.$inferInsert;
+
+// 简介板块设置（单行配置）
+export const homepageIntro = mysqlTable("homepage_intro", {
+  id: int("id").autoincrement().primaryKey(),
+  isVisible: boolean("isVisible").default(true).notNull(),
+  title: varchar("title", { length: 300 }).notNull().default("THE LUXURY TRAVEL EXPERTS"),
+  content: text("content").notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type HomepageIntro = typeof homepageIntro.$inferSelect;
+export type InsertHomepageIntro = typeof homepageIntro.$inferInsert;
+
+// Stories 卡片（多行，可排序）
+export const homepageStories = mysqlTable("homepage_stories", {
+  id: int("id").autoincrement().primaryKey(),
+  isVisible: boolean("isVisible").default(true).notNull(),
+  name: varchar("name", { length: 200 }).notNull(),
+  videoId: varchar("videoId", { length: 50 }),
+  image: varchar("image", { length: 512 }),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type HomepageStory = typeof homepageStories.$inferSelect;
+export type InsertHomepageStory = typeof homepageStories.$inferInsert;
+
+// 赞助商 Logo（多行，可排序）
+export const homepageSponsors = mysqlTable("homepage_sponsors", {
+  id: int("id").autoincrement().primaryKey(),
+  isVisible: boolean("isVisible").default(true).notNull(),
+  name: varchar("name", { length: 200 }).notNull(),
+  logo: varchar("logo", { length: 512 }).notNull(),
+  url: varchar("url", { length: 512 }),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type HomepageSponsor = typeof homepageSponsors.$inferSelect;
+export type InsertHomepageSponsor = typeof homepageSponsors.$inferInsert;

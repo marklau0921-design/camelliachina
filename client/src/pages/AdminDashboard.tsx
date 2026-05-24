@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import AdminLayout from "@/components/AdminLayout";
-import { MapPin, Compass, Map, BookOpen, Video, Tag, Mail, ArrowRight } from "lucide-react";
+import { MapPin, Compass, Map, BookOpen, Video, Tag, Mail, ArrowRight, Home } from "lucide-react";
 
 const ACCENT = "#F5569B";
 
@@ -74,6 +74,7 @@ export default function AdminDashboard() {
           <StatCard icon={BookOpen}label="Stories"     count={stories.length}     path="/admin/stories"     color="#c96e9e" />
           <StatCard icon={Video}   label="Videos"      count={videos.length}      path="/admin/videos"      color="#9e6ec9" />
           <StatCard icon={Tag}     label="Tags"        count={tags.length}        path="/admin/tags"        color="#c9896e" />
+          <StatCard icon={Home}    label="Homepage"    count={undefined}          path="/admin/homepage"    color="#F5569B" />
         </div>
 
         {/* Recent enquiries */}

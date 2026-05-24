@@ -39,6 +39,10 @@ import {
   listVideos, getVideoById, getVideoTagIds, createVideo, updateVideo, deleteVideo,
   listImages, createImageRecord, deleteImageRecord,
   getRecommendedExperiences,
+  getHomepageHero, upsertHomepageHero,
+  getHomepageIntro, upsertHomepageIntro,
+  listHomepageStories, createHomepageStory, updateHomepageStory, deleteHomepageStory,
+  listHomepageSponsors, createHomepageSponsor, updateHomepageSponsor, deleteHomepageSponsor,
 } from "./db-cms";
 
 const ADMIN_COOKIE = "admin_session";
@@ -1209,6 +1213,138 @@ export const appRouter = router({
       if (!db) return [];
       return db.select().from(enquiries).orderBy(desc(enquiries.createdAt));
     }),
+  }),
+
+  // ─── Homepage Management ──────────────────────────────────────────────────
+  homepage: router({
+    // Public: get all homepage data for frontend rendering
+    getAll: publicProcedure.query(async () => {
+      const [hero, intro, stories, sponsors] = await Promise.all([
+        getHomepageHero(),
+        getHomepageIntro(),
+        listHomepageStories(),
+        listHomepageSponsors(),
+      ]);
+      return { hero, intro, stories, sponsors };
+    }),
+
+    // Admin: Hero
+    getHero: publicProcedure.query(async ({ ctx }) => {
+      await requireAdmin(ctx);
+      return getHomepageHero();
+    }),
+    updateHero: publicProcedure
+      .input(z.object({
+        isVisible: z.boolean().optional(),
+        backgroundImage: z.string().optional().nullable(),
+        title: z.string().optional(),
+        subtitle: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        return upsertHomepageHero(input);
+      }),
+
+    // Admin: Intro
+    getIntro: publicProcedure.query(async ({ ctx }) => {
+      await requireAdmin(ctx);
+      return getHomepageIntro();
+    }),
+    updateIntro: publicProcedure
+      .input(z.object({
+        isVisible: z.boolean().optional(),
+        title: z.string().optional(),
+        content: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        return upsertHomepageIntro(input);
+      }),
+
+    // Admin: Stories
+    listStories: publicProcedure.query(async ({ ctx }) => {
+      await requireAdmin(ctx);
+      return listHomepageStories();
+    }),
+    createStory: publicProcedure
+      .input(z.object({
+        title: z.string().min(1),
+        youtubeId: z.string().optional(),
+        thumbnailUrl: z.string().optional(),
+        isVisible: z.boolean().default(true),
+        sortOrder: z.number().default(0),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        return createHomepageStory({ name: input.title, videoId: input.youtubeId, image: input.thumbnailUrl, isVisible: input.isVisible, sortOrder: input.sortOrder });
+      }),
+    updateStory: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().optional(),
+        youtubeId: z.string().optional(),
+        thumbnailUrl: z.string().optional(),
+        isVisible: z.boolean().optional(),
+        sortOrder: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        const { id, title, youtubeId, thumbnailUrl, ...rest } = input;
+        const data: Record<string, any> = { ...rest };
+        if (title !== undefined) data.name = title;
+        if (youtubeId !== undefined) data.videoId = youtubeId;
+        if (thumbnailUrl !== undefined) data.image = thumbnailUrl;
+        return updateHomepageStory(id, data);
+      }),
+    deleteStory: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        await deleteHomepageStory(input.id);
+        return { success: true };
+      }),
+
+    // Admin: Sponsors
+    listSponsors: publicProcedure.query(async ({ ctx }) => {
+      await requireAdmin(ctx);
+      return listHomepageSponsors();
+    }),
+    createSponsor: publicProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        logoUrl: z.string().min(1),
+        websiteUrl: z.string().optional(),
+        isVisible: z.boolean().default(true),
+        sortOrder: z.number().default(0),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        return createHomepageSponsor({ name: input.name, logo: input.logoUrl, url: input.websiteUrl, isVisible: input.isVisible, sortOrder: input.sortOrder });
+      }),
+    updateSponsor: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        logoUrl: z.string().optional(),
+        websiteUrl: z.string().optional(),
+        isVisible: z.boolean().optional(),
+        sortOrder: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        const { id, logoUrl, websiteUrl, ...rest } = input;
+        const data: Record<string, any> = { ...rest };
+        if (logoUrl !== undefined) data.logo = logoUrl;
+        if (websiteUrl !== undefined) data.url = websiteUrl;
+        return updateHomepageSponsor(id, data);
+      }),
+    deleteSponsor: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        await deleteHomepageSponsor(input.id);
+        return { success: true };
+      }),
   }),
 });
 
