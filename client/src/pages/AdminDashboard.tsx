@@ -234,8 +234,7 @@ export default function AdminDashboard() {
   function handleConfirm() {
     setShowConfirm(false);
     setGenerating(true);
-    const adminToken = localStorage.getItem("admin_token") || "";
-    generateMutation.mutate({ adminToken });
+    generateMutation.mutate();
   }
 
   return (

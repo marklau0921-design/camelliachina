@@ -9,7 +9,6 @@ import { getDb } from "./db";
 import { enquiries, cityExperiences, experiences } from "../drizzle/schema";
 import { desc, eq, notInArray } from "drizzle-orm";
 import { ENV } from "./_core/env";
-import { SignJWT, jwtVerify } from "jose";
 import { parse as parseCookies } from "cookie";
 import fs from "fs";
 import path from "path";
@@ -49,43 +48,38 @@ import {
   listWhyUsSections, createWhyUsSection, updateWhyUsSection, deleteWhyUsSection,
 } from "./db-cms";
 
-const ADMIN_COOKIE = "admin_session";
+// ── Admin session store (in-memory, no persistence) ──────────────────────────
+// Sessions expire after 4 hours. Server restart clears all sessions automatically.
+// No JWT, no localStorage — pure server-side session cookie only.
+const ADMIN_COOKIE = "admin_sid";
+const SESSION_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
+const adminSessions = new Map<string, number>(); // sessionId -> expiresAt
 
-function getAdminCookie(req: { headers: { cookie?: string } }): string | undefined {
+function createAdminSession(): string {
+  const sessionId = nanoid(48);
+  adminSessions.set(sessionId, Date.now() + SESSION_TTL_MS);
+  return sessionId;
+}
+
+function isValidAdminSession(sessionId: string | undefined): boolean {
+  if (!sessionId) return false;
+  const expiresAt = adminSessions.get(sessionId);
+  if (!expiresAt) return false;
+  if (Date.now() > expiresAt) {
+    adminSessions.delete(sessionId);
+    return false;
+  }
+  return true;
+}
+
+function getAdminSessionId(req: { headers: { cookie?: string } }): string | undefined {
   const cookies = parseCookies(req.headers.cookie || "");
   return cookies[ADMIN_COOKIE];
 }
 
-function getAdminTokenFromHeader(headers: Record<string, string | string[] | undefined>): string | undefined {
-  const auth = headers["x-admin-token"];
-  if (!auth) return undefined;
-  return Array.isArray(auth) ? auth[0] : auth;
-}
-
-async function signAdminToken() {
-  const secret = new TextEncoder().encode(ENV.cookieSecret || "admin-secret");
-  return new SignJWT({ role: "admin" })
-    .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime("7d")
-    .sign(secret);
-}
-
-async function verifyAdminToken(token: string) {
-  try {
-    const secret = new TextEncoder().encode(ENV.cookieSecret || "admin-secret");
-    await jwtVerify(token, secret);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-async function requireAdmin(ctx: { req: { headers: Record<string, string | string[] | undefined> } }) {
-  // Support both cookie (legacy) and x-admin-token header (localStorage-based)
-  const tokenFromHeader = getAdminTokenFromHeader(ctx.req.headers);
-  const tokenFromCookie = getAdminCookie(ctx.req as any);
-  const token = tokenFromHeader || tokenFromCookie;
-  if (!token || !(await verifyAdminToken(token))) {
+function requireAdmin(ctx: { req: { headers: Record<string, string | string[] | undefined> } }) {
+  const sessionId = getAdminSessionId(ctx.req as any);
+  if (!isValidAdminSession(sessionId)) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 }
@@ -232,33 +226,32 @@ export const appRouter = router({
 
   // ─── Admin auth ──────────────────────────────────────────────────────────
   admin: router({
-    check: publicProcedure.query(async ({ ctx }) => {
-      const tokenFromHeader = getAdminTokenFromHeader(ctx.req.headers as Record<string, string | string[] | undefined>);
-      const tokenFromCookie = getAdminCookie(ctx.req as any);
-      const token = tokenFromHeader || tokenFromCookie;
-      if (!token) return { authenticated: false };
-      const valid = await verifyAdminToken(token);
-      return { authenticated: valid };
+    check: publicProcedure.query(({ ctx }) => {
+      const sessionId = getAdminSessionId(ctx.req as any);
+      return { authenticated: isValidAdminSession(sessionId) };
     }),
 
     login: publicProcedure
       .input(z.object({ password: z.string() }))
-      .mutation(async ({ ctx, input }) => {
+      .mutation(({ ctx, input }) => {
         const correctPassword = ENV.adminPassword;
         if (!correctPassword || input.password !== correctPassword) {
           throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid password" });
         }
-        const token = await signAdminToken();
-        // Also set cookie as fallback
-        try {
-          const cookieOpts = getSessionCookieOptions(ctx.req);
-          ctx.res.cookie(ADMIN_COOKIE, token, { ...cookieOpts, maxAge: 7 * 24 * 60 * 60 * 1000 });
-        } catch { /* ignore cookie errors */ }
-        // Return token so frontend can store in localStorage
-        return { success: true, token };
+        // Create in-memory session (no JWT, no localStorage)
+        const sessionId = createAdminSession();
+        const cookieOpts = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(ADMIN_COOKIE, sessionId, {
+          ...cookieOpts,
+          httpOnly: true,
+          maxAge: SESSION_TTL_MS,
+        });
+        return { success: true };
       }),
 
     logout: publicProcedure.mutation(({ ctx }) => {
+      const sessionId = getAdminSessionId(ctx.req as any);
+      if (sessionId) adminSessions.delete(sessionId);
       const cookieOpts = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(ADMIN_COOKIE, { ...cookieOpts, maxAge: -1 });
       return { success: true };
@@ -873,10 +866,8 @@ export const appRouter = router({
   // ─── Static page generation ─────────────────────────────────────────────
   staticGen: router({
     generate: publicProcedure
-      .input(z.object({ adminToken: z.string() }))
-      .mutation(async ({ ctx, input }) => {
-        const valid = await verifyAdminToken(input.adminToken);
-        if (!valid) throw new TRPCError({ code: "UNAUTHORIZED", message: "Admin access required" });
+      .mutation(async ({ ctx }) => {
+        requireAdmin(ctx);
         const protocol = (ctx.req.headers["x-forwarded-proto"] as string) || "http";
         const host = (ctx.req.headers["x-forwarded-host"] as string) || (ctx.req.headers["host"] as string) || "localhost:3000";
         const baseUrl = `${protocol}://${host}`;
@@ -887,28 +878,22 @@ export const appRouter = router({
       }),
 
     generateNavOnly: publicProcedure
-      .input(z.object({ adminToken: z.string() }))
-      .mutation(async ({ ctx, input }) => {
-        const valid = await verifyAdminToken(input.adminToken);
-        if (!valid) throw new TRPCError({ code: "UNAUTHORIZED", message: "Admin access required" });
+      .mutation(async ({ ctx }) => {
+        requireAdmin(ctx);
         const success = await generateNavData();
         return { success };
       }),
 
     clearCache: publicProcedure
-      .input(z.object({ adminToken: z.string() }))
-      .mutation(async ({ ctx, input }) => {
-        const valid = await verifyAdminToken(input.adminToken);
-        if (!valid) throw new TRPCError({ code: "UNAUTHORIZED", message: "Admin access required" });
+      .mutation(async ({ ctx }) => {
+        requireAdmin(ctx);
         clearStaticCache();
         return { success: true };
       }),
 
     status: publicProcedure
-      .input(z.object({ adminToken: z.string() }))
-      .query(async ({ ctx, input }) => {
-        const valid = await verifyAdminToken(input.adminToken);
-        if (!valid) throw new TRPCError({ code: "UNAUTHORIZED", message: "Admin access required" });
+      .query(async ({ ctx }) => {
+        requireAdmin(ctx);
         const navDataPath = path.join(STATIC_CACHE_DIR, "nav-data.json");
         let lastGenerated: string | null = null;
         let pageCount = 0;

@@ -32,12 +32,9 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const passwordRef = useRef<HTMLInputElement>(null);
-
   const loginMutation = trpc.admin.login.useMutation({
-    onSuccess: (data) => {
-      if (data.token) {
-        localStorage.setItem("admin_token", data.token);
-      }
+    onSuccess: () => {
+      // Session is stored in httpOnly cookie only — no localStorage
       onSuccess();
     },
     onError: (err) => {
@@ -226,11 +223,16 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { data: authData, isLoading: authLoading, isError: authError } = trpc.admin.check.useQuery(
     undefined,
-    { retry: false, refetchOnWindowFocus: false }
+    {
+      retry: false,
+      refetchOnWindowFocus: true,   // Re-check when user returns to tab
+      staleTime: 0,                  // Always consider data stale
+      gcTime: 0,                     // Never cache
+    }
   );
   const logout = trpc.admin.logout.useMutation({
     onSuccess: () => {
-      localStorage.removeItem("admin_token");
+      // Cookie is cleared by server; just redirect to login
       window.location.href = "/admin";
     },
   });
