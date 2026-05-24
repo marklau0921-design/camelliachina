@@ -992,7 +992,7 @@ export default function YunnanDetail() {
             </div>
 
             {/* Right: section header + cards */}
-            <div style={{ flex: 1, minWidth: 0, maxWidth: '934px' }}>
+            <div style={{ flex: 1, minWidth: 0, maxWidth: '964px' }}>
               {/* Section header */}
               <div style={{ paddingRight: '24px', paddingTop: '64px', paddingBottom: '32px' }}>
                 <h2 className="font-bold uppercase mb-4" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', letterSpacing: '0.05em', fontFamily: 'sans-serif' }}>
@@ -1019,7 +1019,7 @@ export default function YunnanDetail() {
                       display: 'flex',
                       flexDirection: imageLeft ? 'row' : 'row-reverse',
                       width: '100%',
-                      maxWidth: '934px',
+                      maxWidth: '964px',
                       background: '#ffffff',
                       borderRadius: '12px',
                       overflow: 'hidden',

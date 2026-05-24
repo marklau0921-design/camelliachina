@@ -9,26 +9,26 @@
 
 ## 阶段 2：数据库 Schema 设计与迁移
 
-- [ ] 设计 team_members 表（已有基础，需扩展）
-- [ ] 设计 cities 表（目的地信息）
-- [ ] 设计 experiences 表（体验信息）
-- [ ] 设计 itineraries 表（行程信息）
-- [ ] 设计 stories 表（故事内容）
-- [ ] 设计 videos 表（视频资源）
-- [ ] 设计 tags 表（标签系统）
-- [ ] 生成 Drizzle 迁移文件
-- [ ] 执行数据库迁移
+- [x] 设计 team_members 表（已有基础，需扩展）
+- [x] 设计 cities 表（目的地信息）
+- [x] 设计 experiences 表（体验信息）
+- [x] 设计 itineraries 表（行程信息）
+- [x] 设计 stories 表（故事内容）
+- [x] 设计 videos 表（视频资源）
+- [x] 设计 tags 表（标签系统）
+- [x] 生成 Drizzle 迁移文件
+- [x] 执行数据库迁移
 
 ## 阶段 3：后端 tRPC 路由与数据库查询
 
-- [ ] 实现 teamMembers 路由（list、get、create、update、delete）
-- [ ] 实现 cities 路由（list、get、create、update、delete）
-- [ ] 实现 experiences 路由（list、get、create、update、delete）
-- [ ] 实现 itineraries 路由（list、get、create、update、delete）
-- [ ] 实现 stories 路由（list、get、create、update、delete）
-- [ ] 实现 videos 路由（list、get、create、update、delete）
-- [ ] 实现 tags 路由（list、get、create、update、delete）
-- [ ] 为所有路由添加权限检查（后台操作需管理员权限）
+- [x] 实现 teamMembers 路由（list、get、create、update、delete）
+- [x] 实现 cities 路由（list、get、create、update、delete）
+- [x] 实现 experiences 路由（list、get、create、update、delete）
+- [x] 实现 itineraries 路由（list、get、create、update、delete）
+- [x] 实现 stories 路由（list、get、create、update、delete）
+- [x] 实现 videos 路由（list、get、create、update、delete）
+- [x] 实现 tags 路由（list、get、create、update、delete）
+- [x] 为所有路由添加权限检查（后台操作需管理员权限）
 
 ## 阶段 4：前台页面迁移与设计还原
 
