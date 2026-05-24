@@ -860,10 +860,10 @@ export default function YunnanDetail() {
         </div>
         {/* Hero text - centered */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-          <h1 className="text-white leading-tight mb-6" style={{ fontSize: '60px', letterSpacing: '-0.01em', fontFamily: 'Playfair Display, Georgia, serif', fontWeight: 400 }}>
+          <h1 className="text-white leading-tight mb-6" style={{ fontSize: '40px', letterSpacing: '-0.01em', fontFamily: 'Lato', fontWeight: '500' }}>
             A Journey Through China's Most Diverse Province
           </h1>
-          <p className="text-white" style={{ fontSize: '30px', fontFamily: 'Playfair Display, Georgia, serif', fontWeight: 400, letterSpacing: '0.02em' }}>
+          <p className="text-white" style={{ fontSize: '30px', fontFamily: 'lato', fontWeight: '500', letterSpacing: '0.02em' }}>
             England & Scotland
           </p>
         </div>
