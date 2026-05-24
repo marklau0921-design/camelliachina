@@ -64,7 +64,12 @@ function TypeFormModal({
       onSaved();
       onClose();
     } catch (e: any) {
-      toast.error(e.message ?? "Error saving");
+      const msg = e.message ?? "Error saving";
+      if (msg.includes("Duplicate") || msg.includes("unique") || msg.includes("UNIQUE")) {
+        toast.error("This slug already exists. Please use a different name.");
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setSaving(false);
     }
@@ -89,7 +94,14 @@ function TypeFormModal({
             <label style={{ display: "block", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#888", marginBottom: "8px" }}>Name *</label>
             <input
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={e => {
+                const newName = e.target.value;
+                setName(newName);
+                // 如果 slug 还没有被手动修改过（或为空），则自动生成
+                if (!initial) {
+                  setSlug(newName.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, ''));
+                }
+              }}
               placeholder="e.g. Cultural, Adventure, Nature..."
               style={{ width: "100%", padding: "9px 12px", fontSize: "13px", background: "#f2f2f2", border: "1px solid #ddd", outline: "none", color: "#2d2d2d", boxSizing: "border-box" }}
               onFocus={e => { e.target.style.borderColor = "#F5569B"; }}
