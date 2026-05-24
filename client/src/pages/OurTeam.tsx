@@ -142,6 +142,8 @@ function StoryImages({ member, mirrored = false }: { member: TeamMember; mirrore
 
 export default function OurTeam() {
   const { data } = trpc.cms.listTeamMembers.useQuery(undefined, { retry: false });
+  const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const ctaBg = homepageAssets?.cta?.url;
   const members = data && data.length > 0 ? data : FALLBACK_MEMBERS;
 
   return (
@@ -184,7 +186,17 @@ export default function OurTeam() {
         }
       `}</style>
       <Navigation />
-      <div style={{ height: '218px', background: '#3d9e8c', position: 'relative', overflow: 'visible', backgroundImage: 'radial-gradient(ellipse 80% 60% at 80% 50%, rgba(255,255,255,0.07) 0%, transparent 70%), radial-gradient(ellipse 40% 80% at 20% 30%, rgba(255,255,255,0.05) 0%, transparent 60%)' }} />
+      <div style={{ height: '218px', background: '#3d9e8c', position: 'relative', overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `url(${ctaBg || '/manus-storage/texture-buried_038ce46e.png'})`,
+          backgroundSize: '400px 400px',
+          backgroundRepeat: 'repeat',
+          opacity: 0.65,
+          mixBlendMode: 'multiply',
+        }} />
+      </div>
       {members.map((member, index) => <TeamMemberSection key={member.id} member={member} index={index} />)}
       <Footer />
     </div>
