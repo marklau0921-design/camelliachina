@@ -897,12 +897,12 @@ export default function YunnanDetail() {
             background: 'rgba(245,245,245,0.97)',
           }}
         >
-          <div className="flex items-center justify-center px-2 md:px-16">
+          <div className="flex items-center justify-center px-2 md:px-16 h-full">
             {sections.map((s) => (
               <button
                 key={s.id}
                 onClick={() => scrollToSection(s.id)}
-                className={`trip-tab-underline px-2 md:px-5 py-3 uppercase transition-colors ${
+                className={`trip-tab-underline px-2 md:px-5 uppercase transition-colors flex items-center justify-center h-full ${
                   activeSection === s.id ? 'trip-tab-active' : ''
                 }`}
                 style={{
