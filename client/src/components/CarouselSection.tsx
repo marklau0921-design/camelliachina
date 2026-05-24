@@ -40,10 +40,11 @@ const carouselData: CarouselItem[] = [
   }
 ];
 
-export default function CarouselSection() {
-  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
-
-  // ── Native scrollLeft + inertia (same as Explore Our Trips) ──
+// ── Reusable Stories carousel strip ──────────────────────────────────────────
+function StoriesStrip({ onPlayVideo, didDragRef }: {
+  onPlayVideo: (videoId: string) => void;
+  didDragRef: React.MutableRefObject<boolean>;
+}) {
   const trackRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const startXRef = useRef(0);
@@ -51,7 +52,7 @@ export default function CarouselSection() {
   const lastXRef = useRef(0);
   const velocityRef = useRef(0);
   const rafRef = useRef<number | null>(null);
-  const didDragRef = useRef(false); // track whether user actually dragged (to suppress click)
+  const localDragRef = useRef(false);
 
   const cancelInertia = () => {
     if (rafRef.current !== null) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
@@ -71,19 +72,10 @@ export default function CarouselSection() {
 
   useEffect(() => () => cancelInertia(), []);
 
-  useEffect(() => {
-    if (selectedVideoId) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-    return () => { document.body.style.overflow = 'auto'; };
-  }, [selectedVideoId]);
-
   const onMouseDown = (e: React.MouseEvent) => {
-    if (selectedVideoId) return;
     cancelInertia();
     draggingRef.current = true;
+    localDragRef.current = false;
     didDragRef.current = false;
     startXRef.current = e.pageX - (trackRef.current?.offsetLeft ?? 0);
     scrollStartRef.current = trackRef.current?.scrollLeft ?? 0;
@@ -113,15 +105,14 @@ export default function CarouselSection() {
     const walk = (x - startXRef.current) * 1.0;
     velocityRef.current = e.pageX - lastXRef.current;
     lastXRef.current = e.pageX;
-    if (Math.abs(walk) > 4) didDragRef.current = true;
+    if (Math.abs(walk) > 4) { localDragRef.current = true; didDragRef.current = true; }
     if (trackRef.current) trackRef.current.scrollLeft = scrollStartRef.current - walk;
   };
 
-  // Touch support
   const onTouchStart = (e: React.TouchEvent) => {
-    if (selectedVideoId) return;
     cancelInertia();
     draggingRef.current = true;
+    localDragRef.current = false;
     didDragRef.current = false;
     startXRef.current = e.touches[0].pageX - (trackRef.current?.offsetLeft ?? 0);
     scrollStartRef.current = trackRef.current?.scrollLeft ?? 0;
@@ -135,7 +126,7 @@ export default function CarouselSection() {
     const walk = (x - startXRef.current) * 1.0;
     velocityRef.current = e.touches[0].pageX - lastXRef.current;
     lastXRef.current = e.touches[0].pageX;
-    if (Math.abs(walk) > 4) didDragRef.current = true;
+    if (Math.abs(walk) > 4) { localDragRef.current = true; didDragRef.current = true; }
     if (trackRef.current) trackRef.current.scrollLeft = scrollStartRef.current - walk;
   };
 
@@ -146,7 +137,93 @@ export default function CarouselSection() {
   };
 
   return (
+    <div
+      ref={trackRef}
+      className="similar-track"
+      onMouseDown={onMouseDown}
+      onMouseLeave={onMouseLeave}
+      onMouseUp={onMouseUp}
+      onMouseMove={onMouseMove}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      style={{
+        position: 'relative',
+        zIndex: 1,
+        width: '100%',
+        overflowX: 'scroll',
+        overflowY: 'hidden',
+        cursor: 'grab',
+        userSelect: 'none',
+        paddingLeft: '24px',
+        paddingRight: '24px',
+      } as React.CSSProperties}
+    >
+      <div style={{ display: 'flex', flexDirection: 'row', gap: '24px', alignItems: 'flex-start', minWidth: 'max-content', paddingBottom: '8px' }}>
+        {carouselData.map((item) => (
+          <div
+            key={item.id}
+            className="relative group overflow-hidden flex-shrink-0"
+            style={{ width: '600px', aspectRatio: '16/9', userSelect: 'none' }}
+          >
+            {item.videoId ? (
+              <>
+                <img
+                  src={`https://img.youtube.com/vi/${item.videoId}/maxresdefault.jpg`}
+                  alt={item.name}
+                  className="w-full h-full object-cover select-none"
+                  draggable={false}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg`;
+                  }}
+                />
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all duration-300" />
+                {/* Play button */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <button
+                    onClick={() => {
+                      if (!localDragRef.current && item.videoId) onPlayVideo(item.videoId);
+                    }}
+                    className="w-16 h-16 rounded-full bg-[#F5F3EF]/90 group-hover:bg-[#F5F3EF] transition-all duration-300 flex items-center justify-center cursor-pointer hover:scale-110"
+                  >
+                    <svg className="w-8 h-8 text-red-600 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-full h-full object-cover select-none"
+                draggable={false}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function CarouselSection() {
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+  const didDragRef = useRef(false);
+
+  useEffect(() => {
+    if (selectedVideoId) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => { document.body.style.overflow = 'auto'; };
+  }, [selectedVideoId]);
+
+  return (
     <>
+      {/* ── First Stories section ── */}
       <section style={{backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '0'}}>
         <div className="flex flex-col h-auto w-full">
           {/* Header */}
@@ -171,74 +248,43 @@ export default function CarouselSection() {
           </div>
 
           {/* Scroll track */}
-          <div
-            ref={trackRef}
-            className="similar-track"
-            onMouseDown={onMouseDown}
-            onMouseLeave={onMouseLeave}
-            onMouseUp={onMouseUp}
-            onMouseMove={onMouseMove}
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
-            style={{
-              position: 'relative',
-              zIndex: 1,
-              width: '100%',
-              overflowX: 'scroll',
-              overflowY: 'hidden',
-              cursor: 'grab',
-              userSelect: 'none',
-              paddingLeft: '24px',
-              paddingRight: '24px',
-            } as React.CSSProperties}
-          >
-            <div style={{ display: 'flex', flexDirection: 'row', gap: '24px', alignItems: 'flex-start', minWidth: 'max-content', paddingBottom: '8px' }}>
-              {carouselData.map((item) => (
-                <div
-                  key={item.id}
-                  className="relative group overflow-hidden flex-shrink-0"
-                  style={{ width: '600px', aspectRatio: '16/9', userSelect: 'none' }}
-                >
-                  {item.videoId ? (
-                    <>
-                      <img
-                        src={`https://img.youtube.com/vi/${item.videoId}/maxresdefault.jpg`}
-                        alt={item.name}
-                        className="w-full h-full object-cover select-none"
-                        draggable={false}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg`;
-                        }}
-                      />
-                      {/* Overlay */}
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all duration-300" />
-                      {/* Play button */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <button
-                          onClick={() => {
-                            if (!didDragRef.current && item.videoId) setSelectedVideoId(item.videoId);
-                          }}
-                          className="w-16 h-16 rounded-full bg-[#F5F3EF]/90 group-hover:bg-[#F5F3EF] transition-all duration-300 flex items-center justify-center cursor-pointer hover:scale-110"
-                        >
-                          <svg className="w-8 h-8 text-red-600 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover select-none"
-                      draggable={false}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
+          <StoriesStrip onPlayVideo={setSelectedVideoId} didDragRef={didDragRef} />
+        </div>
+
+        {/* View our channel button */}
+        <div className="w-full flex justify-center" style={{backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '64px'}}>
+          <button className="px-8 py-3 bg-black text-white text-sm font-normal tracking-wider uppercase rounded border-2 border-black hover:bg-white hover:text-black transition-all duration-300 active:scale-95 active:shadow-lg">
+            View our channel
+          </button>
+        </div>
+      </section>
+
+      {/* ── Second Stories section (identical) ── */}
+      <section style={{backgroundColor: '#ffffff', paddingTop: '48px', paddingBottom: '0'}}>
+        <div className="flex flex-col h-auto w-full">
+          {/* Header */}
+          <div className="w-full flex flex-col justify-start flex-shrink-0 select-none" style={{backgroundColor: '#ffffff', paddingLeft: '24px', paddingRight: '24px'}}>
+            <h2
+              className="text-left text-black"
+              style={{
+                fontFamily: "'Barlow Condensed', 'Arial Narrow', 'Impact', sans-serif",
+                fontWeight: '700',
+                fontSize: '35px',
+                letterSpacing: '0.04em',
+                lineHeight: 1,
+                textTransform: 'uppercase',
+                marginBottom: '12px',
+              }}
+            >
+              Stories From the Road
+            </h2>
+            <p className="text-sm leading-relaxed mb-10 text-gray-700 font-light" style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif' }}>
+              Real stories. Meaningful journeys.
+            </p>
           </div>
+
+          {/* Scroll track */}
+          <StoriesStrip onPlayVideo={setSelectedVideoId} didDragRef={didDragRef} />
         </div>
 
         {/* View our channel button */}
