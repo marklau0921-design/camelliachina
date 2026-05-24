@@ -365,22 +365,7 @@ function ItineraryForm({ initial, onSave, onCancel, saving, title }: {
               <label style={labelStyle}>How Long</label>
               <FocusInput value={form.howLong} onChange={v => set("howLong", v)} placeholder="e.g. 10 nights" />
             </div>
-            <div>
-              <label style={labelStyle}>Number of Days</label>
-              <input
-                type="number" min={1}
-                value={form.days}
-                onChange={e => set("days", parseInt(e.target.value) || 1)}
-                style={inputStyle}
-                onFocus={e => { e.target.style.borderColor = ACCENT; }}
-                onBlur={e => { e.target.style.borderColor = "#ddd"; }}
-              />
-              {totalDays > 0 && totalDays !== form.days && (
-                <p style={{ fontSize: "11px", color: "#e08000", marginTop: "4px" }}>
-                  ⚠ Sections contain {totalDays} days total
-                </p>
-              )}
-            </div>
+
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={labelStyle}>Short Description (card summary)</label>
               <FocusInput value={form.shortDescription} onChange={v => set("shortDescription", v)} placeholder="One-line summary shown on listing cards" />
