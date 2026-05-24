@@ -86,7 +86,7 @@ export default function Home() {
   
   // 转换数据库行程为 Trip 类型
   const itineraries: Trip[] = rawItineraries.map((itin) => ({
-    id: itin.id,
+    id: itin.slug,
     nights: itin.days,
     title: itin.name,
     buttonText: 'Explore Trip',
