@@ -32,13 +32,15 @@
 
 ## 阶段 4：前台页面迁移与设计还原
 
-- [ ] 迁移首页 (Home.tsx) - 保留原有设计风格
-  - [ ] 深色导航栏
-  - [ ] 全屏 Banner
-  - [ ] 证言轮播
-  - [ ] 目的地卡片
-  - [ ] 行程展示
-  - [ ] 媒体库
+- [x] 迁移首页 (Home.tsx) - 保留原有设计风格
+  - [x] 深色导航栏
+  - [x] 全屏 Banner
+  - [x] 证言轮播
+  - [x] 目的地卡片（已链接到数据库）
+  - [x] 行程展示（已链接到数据库）
+  - [x] 媒体库
+- [ ] 创建城市详情页面 (CityDetail.tsx)
+- [ ] 创建体验详情页面 (ExperienceDetail.tsx)
 - [ ] 迁移目的地页面 (Destinations.tsx)
 - [ ] 迁移体验页面 (Experiences.tsx)
 - [ ] 迁移关于我们页面 (About.tsx)
@@ -51,11 +53,11 @@
 
 ## 阶段 5：后台 CMS 管理界面
 
-- [ ] 创建后台布局框架 (AdminLayout.tsx)
+- [x] 创建后台布局框架 (AdminLayout.tsx)
+- [x] 创建 Itineraries 管理页面（包含完整的新增/编辑表单）
 - [ ] 创建 Team Members 管理页面
 - [ ] 创建 Cities 管理页面
 - [ ] 创建 Experiences 管理页面
-- [ ] 创建 Itineraries 管理页面
 - [ ] 创建 Stories 管理页面
 - [ ] 创建 Videos 管理页面
 - [ ] 创建 Tags 管理页面
