@@ -302,19 +302,23 @@ function ItineraryForm({ initial, onSave, onCancel, saving, title }: {
   };
 
   const SaveBar = () => (
-    <div style={{ display: "flex", gap: "10px" }}>
+    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+      {form.slug && (
+        <a
+          href={`/itinerary/${form.slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ padding: "9px 20px", fontSize: "12px", letterSpacing: "0.1em", textTransform: "uppercase", background: "transparent", color: "#888", border: "1px solid #ddd", cursor: "pointer", textDecoration: "none", display: "inline-block" }}
+        >
+          Preview
+        </a>
+      )}
       <button
         onClick={() => onSave(form)}
         disabled={saving || !form.name.trim()}
         style={{ padding: "9px 24px", fontSize: "12px", letterSpacing: "0.1em", textTransform: "uppercase", background: ACCENT, color: "#fff", border: "none", cursor: saving || !form.name.trim() ? "not-allowed" : "pointer", opacity: saving || !form.name.trim() ? 0.5 : 1 }}
       >
         {saving ? "Saving..." : "Save Itinerary"}
-      </button>
-      <button
-        onClick={onCancel}
-        style={{ padding: "9px 20px", fontSize: "12px", letterSpacing: "0.1em", textTransform: "uppercase", background: "transparent", color: "#888", border: "1px solid #ddd", cursor: "pointer" }}
-      >
-        Cancel
       </button>
     </div>
   );
