@@ -111,6 +111,7 @@ export type InsertCityWhatToSee = typeof cityWhatToSee.$inferInsert;
 export const experienceTypes = mysqlTable("experience_types", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
   coverImage: varchar("coverImage", { length: 512 }),
   sortOrder: int("sortOrder").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

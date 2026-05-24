@@ -117,6 +117,7 @@ const cityInput = z.object({
 
 const experienceTypeInput = z.object({
   name: z.string().min(1),
+  slug: z.string().min(1),
   coverImage: z.string().optional(),
   sortOrder: z.number().default(0),
 });

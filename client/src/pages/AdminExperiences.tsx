@@ -11,11 +11,12 @@ function TypeFormModal({
   onClose,
   onSaved,
 }: {
-  initial?: { id: number; name: string; coverImage?: string | null; sortOrder?: number | null };
+  initial?: { id: number; name: string; slug?: string; coverImage?: string | null; sortOrder?: number | null };
   onClose: () => void;
   onSaved: () => void;
 }) {
   const [name, setName] = useState(initial?.name ?? "");
+  const [slug, setSlug] = useState(initial?.slug ?? "");
   const [coverImage, setCoverImage] = useState(initial?.coverImage ?? "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -51,12 +52,13 @@ function TypeFormModal({
 
   async function handleSave() {
     if (!name.trim()) { toast.error("Name is required"); return; }
+    if (!slug.trim()) { toast.error("Slug is required"); return; }
     setSaving(true);
     try {
       if (initial) {
-        await updateMut.mutateAsync({ id: initial.id, name: name.trim(), coverImage: coverImage || undefined });
+        await updateMut.mutateAsync({ id: initial.id, name: name.trim(), slug: slug.trim(), coverImage: coverImage || undefined });
       } else {
-        await createMut.mutateAsync({ name: name.trim(), coverImage: coverImage || undefined, sortOrder: 0 });
+        await createMut.mutateAsync({ name: name.trim(), slug: slug.trim(), coverImage: coverImage || undefined, sortOrder: 0 });
       }
       toast.success(initial ? "Type updated" : "Type created");
       onSaved();
@@ -89,6 +91,18 @@ function TypeFormModal({
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="e.g. Cultural, Adventure, Nature..."
+              style={{ width: "100%", padding: "9px 12px", fontSize: "13px", background: "#f2f2f2", border: "1px solid #ddd", outline: "none", color: "#2d2d2d", boxSizing: "border-box" }}
+              onFocus={e => { e.target.style.borderColor = "#F5569B"; }}
+              onBlur={e => { e.target.style.borderColor = "#ddd"; }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: "block", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#888", marginBottom: "8px" }}>Slug *</label>
+            <input
+              value={slug}
+              onChange={e => setSlug(e.target.value)}
+              placeholder="e.g. cultural, adventure, nature..."
               style={{ width: "100%", padding: "9px 12px", fontSize: "13px", background: "#f2f2f2", border: "1px solid #ddd", outline: "none", color: "#2d2d2d", boxSizing: "border-box" }}
               onFocus={e => { e.target.style.borderColor = "#F5569B"; }}
               onBlur={e => { e.target.style.borderColor = "#ddd"; }}

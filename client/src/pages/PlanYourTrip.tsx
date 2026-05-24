@@ -22,6 +22,9 @@ const PlanYourTrip: React.FC = () => {
   // 动态加载城市列表
   const { data: citiesData = [] } = trpc.cms.listCitiesWithExperiences.useQuery();
   
+  // 动态加载体验类型列表
+  const { data: experienceTypesData = [] } = trpc.cms.listExperienceTypes.useQuery();
+  
   // 动态加载完整体验列表
   const { data: experiencesData = [] } = trpc.cms.listExperiences.useQuery({});
 
@@ -38,14 +41,18 @@ const PlanYourTrip: React.FC = () => {
 
   // 构建体验卡片
   const experienceCards: TravelCard[] = useMemo(() => {
-    return experiencesData.map(exp => ({
-      id: String(exp.id),
-      title: exp.name.toUpperCase(),
-      image: exp.recommendationImage || 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/QjsoLwKicsuvVypZ.jpg',
-      category: 'experience' as const,
-      route: `/experiences/${exp.slug}`,
-    }));
-  }, [experiencesData]);
+    return experiencesData.map(exp => {
+      const typeInfo = experienceTypesData.find(t => t.id === exp.typeId);
+      const typeSlug = typeInfo?.slug || 'experience';
+      return {
+        id: String(exp.id),
+        title: exp.name.toUpperCase(),
+        image: exp.recommendationImage || 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/QjsoLwKicsuvVypZ.jpg',
+        category: 'experience' as const,
+        route: `/experiences/${typeSlug}/${exp.slug}`,
+      };
+    });
+  }, [experiencesData, experienceTypesData]);
 
   // 合并所有卡片
   const travelCards = [...destinationCards, ...experienceCards];
