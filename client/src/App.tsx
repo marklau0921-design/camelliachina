@@ -35,7 +35,6 @@ import AdminExperiencesByType from "./pages/AdminExperiencesByType";
 import AdminExperiencesByCity from "./pages/AdminExperiencesByCity";
 import AdminExperienceEdit from "./pages/AdminExperienceEdit";
 import AdminCityEdit from "./pages/AdminCityEdit";
-import ItineraryTemplate from "./pages/ItineraryTemplate";
 
 import ExperienceCategoryPage from "./pages/ExperienceCategoryPage";
 import CityPage from "./pages/CityPage";
@@ -69,7 +68,6 @@ function Router() {
       <Route path="/experiences/tea-mountains-yaan" component={TeaMountains} />
       <Route path="/template/experience" component={TeaMountains} />
       <Route path="/template/city" component={Sichuan} />
-      <Route path="/template/itinerary" component={ItineraryTemplate} />
       <Route path="/about/why-us" component={WhyUs} />
       <Route path="/about/our-team" component={OurTeam} />
       <Route path="/experiences/:categorySlug/:id" component={ExperienceDetail} />
