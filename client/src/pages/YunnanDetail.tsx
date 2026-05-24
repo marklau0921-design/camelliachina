@@ -850,14 +850,7 @@ export default function YunnanDetail() {
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/35" />
-        {/* Breadcrumb */}
-        <div className="absolute top-20 left-10 flex items-center gap-2 text-white/70 text-xs tracking-widest uppercase" style={{ fontFamily: 'sans-serif', fontSize: '11px' }}>
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
-          <span>/</span>
-          <Link href="/experiences" className="hover:text-white transition-colors">Experiences</Link>
-          <span>/</span>
-          <span className="text-white">Yunnan</span>
-        </div>
+
         {/* Hero text - centered */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
           <h1 className="text-white leading-tight mb-6" style={{ fontSize: '40px', letterSpacing: '-0.01em', fontFamily: 'Lato', fontWeight: '500' }}>
@@ -867,10 +860,7 @@ export default function YunnanDetail() {
             England & Scotland
           </p>
         </div>
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 right-10 text-white/50 text-xs tracking-widest uppercase" style={{ fontFamily: 'sans-serif', fontSize: '10px' }}>
-          Scroll to explore
-        </div>
+
       </div>
 
       {/* ── TRIP SECTION NAV ── */}
