@@ -3,6 +3,15 @@ import { Link, useLocation } from 'wouter';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
+import { trpc } from '../lib/trpc';
+
+type Trip = {
+  id: string | number;
+  nights?: number;
+  title: string;
+  buttonText: string;
+  image: string;
+};
 
 /**
  * YunnanDetail - /experiences/2
@@ -10,6 +19,30 @@ import Footer from '../components/Footer';
  * Layout: Full-screen hero → sticky section nav → overview → day-by-day cards (left image, right text) → full-width dual image dividers → similar trips
  * Color: White bg, black text, accent green for labels/CTA
  */
+
+const similarAllTrips: Trip[] = [
+  {
+    id: '1',
+    nights: 10,
+    title: 'YUNNAN EXPLORER',
+    buttonText: 'Explore Trip',
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
+  },
+  {
+    id: '2',
+    nights: 7,
+    title: 'ANCIENT SILK ROAD',
+    buttonText: 'Explore Trip',
+    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=400&fit=crop',
+  },
+  {
+    id: '3',
+    nights: 12,
+    title: 'TIBETAN HIGHLANDS',
+    buttonText: 'Explore Trip',
+    image: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800&h=400&fit=crop',
+  },
+];
 
 const sections = [
   { id: 'overview', label: 'OVERVIEW' },
@@ -558,13 +591,6 @@ function ImageCarousel({ images, alt }: { images: string[]; alt: string }) {
 }
 
 // ── SIMILAR EXPERIENCES SECTION (mirrors Home's Explore Our Trips) ──
-const similarAllTrips = [
-  { id: '1', nights: 12, title: 'Sichuan: Culture & Nature', buttonText: 'Explore Trip', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop' },
-  { id: '3', title: 'Create Your Own Itinerary', buttonText: 'Create Trip', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop' },
-  { id: '4', nights: 8, title: "Xi'an: Imperial Legacy", buttonText: 'Explore Trip', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop' },
-  { id: '5', nights: 9, title: 'Hangzhou: West Lake Serenity', buttonText: 'Explore Trip', image: 'https://images.unsplash.com/photo-1548013146-72479768bada?w=800&h=400&fit=crop' },
-  { id: '6', nights: 7, title: 'Guilin: Karst Mountains', buttonText: 'Explore Trip', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop' },
-];
 
 function SimilarExperiencesSection() {
   const [, navigate] = useLocation();
@@ -579,65 +605,49 @@ function SimilarExperiencesSection() {
   const [showRightBtn, setShowRightBtn] = useState(true);
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024);
 
-  const cancelInertia2 = () => {
+  const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const { data: rawItineraries = [] } = trpc.cms.listItineraries.useQuery();
+  
+  const itineraries: Trip[] = rawItineraries.map((itin) => ({
+    id: itin.id,
+    nights: itin.days,
+    title: itin.name,
+    buttonText: 'Explore Trip',
+    image: itin.coverImage || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
+  }));
+  const FALLBACK_BANNER = '/manus-storage/home-banner_91093653.webp';
+  const apiBanners = homepageAssets?.banners as Array<{ url: string; id: number }> | undefined;
+  const activeBanners = (apiBanners && apiBanners.length > 0) ? apiBanners.map((b) => b.url) : [FALLBACK_BANNER];
+  const activeCta = homepageAssets?.cta?.url;
+
+  const cancelInertia = () => {
     if (rafIdRef.current !== null) { cancelAnimationFrame(rafIdRef.current); rafIdRef.current = null; }
   };
 
   const updateBtnVisibility = () => {
     const track = trackRef.current;
     if (!track) return;
-    setShowLeftBtn(track.scrollLeft > 2);
-    setShowRightBtn(track.scrollLeft < track.scrollWidth - track.clientWidth - 2);
+    const isAtStart = track.scrollLeft <= 0;
+    const isAtEnd = track.scrollLeft >= track.scrollWidth - track.clientWidth - 10;
+    setShowLeftBtn(!isAtStart);
+    setShowRightBtn(!isAtEnd);
   };
 
-  const startInertia2 = () => {
+  const startInertia = () => {
     const track = trackRef.current;
     if (!track) return;
     const step = () => {
       velocityRef.current *= 0.92;
-      if (Math.abs(velocityRef.current) < 0.5) { velocityRef.current = 0; return; }
+      if (Math.abs(velocityRef.current) < 0.5) { velocityRef.current = 0; updateBtnVisibility(); return; }
       track.scrollLeft -= velocityRef.current;
+      updateBtnVisibility();
       rafIdRef.current = requestAnimationFrame(step);
     };
     rafIdRef.current = requestAnimationFrame(step);
   };
 
-  const onMouseDown2 = (e: React.MouseEvent) => {
-    cancelInertia2();
-    isDraggingRef.current = true;
-    startXRef.current = e.pageX - (trackRef.current?.offsetLeft ?? 0);
-    scrollLeftStartRef.current = trackRef.current?.scrollLeft ?? 0;
-    lastXRef.current = e.pageX;
-    velocityRef.current = 0;
-    if (trackRef.current) trackRef.current.style.cursor = 'grabbing';
-  };
-
-  const onMouseLeave2 = () => {
-    if (!isDraggingRef.current) return;
-    isDraggingRef.current = false;
-    if (trackRef.current) trackRef.current.style.cursor = 'grab';
-    startInertia2();
-  };
-
-  const onMouseUp2 = () => {
-    if (!isDraggingRef.current) return;
-    isDraggingRef.current = false;
-    if (trackRef.current) trackRef.current.style.cursor = 'grab';
-    startInertia2();
-  };
-
-  const onMouseMove2 = (e: React.MouseEvent) => {
-    if (!isDraggingRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - (trackRef.current?.offsetLeft ?? 0);
-    const walk = (x - startXRef.current) * 1.0;
-    velocityRef.current = e.pageX - lastXRef.current;
-    lastXRef.current = e.pageX;
-    if (trackRef.current) trackRef.current.scrollLeft = scrollLeftStartRef.current - walk;
-  };
-
-  const scrollBy2 = (delta: number) => {
-    cancelInertia2();
+  const scrollBy = (delta: number) => {
+    cancelInertia();
     const track = trackRef.current;
     if (!track) return;
     const target = track.scrollLeft + delta;
@@ -653,7 +663,44 @@ function SimilarExperiencesSection() {
     rafIdRef.current = requestAnimationFrame(animStep);
   };
 
-  useEffect(() => () => cancelInertia2(), []);
+  const onMouseDown = (e: React.MouseEvent) => {
+    cancelInertia();
+    isDraggingRef.current = true;
+    startXRef.current = e.pageX - (trackRef.current?.offsetLeft ?? 0);
+    scrollLeftStartRef.current = trackRef.current?.scrollLeft ?? 0;
+    lastXRef.current = e.pageX;
+    velocityRef.current = 0;
+    if (trackRef.current) trackRef.current.style.cursor = 'grabbing';
+  };
+
+  const onMouseLeave = () => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    if (trackRef.current) trackRef.current.style.cursor = 'grab';
+    startInertia();
+  };
+
+  const onMouseUp = () => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    if (trackRef.current) trackRef.current.style.cursor = 'grab';
+    startInertia();
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - (trackRef.current?.offsetLeft ?? 0);
+    const walk = (x - startXRef.current) * 1.0;
+    velocityRef.current = e.pageX - lastXRef.current;
+    lastXRef.current = e.pageX;
+    if (trackRef.current) {
+      trackRef.current.scrollLeft = scrollLeftStartRef.current - walk;
+      updateBtnVisibility();
+    }
+  };
+
+  useEffect(() => () => cancelInertia(), []);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -674,15 +721,15 @@ function SimilarExperiencesSection() {
 
   return (
     <div
-      id="other"
       className="w-full relative flex flex-col lg:flex-row lg:items-center"
       style={{
         minHeight: '680px',
-        paddingTop: '60px',
-        paddingBottom: '60px',
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=900&fit=crop)',
+        paddingTop: '50px',
+        paddingBottom: '50px',
+        backgroundImage: `url(${activeCta || activeBanners[0]})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        backgroundAttachment: 'scroll',
       }}
     >
       {/* Dark frosted glass overlay */}
@@ -690,19 +737,19 @@ function SimilarExperiencesSection() {
 
       {/* Mobile: Title above carousel */}
       <div className="lg:hidden w-full px-6 mb-6 relative z-10">
-        <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: 400, fontSize: '28px', color: 'white', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '12px', lineHeight: 1.1 }}>
-          Similar Experiences
+        <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: 400, fontSize: '28px', color: 'white', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: '12px', lineHeight: 1.1 }}>
+          Explore Our Trips
         </h2>
         <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', fontStyle: 'italic', lineHeight: 1.6 }}>
-          Start your bespoke adventure with us
+          Explore our sample trips or get in touch to begin your bespoke adventure.
         </p>
       </div>
 
-      {/* Left Nav Button - Desktop only; hidden when at leftmost */}
+      {/* Left Nav Button - Desktop only; hidden when at leftmost position */}
       {isDesktop && (
         <button
           style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(0,0,0,0.45)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20, transition: 'background 0.2s, opacity 0.2s', opacity: showLeftBtn ? 1 : 0, pointerEvents: showLeftBtn ? 'auto' : 'none' }}
-          onClick={() => scrollBy2(-600)}
+          onClick={() => scrollBy(-600)}
           onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.7)')}
           onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.45)')}
           aria-label="Scroll left"
@@ -715,40 +762,53 @@ function SimilarExperiencesSection() {
       <div
         ref={trackRef}
         className="similar-track"
-        onMouseDown={onMouseDown2}
-        onMouseLeave={onMouseLeave2}
-        onMouseUp={onMouseUp2}
-        onMouseMove={onMouseMove2}
+        onMouseDown={onMouseDown}
+        onMouseLeave={onMouseLeave}
+        onMouseUp={onMouseUp}
+        onMouseMove={onMouseMove}
         style={{ position: 'relative', zIndex: 1, width: '100%', overflowX: 'scroll', overflowY: 'hidden', cursor: 'grab', userSelect: 'none', paddingLeft: isDesktop ? '60px' : '24px', paddingRight: isDesktop ? '60px' : '24px' } as React.CSSProperties}
       >
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', alignItems: 'flex-start', minWidth: 'max-content', paddingBottom: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '25px', alignItems: 'flex-start', minWidth: 'max-content', paddingBottom: '8px' }}>
           {/* 大屏左边 20vw 空白占位，竖屏不显示 */}
           {isDesktop && <div style={{ width: '20vw', flexShrink: 0 }} />}
-          {/* Title block - Desktop only */}
+          {/* Title block - Desktop only (JS controlled) */}
           {isDesktop && (
             <div style={{ width: '260px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingTop: '8px' }}>
-              <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: 400, fontSize: '32px', color: 'white', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '16px', lineHeight: 1.1 }}>
-                SIMILAR<br />EXPERIENCES
+              <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: '700', fontSize: '32px', color: 'white', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: '16px', lineHeight: 1.1 }}>
+                Explore Our Trips
               </h2>
               <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', fontStyle: 'italic', lineHeight: 1.6 }}>
-                Start your bespoke adventure with us
+                Explore our sample trips or get in touch to begin your bespoke adventure.
               </p>
             </div>
           )}
           {/* Trip Cards */}
-          {similarAllTrips.map((trip) => (
+          {(itineraries && itineraries.length > 0 ? itineraries : similarAllTrips).map((trip) => (
             <div key={trip.id} className="relative group overflow-hidden flex-shrink-0" style={{ width: '310px', height: '550px', userSelect: 'none' }}>
               <img src={trip.image} alt={trip.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" draggable={false} />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />
               <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
-                {trip.nights && <div className="text-xs font-bold uppercase tracking-wider text-yellow-300 text-right">{trip.nights} NIGHTS</div>}
+                {trip.nights && <div className="text-xs font-bold uppercase tracking-wider text-yellow-300 text-right" style={{color: '#ffffff', fontWeight: '500'}}>{trip.nights} NIGHTS</div>}
                 <div>
-                  <h3 className="text-base font-bold uppercase tracking-wider mb-4 leading-tight opacity-85">{trip.title}</h3>
+                  <h3 className="text-base font-bold uppercase tracking-wider mb-4 leading-tight opacity-85" style={{fontWeight: '300'}}>{trip.title}</h3>
                   <button
-                    className="px-4 py-2 border border-white text-white text-xs font-semibold uppercase tracking-wider rounded-sm hover:bg-white hover:text-black transition-all duration-300 opacity-85"
-                    style={{ pointerEvents: 'auto', cursor: 'default' }}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onClick={(e) => { e.stopPropagation(); navigate(`/experiences/${trip.id}`); }}
+                    className="trip-btn px-4 py-2 text-white text-xs font-bold uppercase tracking-widest transition-all duration-200 opacity-85 relative overflow-hidden active:scale-95"
+                    style={{ pointerEvents: 'auto', cursor: 'pointer', background: 'rgba(20,20,20,0.55)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,1)'; e.currentTarget.style.color = '#111'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(20,20,20,0.55)'; e.currentTarget.style.color = '#fff'; }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      // ripple effect
+                      const btn = e.currentTarget;
+                      const circle = document.createElement('span');
+                      const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+                      const radius = diameter / 2;
+                      const rect = btn.getBoundingClientRect();
+                      circle.style.cssText = `position:absolute;width:${diameter}px;height:${diameter}px;left:${e.clientX - rect.left - radius}px;top:${e.clientY - rect.top - radius}px;background:rgba(255,255,255,0.35);border-radius:50%;transform:scale(0);animation:ripple 0.5s linear;pointer-events:none;`;
+                      btn.appendChild(circle);
+                      setTimeout(() => circle.remove(), 600);
+                    }}
+                    onClick={(e) => { e.stopPropagation(); navigate(`/itinerary/${trip.id}`); }}
                   >
                     {trip.buttonText}
                   </button>
@@ -758,16 +818,20 @@ function SimilarExperiencesSection() {
           ))}
           {/* View More */}
           <div className="flex-shrink-0" style={{ width: '155px', height: '550px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-            <button className="px-6 py-3 rounded-sm transition-all duration-300 bg-white/20 border border-white/50 text-white font-semibold uppercase tracking-wider text-sm hover:bg-white hover:text-black">View More</button>
+            <button
+              className="px-6 py-3 rounded-sm transition-all duration-300 bg-white/20 border border-white/50 text-white font-semibold uppercase tracking-wider text-sm"
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#000000'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = '#ffffff'; }}
+            >View More</button>
           </div>
         </div>
       </div>
 
-      {/* Right Nav Button - Desktop only; hidden when at rightmost */}
+      {/* Right Nav Button - Desktop only; hidden when at rightmost position */}
       {isDesktop && (
         <button
           style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(0,0,0,0.45)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20, transition: 'background 0.2s, opacity 0.2s', opacity: showRightBtn ? 1 : 0, pointerEvents: showRightBtn ? 'auto' : 'none' }}
-          onClick={() => scrollBy2(600)}
+          onClick={() => scrollBy(600)}
           onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.7)')}
           onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.45)')}
           aria-label="Scroll right"
