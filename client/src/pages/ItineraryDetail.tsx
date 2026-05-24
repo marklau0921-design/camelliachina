@@ -118,7 +118,7 @@ function GalleryStrip({ images }: { images: string[] }) {
       </button>
       <div ref={trackRef} onMouseDown={onMouseDown} onMouseLeave={onMouseLeave} onMouseUp={onMouseUp} onMouseMove={onMouseMove}
         className="gallery-track"
-        style={{ display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'scroll', overflowY: 'hidden', width: '100%', height: '100%', paddingLeft: '56px', paddingRight: '56px', cursor: 'grab', userSelect: 'none', overscrollBehaviorX: 'none' } as React.CSSProperties}>
+        style={{ display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'scroll', overflowY: 'hidden', width: '100%', height: '100%', paddingLeft: '12px', paddingRight: '12px', cursor: 'grab', userSelect: 'none', overscrollBehaviorX: 'none' } as React.CSSProperties}>
         {images.map((img, idx) => (
           <div key={idx} className="gallery-img-responsive" style={{ flexShrink: 0, overflow: 'hidden', borderRadius: '4px' }}>
             <img src={img} alt="" draggable={false} style={{ height: '100%', width: 'auto', display: 'block', pointerEvents: 'none' }} />
