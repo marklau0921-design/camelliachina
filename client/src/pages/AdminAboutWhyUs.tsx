@@ -1,19 +1,89 @@
 import React from 'react';
+import { useLocation } from 'wouter';
 import AdminLayout from '@/components/AdminLayout';
 import ImageUploader from '@/components/ImageUploader';
 import { trpc } from '@/lib/trpc';
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+
+const ACCENT = '#F5569B';
+
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: '11px',
+  letterSpacing: '0.12em',
+  textTransform: 'uppercase',
+  color: '#888',
+  marginBottom: '8px',
+};
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '9px 12px',
+  fontSize: '13px',
+  background: '#f2f2f2',
+  border: '1px solid #ddd',
+  outline: 'none',
+  color: '#2d2d2d',
+  boxSizing: 'border-box',
+};
+
+const sectionStyle: React.CSSProperties = {
+  background: '#fff',
+  border: '1px solid #eee',
+  padding: '28px',
+  marginBottom: '24px',
+};
+
+const sectionTitleStyle: React.CSSProperties = {
+  fontSize: '13px',
+  fontWeight: '600',
+  letterSpacing: '0.12em',
+  textTransform: 'uppercase',
+  color: '#1a1a1a',
+  marginBottom: '20px',
+  paddingBottom: '12px',
+  borderBottom: '1px solid #eee',
+};
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return <div style={sectionTitleStyle}>{children}</div>;
+}
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label style={{ display: 'block', marginBottom: '16px' }}>
-      <span style={{ display: 'block', fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#777', marginBottom: '6px' }}>{label}</span>
+    <div>
+      <label style={labelStyle}>{label}</label>
       {children}
-    </label>
+    </div>
   );
 }
 
-const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 12px', border: '1px solid #ddd', fontSize: '14px', boxSizing: 'border-box' };
-const textAreaStyle: React.CSSProperties = { ...inputStyle, minHeight: '100px', resize: 'vertical' };
+function TextInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  return (
+    <input
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      style={inputStyle}
+      onFocus={e => { e.target.style.borderColor = ACCENT; }}
+      onBlur={e => { e.target.style.borderColor = '#ddd'; }}
+    />
+  );
+}
+
+function TextArea({ value, onChange, placeholder, rows = 4 }: { value: string; onChange: (v: string) => void; placeholder?: string; rows?: number }) {
+  return (
+    <textarea
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      rows={rows}
+      style={{ ...inputStyle, resize: 'vertical' }}
+      onFocus={e => { e.target.style.borderColor = ACCENT; }}
+      onBlur={e => { e.target.style.borderColor = '#ddd'; }}
+    />
+  );
+}
 
 interface SectionForm {
   title: string;
@@ -24,51 +94,67 @@ interface SectionForm {
 
 const emptySection: SectionForm = { title: '', content: '', image: '', sortOrder: 0 };
 
-function SectionFormPanel({
+function WhyUsSectionForm({
   initial,
   onSubmit,
   onCancel,
   isPending,
+  formTitle,
 }: {
   initial?: Partial<SectionForm>;
   onSubmit: (data: SectionForm) => void;
   onCancel?: () => void;
   isPending?: boolean;
+  formTitle: string;
 }) {
   const [form, setForm] = React.useState<SectionForm>({ ...emptySection, ...initial });
   const update = <K extends keyof SectionForm>(key: K, value: SectionForm[K]) =>
     setForm(prev => ({ ...prev, [key]: value }));
 
   return (
-    <form
-      onSubmit={e => { e.preventDefault(); onSubmit(form); }}
-      style={{ background: '#fff', border: '1px solid #e5e5e5', padding: '24px', marginBottom: '20px' }}
-    >
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px', alignItems: 'start' }}>
-        <Field label="Title">
-          <input value={form.title} onChange={e => update('title', e.target.value)} style={inputStyle} required />
-        </Field>
-        <Field label="Sort Order">
-          <input type="number" value={form.sortOrder} onChange={e => update('sortOrder', Number(e.target.value))} style={{ ...inputStyle, width: '90px' }} />
-        </Field>
+    <form onSubmit={e => { e.preventDefault(); onSubmit(form); }}>
+      <div style={sectionStyle}>
+        <SectionTitle>{formTitle}</SectionTitle>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '20px', marginBottom: '20px', alignItems: 'end' }}>
+          <Field label="Title *">
+            <TextInput value={form.title} onChange={v => update('title', v)} placeholder="e.g. Local Expertise" />
+          </Field>
+          <Field label="Sort Order">
+            <input
+              type="number"
+              value={form.sortOrder}
+              onChange={e => update('sortOrder', Number(e.target.value))}
+              style={{ ...inputStyle, width: '90px' }}
+              onFocus={e => { e.target.style.borderColor = ACCENT; }}
+              onBlur={e => { e.target.style.borderColor = '#ddd'; }}
+            />
+          </Field>
+        </div>
+        <div style={{ marginBottom: '20px' }}>
+          <Field label="Content *">
+            <TextArea value={form.content} onChange={v => update('content', v)} rows={4} placeholder="Describe this reason..." />
+          </Field>
+        </div>
+        <ImageUploader
+          label="Section Image"
+          value={form.image}
+          onChange={value => update('image', value)}
+          category="about"
+          source="why-us"
+          sourceLabel={form.title || 'Why Us Section'}
+          sourceUrl="/about/why-us"
+        />
       </div>
-      <Field label="Content">
-        <textarea value={form.content} onChange={e => update('content', e.target.value)} style={textAreaStyle} required />
-      </Field>
-      <ImageUploader
-        label="Section Image"
-        value={form.image}
-        onChange={value => update('image', value)}
-        category="about"
-        source="why-us"
-        sourceLabel={form.title || 'Why Us Section'}
-        sourceUrl="/about/why-us"
-      />
-      <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '32px' }}>
         <button
           type="submit"
           disabled={isPending}
-          style={{ background: '#111', color: '#fff', border: 0, padding: '10px 18px', cursor: 'pointer' }}
+          style={{
+            padding: '10px 28px', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase',
+            background: isPending ? 'rgba(245,86,155,0.5)' : ACCENT,
+            color: '#fff', border: 'none', cursor: isPending ? 'not-allowed' : 'pointer',
+          }}
         >
           {isPending ? 'Saving...' : 'Save Section'}
         </button>
@@ -76,7 +162,10 @@ function SectionFormPanel({
           <button
             type="button"
             onClick={onCancel}
-            style={{ background: '#f3f3f3', color: '#333', border: '1px solid #ddd', padding: '10px 18px', cursor: 'pointer' }}
+            style={{
+              padding: '10px 24px', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase',
+              background: 'transparent', color: '#888', border: '1px solid #ddd', cursor: 'pointer',
+            }}
           >
             Cancel
           </button>
@@ -87,13 +176,13 @@ function SectionFormPanel({
 }
 
 export default function AdminAboutWhyUs() {
+  const [, navigate] = useLocation();
   const utils = trpc.useUtils();
   const { data: sections = [], isLoading } = trpc.about.listWhyUsSections.useQuery();
   const [editingId, setEditingId] = React.useState<number | null>(null);
   const [showCreate, setShowCreate] = React.useState(false);
 
   const invalidate = () => utils.about.listWhyUsSections.invalidate();
-
   const createMutation = trpc.about.createWhyUsSection.useMutation({
     onSuccess: () => { invalidate(); setShowCreate(false); },
   });
@@ -104,47 +193,59 @@ export default function AdminAboutWhyUs() {
 
   return (
     <AdminLayout title="Why Us?">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <div>
-          <a
-            href="/admin/about"
-            style={{ fontSize: '12px', color: '#999', textDecoration: 'none', letterSpacing: '0.08em', textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}
-          >
-            ← Back to About
-          </a>
-          <h1 style={{ margin: 0, fontFamily: 'Georgia, serif', fontWeight: 400 }}>Why Us? Sections</h1>
-          <p style={{ color: '#777', marginTop: '6px' }}>
-            Manage the sections displayed on the <strong>/about/why-us</strong> page. Each section has a title, content, and image.
-          </p>
+      <div style={{ padding: '32px', maxWidth: '900px' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button
+              onClick={() => navigate('/admin/about')}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase' }}
+              onMouseEnter={e => { e.currentTarget.style.color = ACCENT; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#888'; }}
+            >
+              <ArrowLeft size={14} /> Back
+            </button>
+            <h1 style={{ fontSize: '20px', fontWeight: '300', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#1a1a1a', margin: 0 }}>
+              Why Us?
+            </h1>
+          </div>
+          {!showCreate && editingId === null && (
+            <button
+              onClick={() => setShowCreate(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '10px 20px', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase',
+                background: ACCENT, color: '#fff', border: 'none', cursor: 'pointer',
+              }}
+            >
+              <Plus size={14} /> Add Section
+            </button>
+          )}
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          style={{ background: '#F5569B', color: '#fff', border: 0, padding: '11px 18px', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '12px' }}
-        >
-          + Add Section
-        </button>
-      </div>
 
-      {showCreate && (
-        <SectionFormPanel
-          onSubmit={data => createMutation.mutate({ ...data, image: data.image || undefined })}
-          onCancel={() => setShowCreate(false)}
-          isPending={createMutation.isPending}
-        />
-      )}
+        {/* Create form */}
+        {showCreate && (
+          <WhyUsSectionForm
+            formTitle="New Section"
+            onSubmit={data => createMutation.mutate({ ...data, image: data.image || undefined })}
+            onCancel={() => setShowCreate(false)}
+            isPending={createMutation.isPending}
+          />
+        )}
 
-      {isLoading ? (
-        <p style={{ color: '#999' }}>Loading...</p>
-      ) : sections.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 0', color: '#aaa' }}>
-          <p style={{ fontSize: '14px' }}>No sections yet. Click "+ Add Section" to get started.</p>
-        </div>
-      ) : (
-        sections.map((section, idx) => (
-          <div key={section.id} style={{ background: '#fff', border: '1px solid #e5e5e5', marginBottom: '14px' }}>
-            {editingId === section.id ? (
-              <div style={{ padding: '0' }}>
-                <SectionFormPanel
+        {/* Section list */}
+        {isLoading ? (
+          <div style={{ padding: '48px', textAlign: 'center', color: '#888', fontSize: '13px' }}>Loading...</div>
+        ) : sections.length === 0 && !showCreate ? (
+          <div style={{ textAlign: 'center', padding: '60px', color: '#aaa' }}>
+            <p style={{ fontSize: '13px' }}>No sections yet. Click "+ Add Section" to get started.</p>
+          </div>
+        ) : (
+          sections.map((section, idx) => (
+            <div key={section.id}>
+              {editingId === section.id ? (
+                <WhyUsSectionForm
+                  formTitle={`Edit Section ${String(idx + 1).padStart(2, '0')}`}
                   initial={{
                     title: section.title,
                     content: section.content,
@@ -155,50 +256,55 @@ export default function AdminAboutWhyUs() {
                   onCancel={() => setEditingId(null)}
                   isPending={updateMutation.isPending}
                 />
-              </div>
-            ) : (
-              <div style={{ display: 'flex', gap: '18px', alignItems: 'center', padding: '18px' }}>
-                {section.image ? (
-                  <img
-                    src={section.image}
-                    alt={section.title}
-                    style={{ width: '80px', height: '60px', objectFit: 'cover', flexShrink: 0 }}
-                  />
-                ) : (
-                  <div style={{ width: '80px', height: '60px', background: '#f2f2f2', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: '10px', color: '#bbb', textTransform: 'uppercase', letterSpacing: '0.1em' }}>No Image</span>
+              ) : (
+                <div style={{ background: '#fff', border: '1px solid #eee', marginBottom: '12px', padding: '18px 24px', display: 'flex', gap: '18px', alignItems: 'center' }}>
+                  {/* Index badge */}
+                  <span style={{ fontSize: '11px', color: '#c8b89a', letterSpacing: '0.15em', textTransform: 'uppercase', flexShrink: 0, width: '24px' }}>
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
+                  {/* Thumbnail */}
+                  {section.image ? (
+                    <img src={section.image} alt={section.title} style={{ width: '72px', height: '54px', objectFit: 'cover', flexShrink: 0 }} />
+                  ) : (
+                    <div style={{ width: '72px', height: '54px', background: '#f2f2f2', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '10px', color: '#bbb', textTransform: 'uppercase', letterSpacing: '0.1em' }}>No Img</span>
+                    </div>
+                  )}
+                  {/* Info */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '15px', color: '#1a1a1a', marginBottom: '4px' }}>{section.title}</div>
+                    <div style={{ fontSize: '12px', color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {section.content}
+                    </div>
                   </div>
-                )}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-                    <span style={{ fontSize: '11px', color: '#c8b89a', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
-                      {String(idx + 1).padStart(2, '0')}
-                    </span>
-                    <h3 style={{ margin: 0, fontSize: '16px', fontFamily: 'Georgia, serif', fontWeight: 400 }}>{section.title}</h3>
-                  </div>
-                  <p style={{ margin: 0, color: '#777', fontSize: '13px', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {section.content}
-                  </p>
-                </div>
-                <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                  {/* Actions */}
                   <button
                     onClick={() => setEditingId(section.id)}
-                    style={{ border: '1px solid #ddd', background: '#fff', padding: '8px 12px', cursor: 'pointer', fontSize: '13px' }}
+                    style={{
+                      padding: '7px 16px', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase',
+                      background: 'transparent', color: '#555', border: '1px solid #ddd', cursor: 'pointer',
+                      transition: 'border-color 0.15s, color 0.15s', flexShrink: 0,
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.color = ACCENT; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#ddd'; e.currentTarget.style.color = '#555'; }}
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => { if (confirm('Delete this section?')) deleteMutation.mutate({ id: section.id }); }}
-                    style={{ border: '1px solid #f1c5c5', color: '#b00020', background: '#fff', padding: '8px 12px', cursor: 'pointer', fontSize: '13px' }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', display: 'flex', alignItems: 'center', padding: '4px', transition: 'color 0.15s', flexShrink: 0 }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#b00020'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = '#ccc'; }}
+                    title="Delete section"
                   >
-                    Delete
+                    <Trash2 size={15} />
                   </button>
                 </div>
-              </div>
-            )}
-          </div>
-        ))
-      )}
+              )}
+            </div>
+          ))
+        )}
+      </div>
     </AdminLayout>
   );
 }
