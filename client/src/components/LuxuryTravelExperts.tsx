@@ -6,8 +6,10 @@
 
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { trpc } from '@/lib/trpc';
 
 export default function LuxuryTravelExperts() {
+  const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const testimonials = [
@@ -110,27 +112,37 @@ export default function LuxuryTravelExperts() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-8">
-        {/* Title and Description */}
+        {/* Title and Description - DB driven, fallback to static */}
+        {(!homepageData?.intro || homepageData.intro.isVisible !== false) && (
         <div className="text-center mb-16">
           <h2 className="font-display text-2xl md:text-3xl font-bold mb-6 uppercase tracking-wider" style={{ color: 'black', fontSize: '16px', fontFamily: 'Helvetica Neue Bold', fontWeight: '500' }}>
-            Wayseek中国之旅
+            {homepageData?.intro?.title || 'Wayseek中国之旅'}
           </h2>
-          <p className="text-sm md:text-base max-w-4xl mx-auto leading-relaxed mb-4" style={{ color: 'rgb(82, 87, 92)', fontFamily: 'Brandon Grotesque, sans-serif' }}>
-            China is vast, full of wonders. But information engulfs us. See this, do that, don't miss this. It seems that the more choices there are, the more overwhelmed we feel. What's more, you're rarely asked how you want to feel.
-          </p>
-          <p className="text-sm md:text-base max-w-4xl mx-auto leading-relaxed mb-4" style={{ color: 'rgb(82, 87, 92)', fontFamily: 'Brandon Grotesque, sans-serif' }}>
-            That's not us. WaySeek is a tailor-made immersive travel company that designs fully personalised itineraries.
-          </p>
-          <p className="text-sm md:text-base max-w-4xl mx-auto leading-relaxed mb-4" style={{ color: 'rgb(82, 87, 92)', fontFamily: 'Brandon Grotesque, sans-serif' }}>
-            For the past five years, we've been exploring China through its people, culture, landscapes, and everyday life — searching for experiences that feel genuine, personal, and deeply connected to the place itself. No rushed tours. No generic itineraries. Just a deeper, more personal way to travel through China.
-          </p>
-          <p className="text-sm md:text-base max-w-4xl mx-auto leading-relaxed mb-8" style={{ color: 'rgb(82, 87, 92)', fontFamily: 'Brandon Grotesque, sans-serif' }}>
-            So let's begin. Let's do something remarkable.
-          </p>
+          {homepageData?.intro?.content ? (
+            <div className="text-sm md:text-base max-w-4xl mx-auto leading-relaxed mb-8" style={{ color: 'rgb(82, 87, 92)', fontFamily: 'Brandon Grotesque, sans-serif', whiteSpace: 'pre-line' }}>
+              {homepageData.intro.content}
+            </div>
+          ) : (
+            <>
+              <p className="text-sm md:text-base max-w-4xl mx-auto leading-relaxed mb-4" style={{ color: 'rgb(82, 87, 92)', fontFamily: 'Brandon Grotesque, sans-serif' }}>
+                China is vast, full of wonders. But information engulfs us. See this, do that, don't miss this. It seems that the more choices there are, the more overwhelmed we feel. What's more, you're rarely asked how you want to feel.
+              </p>
+              <p className="text-sm md:text-base max-w-4xl mx-auto leading-relaxed mb-4" style={{ color: 'rgb(82, 87, 92)', fontFamily: 'Brandon Grotesque, sans-serif' }}>
+                That's not us. WaySeek is a tailor-made immersive travel company that designs fully personalised itineraries.
+              </p>
+              <p className="text-sm md:text-base max-w-4xl mx-auto leading-relaxed mb-4" style={{ color: 'rgb(82, 87, 92)', fontFamily: 'Brandon Grotesque, sans-serif' }}>
+                For the past five years, we've been exploring China through its people, culture, landscapes, and everyday life — searching for experiences that feel genuine, personal, and deeply connected to the place itself. No rushed tours. No generic itineraries. Just a deeper, more personal way to travel through China.
+              </p>
+              <p className="text-sm md:text-base max-w-4xl mx-auto leading-relaxed mb-8" style={{ color: 'rgb(82, 87, 92)', fontFamily: 'Brandon Grotesque, sans-serif' }}>
+                So let's begin. Let's do something remarkable.
+              </p>
+            </>
+          )}
           <a href="/make-an-enquiry" className="inline-block px-8 py-3 bg-black text-white text-sm font-normal tracking-wider uppercase rounded border-2 border-black hover:bg-white hover:text-black transition-all duration-300 active:scale-95">
             Get In Touch
           </a>
         </div>
+        )}
 
         {/* Desktop: 4-column carousel with pagination */}
         <div className="hidden md:block">

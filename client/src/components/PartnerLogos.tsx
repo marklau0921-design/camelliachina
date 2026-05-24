@@ -1,6 +1,7 @@
-import { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
+import { trpc } from '@/lib/trpc';
 
-const logos = [
+const fallbackLogos = [
   { src: '/manus-storage/VirtuosoPart-of_-150x150_55a260ef.png', alt: 'Virtuoso', invert: true },
   { src: '/manus-storage/Fan-ClubPart-of_-150x150_f293bc50.png', alt: 'Fan Club', invert: true },
   { src: '/manus-storage/PenClubPart-of_-150x150_d0bbd11a.png', alt: 'Pen Club', invert: true },
@@ -13,6 +14,13 @@ const logos = [
 ];
 
 export default function PartnerLogos() {
+  const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
+
+  // 使用 DB sponsors，若无数据则 fallback
+  const logos = (homepageData?.sponsors && homepageData.sponsors.length > 0)
+    ? homepageData.sponsors.map(sp => ({ src: sp.logo || '', alt: sp.name, invert: false, url: sp.url || undefined }))
+    : fallbackLogos;
+
   const trackRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const startXRef = useRef(0);
@@ -142,21 +150,40 @@ export default function PartnerLogos() {
               minWidth: '200px',
               }}
             >
-              <img
-                src={logo.src}
-                alt={logo.alt}
-                draggable={false}
-                style={{
-                height: (logo as any).height ? `${(logo as any).height}px` : '100%',
-                width: 'auto',
-                maxWidth: '320px',
-                  objectFit: 'contain',
-                  filter: logo.invert ? 'invert(1) grayscale(100%)' : 'grayscale(100%)',
-                  opacity: 0.7,
-                  transition: 'opacity 0.2s',
-                  pointerEvents: 'none',
-                }}
-              />
+              {(logo as any).url ? (
+                <a href={(logo as any).url} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img
+                    src={logo.src}
+                    alt={logo.alt}
+                    draggable={false}
+                    style={{
+                    height: (logo as any).height ? `${(logo as any).height}px` : '100%',
+                    width: 'auto',
+                    maxWidth: '320px',
+                      objectFit: 'contain',
+                      filter: logo.invert ? 'invert(1) grayscale(100%)' : 'grayscale(100%)',
+                      opacity: 0.7,
+                      transition: 'opacity 0.2s',
+                    }}
+                  />
+                </a>
+              ) : (
+                <img
+                  src={logo.src}
+                  alt={logo.alt}
+                  draggable={false}
+                  style={{
+                  height: (logo as any).height ? `${(logo as any).height}px` : '100%',
+                  width: 'auto',
+                  maxWidth: '320px',
+                    objectFit: 'contain',
+                    filter: logo.invert ? 'invert(1) grayscale(100%)' : 'grayscale(100%)',
+                    opacity: 0.7,
+                    transition: 'opacity 0.2s',
+                    pointerEvents: 'none',
+                  }}
+                />
+              )}
             </div>
           ))}
         </div>

@@ -78,6 +78,8 @@ export default function Home() {
 
   // 动态首页资产
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  // 首页管理模块公开数据（hero/intro/stories/sponsors）
+  const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
   
   // 从数据库动态加载行程
   const { data: rawItineraries = [] } = trpc.cms.listItineraries.useQuery();
@@ -95,7 +97,11 @@ export default function Home() {
   const FALLBACK_LOGO = '/manus-storage/wayseek-logo-pink2_a5317c72.png';
   const apiBanners = homepageAssets?.banners as Array<{ url: string; id: number }> | undefined;
   const activeLogo = homepageAssets?.logo?.url ?? FALLBACK_LOGO;
-  const activeBanners = (apiBanners && apiBanners.length > 0) ? apiBanners.map((b) => b.url) : [FALLBACK_BANNER];
+  // 若 homepage_hero 有 backgroundImage，优先使用；否则回退到 media assets banners
+  const heroBackgroundImage = homepageData?.hero?.backgroundImage;
+  const activeBanners = heroBackgroundImage
+    ? [heroBackgroundImage]
+    : (apiBanners && apiBanners.length > 0) ? apiBanners.map((b) => b.url) : [FALLBACK_BANNER];
   const activeCta = homepageAssets?.cta?.url;
 
   const [, navigate] = useLocation();

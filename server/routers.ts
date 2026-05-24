@@ -1228,6 +1228,22 @@ export const appRouter = router({
       return { hero, intro, stories, sponsors };
     }),
 
+    // Public: Homepage data for frontend
+    getPublicData: publicProcedure.query(async () => {
+      const [hero, intro, stories, sponsors] = await Promise.all([
+        getHomepageHero(),
+        getHomepageIntro(),
+        listHomepageStories(),
+        listHomepageSponsors(),
+      ]);
+      return {
+        hero,
+        intro,
+        stories: stories.filter(s => s.isVisible),
+        sponsors: sponsors.filter(s => s.isVisible),
+      };
+    }),
+
     // Admin: Hero
     getHero: publicProcedure.query(async ({ ctx }) => {
       await requireAdmin(ctx);

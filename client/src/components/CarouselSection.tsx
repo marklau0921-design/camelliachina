@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { trpc } from '@/lib/trpc';
 
 interface CarouselItem {
   id: number;
@@ -9,7 +10,7 @@ interface CarouselItem {
   videoId?: string;
 }
 
-const carouselData: CarouselItem[] = [
+const fallbackCarouselData: CarouselItem[] = [
   {
     id: 1,
     name: 'GUILIN',
@@ -41,9 +42,10 @@ const carouselData: CarouselItem[] = [
 ];
 
 // ── Reusable Stories carousel strip ──────────────────────────────────────────
-function StoriesStrip({ onPlayVideo, didDragRef }: {
+function StoriesStrip({ onPlayVideo, didDragRef, items }: {
   onPlayVideo: (videoId: string) => void;
   didDragRef: React.MutableRefObject<boolean>;
+  items: CarouselItem[];
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
@@ -160,7 +162,7 @@ function StoriesStrip({ onPlayVideo, didDragRef }: {
       } as React.CSSProperties}
     >
       <div style={{ display: 'flex', flexDirection: 'row', gap: '24px', alignItems: 'flex-start', minWidth: 'max-content', paddingBottom: '8px' }}>
-        {carouselData.map((item) => (
+        {items.map((item) => (
           <div
             key={item.id}
             className="relative group overflow-hidden flex-shrink-0"
@@ -211,6 +213,18 @@ function StoriesStrip({ onPlayVideo, didDragRef }: {
 export default function CarouselSection() {
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const didDragRef = useRef(false);
+  const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
+
+  // 将 DB stories 转换为 CarouselItem 格式，若无 DB 数据则使用 fallback
+  const carouselItems: CarouselItem[] = (homepageData?.stories && homepageData.stories.length > 0)
+    ? homepageData.stories.map(s => ({
+        id: s.id,
+        name: s.name,
+        description: '',
+        image: s.image || '',
+        videoId: s.videoId || undefined,
+      }))
+    : fallbackCarouselData;
 
   useEffect(() => {
     if (selectedVideoId) {
@@ -248,7 +262,7 @@ export default function CarouselSection() {
           </div>
 
           {/* Scroll track */}
-          <StoriesStrip onPlayVideo={setSelectedVideoId} didDragRef={didDragRef} />
+          <StoriesStrip onPlayVideo={setSelectedVideoId} didDragRef={didDragRef} items={carouselItems} />
         </div>
 
         {/* View our channel button */}
@@ -284,7 +298,7 @@ export default function CarouselSection() {
           </div>
 
           {/* Scroll track */}
-          <StoriesStrip onPlayVideo={setSelectedVideoId} didDragRef={didDragRef} />
+          <StoriesStrip onPlayVideo={setSelectedVideoId} didDragRef={didDragRef} items={carouselItems} />
         </div>
 
         {/* View our channel button */}

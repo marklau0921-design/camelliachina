@@ -116,14 +116,14 @@
 
 ## 主页管理后台模块
 
-- [ ] 数据库：新增 homepage_hero（Banner 设置）表
-- [ ] 数据库：新增 homepage_intro（简介板块）表
-- [ ] 数据库：新增 homepage_stories（Stories 卡片）表
-- [ ] 数据库：新增 homepage_sponsors（赞助商 Logo）表
-- [ ] 后端：homepage router（get/update hero、intro、stories CRUD、sponsors CRUD）
-- [ ] 后台：AdminHomepage.tsx 管理页面（四个板块的编辑界面）
-- [ ] 后台：注册 /admin/homepage 路由和导航
-- [ ] 前台：主页 Hero Banner 从数据库读取
-- [ ] 前台：主页简介板块从数据库读取
-- [ ] 前台：CarouselSection Stories 从数据库读取
-- [ ] 前台：PartnerLogos 赞助商从数据库读取
+- [x] 数据库：新增 homepage_hero（Banner 设置）表
+- [x] 数据库：新增 homepage_intro（简介板块）表
+- [x] 数据库：新增 homepage_stories（Stories 卡片）表
+- [x] 数据库：新增 homepage_sponsors（赞助商 Logo）表
+- [x] 后端：homepage router（get/update hero、intro、stories CRUD、sponsors CRUD）
+- [x] 后台：AdminHomepage.tsx 管理页面（四个板块的编辑界面）
+- [x] 后台：注册 /admin/homepage 路由和导航
+- [x] 前台：主页 Hero Banner 从数据库读取（保留现有 media assets 逻辑）
+- [x] 前台：主页简介板块从数据库读取（LuxuryTravelExperts.tsx）
+- [x] 前台：CarouselSection Stories 从数据库读取
+- [x] 前台：PartnerLogos 赞助商从数据库读取
