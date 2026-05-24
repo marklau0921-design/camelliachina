@@ -887,7 +887,7 @@ export default function YunnanDetail() {
           }
         `}</style>
         <div
-          className="w-full"
+          className="w-full h-full"
           style={{
             position: stickyFixed ? 'fixed' : 'relative',
             top: stickyFixed ? 0 : 'auto',
@@ -902,7 +902,7 @@ export default function YunnanDetail() {
               <button
                 key={s.id}
                 onClick={() => scrollToSection(s.id)}
-                className={`trip-tab-underline px-2 md:px-5 uppercase transition-colors flex items-center justify-center h-full ${
+                className={`trip-tab-underline px-2 md:px-5 uppercase transition-colors text-xs font-semibold tracking-wider ${
                   activeSection === s.id ? 'trip-tab-active' : ''
                 }`}
                 style={{
