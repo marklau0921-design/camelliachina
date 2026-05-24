@@ -34,7 +34,7 @@ export default function DestinationsMap() {
       <section 
         className="flex-1 w-full pb-16 relative"
         style={{
-          backgroundImage: 'url(/manus-storage/destinations-bg_506ad492.avif), url(/manus-storage/destinations-bg_506ad492.avif)',
+          backgroundImage: ', ',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed'

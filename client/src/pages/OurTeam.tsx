@@ -190,7 +190,7 @@ export default function OurTeam() {
         <div style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: `url(${ctaBg || '/manus-storage/texture-buried_038ce46e.png'})`,
+          backgroundImage: `url(${ctaBg || ''})`,
           backgroundSize: '400px 400px',
           backgroundRepeat: 'repeat',
           opacity: 0.65,

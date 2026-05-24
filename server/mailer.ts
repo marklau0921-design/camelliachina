@@ -53,8 +53,7 @@ function sectionHeader(title: string): string {
 }
 
 function buildEmailHtml(data: ContactFormData & { createdAt: Date }): string {
-  const logoUrl =
-    "https://chinaluxury-chkz3asb.manus.space/manus-storage/wayseek-logo-pink2_a5317c72.png";
+  const logoUrl = ""; // Logo will be uploaded via Admin panel
 
   const contactRows =
     row("Name", `${data.firstName} ${data.lastName}`, true) +

@@ -25,7 +25,7 @@ const articles: Article[] = [
     category: 'Wellness',
     date: 'January 2026',
     readTime: '8 min read',
-    image: '/manus-storage/lQarUKpI71rP_a45c4e2d.avif',
+    image: '',
   },
   {
     id: 2,
@@ -34,7 +34,7 @@ const articles: Article[] = [
     category: 'Travel Tips',
     date: 'December 2025',
     readTime: '10 min read',
-    image: '/manus-storage/cKNNGGcYAuYR_67291337.avif',
+    image: '',
   },
   {
     id: 3,
@@ -43,7 +43,7 @@ const articles: Article[] = [
     category: 'Gastronomy',
     date: 'November 2025',
     readTime: '12 min read',
-    image: '/manus-storage/mwMaZxOiIbSC_6316bb33.avif',
+    image: '',
   },
   {
     id: 4,
@@ -52,7 +52,7 @@ const articles: Article[] = [
     category: 'Destinations',
     date: 'October 2025',
     readTime: '9 min read',
-    image: '/manus-storage/xU3Z1k1TTXSG_efe4d129.avif',
+    image: '',
   },
   {
     id: 5,
@@ -61,7 +61,7 @@ const articles: Article[] = [
     category: 'Culture',
     date: 'September 2025',
     readTime: '7 min read',
-    image: '/manus-storage/fF6fvDhSO1V4_417b505c.avif',
+    image: '',
   },
   {
     id: 6,
@@ -70,7 +70,7 @@ const articles: Article[] = [
     category: 'Photography',
     date: 'August 2025',
     readTime: '11 min read',
-    image: '/manus-storage/MUKm78KwPQEA_52ca0f8f.avif',
+    image: '',
   },
 ];
 
@@ -84,7 +84,7 @@ export default function Inspiration() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('/manus-storage/7QgucNsF5n2h_efe4d129.avif'), url('/manus-storage/7QgucNsF5n2h_efe4d129.avif')`
+            backgroundImage: `url(''), url('')`
           }}
         >
           <div className="absolute inset-0 bg-black/50"></div>

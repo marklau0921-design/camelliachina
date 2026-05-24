@@ -28,7 +28,7 @@ const destinations: Destination[] = [
   {
     id: 'chengdu-sichuan',
     name: 'Chengdu & Sichuan',
-    previewImage: '/manus-storage/sichuan-1-main_d212b850.avif',
+    previewImage: '',
     route: '/destinations/sichuan',
     experiences: [
       "Tea Mountains of Ya'an",
@@ -43,7 +43,7 @@ const destinations: Destination[] = [
   {
     id: 'chongqing',
     name: 'Chongqing',
-    previewImage: '/manus-storage/hero-rural-life_08356dd8.avif',
+    previewImage: '',
     experiences: [
       'Yangtze River Cruises',
       'Hotpot Culture',
@@ -57,7 +57,7 @@ const destinations: Destination[] = [
   {
     id: 'yunnan',
     name: 'Yunnan (Dali, Lijiang, Shangri-La)',
-    previewImage: '/manus-storage/yunnan-1-main_e8e0ebf5.avif',
+    previewImage: '',
     experiences: [
       'Dali Old Town',
       'Lijiang Ancient City',
@@ -71,7 +71,7 @@ const destinations: Destination[] = [
   {
     id: 'tibet',
     name: 'Tibet / Xizang',
-    previewImage: '/manus-storage/hero-snow-mountain_f75c5878.avif',
+    previewImage: '',
     experiences: [
       'Potala Palace',
       'Jokhang Temple',
@@ -85,7 +85,7 @@ const destinations: Destination[] = [
   {
     id: 'guizhou',
     name: 'Guizhou',
-    previewImage: '/manus-storage/why-into-china-herder_04e8ebad.avif',
+    previewImage: '',
     experiences: [
       'Miao Village Festivals',
       'Dong Drum Tower Culture',
@@ -99,7 +99,7 @@ const destinations: Destination[] = [
   {
     id: 'yangshuo-guilin',
     name: 'Yangshuo & Guilin',
-    previewImage: '/manus-storage/guilin-1-main_a6634a5f.avif',
+    previewImage: '',
     experiences: [
       'Li River Cruise',
       'Karst Peak Cycling',
@@ -113,7 +113,7 @@ const destinations: Destination[] = [
   {
     id: 'zhangjiajie',
     name: 'Zhangjiajie',
-    previewImage: '/manus-storage/zhangjiajie-1-main_e8f92015.avif',
+    previewImage: '',
     experiences: [
       'Avatar Mountains Hike',
       'Glass Bridge Walk',
@@ -127,7 +127,7 @@ const destinations: Destination[] = [
   {
     id: 'xian',
     name: "Xi'an",
-    previewImage: '/manus-storage/xian-1-main_2d53ee78.avif',
+    previewImage: '',
     experiences: [
       'Terracotta Warriors',
       'Ancient City Wall Cycling',
@@ -141,7 +141,7 @@ const destinations: Destination[] = [
   {
     id: 'xinjiang',
     name: 'Xinjiang',
-    previewImage: '/manus-storage/hero-snow-mountain_f75c5878.avif',
+    previewImage: '',
     experiences: [
       'Kashgar Old City',
       'Taklamakan Desert',
@@ -155,7 +155,7 @@ const destinations: Destination[] = [
   {
     id: 'beijing',
     name: 'Beijing',
-    previewImage: '/manus-storage/beijing-1-main_46ed2ee1.avif',
+    previewImage: '',
     experiences: [
       'Great Wall Hike',
       'Forbidden City',
@@ -169,7 +169,7 @@ const destinations: Destination[] = [
   {
     id: 'shanghai',
     name: 'Shanghai',
-    previewImage: '/manus-storage/shanghai-1-main_a89c2c46.avif',
+    previewImage: '',
     experiences: [
       'The Bund Night Walk',
       'French Concession',

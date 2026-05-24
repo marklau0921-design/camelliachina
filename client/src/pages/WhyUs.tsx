@@ -41,35 +41,35 @@ const STATIC_SLIDES: Slide[] = [
     title: 'Unmatched Local Knowledge',
     description:
       "Our guides and partners have spent decades living and breathing the landscapes, cultures, and hidden corners of China. We don't follow itineraries — we follow curiosity, leading you to places most travellers never find.",
-    image: '/manus-storage/sichuan-1-main_7e303aa1.avif',
+    image: '',
   },
   {
     num: '02',
     title: 'Truly Tailor-Made',
     description:
       'Every journey we craft is built from scratch around you — your pace, your passions, your idea of luxury. No templates, no group tours. Just a trip that feels like it was made for no one else.',
-    image: '/manus-storage/yunnan-1-main_bc2d600d.avif',
+    image: '',
   },
   {
     num: '03',
     title: 'Access Beyond the Obvious',
     description:
       "From private tea harvests in Ya'an to dawn ceremonies at remote Tibetan monasteries, we open doors that remain closed to most. Our relationships with local communities give you access that simply cannot be booked elsewhere.",
-    image: '/manus-storage/zhangjiajie-1-main_aad9f7a1.avif',
+    image: '',
   },
   {
     num: '04',
     title: 'Seamless from Start to Finish',
     description:
       'We handle every detail — transfers, accommodation, permits, guides — so you can be fully present. Our team is reachable throughout your journey, ensuring that the unexpected becomes part of the adventure, not a disruption.',
-    image: '/manus-storage/guilin-1-main_bb73c4c8.avif',
+    image: '',
   },
   {
     num: '05',
     title: 'Travel That Gives Back',
     description:
       'We work exclusively with local operators, stay in family-run guesthouses, and contribute to the communities we visit. When you travel with Wayseek, your journey supports the very people and places that make it extraordinary.',
-    image: '/manus-storage/hero-rural-life_7e74a18e.avif',
+    image: '',
   },
 ];
 
@@ -235,7 +235,7 @@ export default function WhyUs() {
 
     const imageBlock = slide.isCover ? (
       <div style={{ width: '100%', height: '100%', background: '#00a0a6', position: 'relative' }}>
-        <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: 'url(/manus-storage/texture-noise_3d19203d.png)', backgroundRepeat: 'repeat', backgroundSize: '300px 300px' }} />
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: '', backgroundRepeat: 'repeat', backgroundSize: '300px 300px' }} />
       </div>
     ) : (
       <>
@@ -258,7 +258,7 @@ export default function WhyUs() {
               paddingLeft: 'clamp(40px,8vw,120px)', paddingRight: '40px',
               willChange: 'transform', animation: anim('left'),
             }}>
-              <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: 'url(/manus-storage/texture-noise_3d19203d.png)', backgroundRepeat: 'repeat', backgroundSize: '300px 300px', pointerEvents: 'none' }} />
+              <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: '', backgroundRepeat: 'repeat', backgroundSize: '300px 300px', pointerEvents: 'none' }} />
               {textBlock.props.children}
             </div>
           ) : (
@@ -281,7 +281,7 @@ export default function WhyUs() {
               paddingLeft: 'clamp(40px,5vw,80px)', paddingRight: '40px',
               willChange: 'transform', animation: anim('right'),
             }}>
-              <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: 'url(/manus-storage/texture-noise_3d19203d.png)', backgroundRepeat: 'repeat', backgroundSize: '300px 300px', pointerEvents: 'none' }} />
+              <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: '', backgroundRepeat: 'repeat', backgroundSize: '300px 300px', pointerEvents: 'none' }} />
               {textBlock.props.children}
             </div>
           ) : (

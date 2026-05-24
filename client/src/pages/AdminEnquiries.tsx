@@ -29,7 +29,7 @@ function formatDate(d: Date) {
 
 // Email preview HTML — table-based layout
 function buildEmailHtml(data: Enquiry) {
-  const logoUrl = '/manus-storage/wayseek-logo-pink2_a5317c72.png';
+  const logoUrl = '';
 
   const sectionHeader = (title: string) =>
     `<tr><td colspan="2" style="background:#c8c8c8;padding:10px 20px;font-size:16px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#1a1a1a;border-bottom:1px solid #b8b8b8">${title}</td></tr>`;

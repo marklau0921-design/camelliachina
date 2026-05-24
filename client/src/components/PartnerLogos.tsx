@@ -2,15 +2,15 @@ import React, { useRef, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
 
 const fallbackLogos = [
-  { src: '/manus-storage/VirtuosoPart-of_-150x150_55a260ef.png', alt: 'Virtuoso', invert: true },
-  { src: '/manus-storage/Fan-ClubPart-of_-150x150_f293bc50.png', alt: 'Fan Club', invert: true },
-  { src: '/manus-storage/PenClubPart-of_-150x150_d0bbd11a.png', alt: 'Pen Club', invert: true },
-  { src: '/manus-storage/Forbes-193x40-1_bda291d3.svg', alt: 'Forbes', invert: false },
-  { src: '/manus-storage/EnsemblePart-of_-150x150_40c6d44f.png', alt: 'Ensemble', invert: true },
-  { src: '/manus-storage/EF_Education_First_logo.svg_c374a76a.png', alt: 'EF Education First', invert: false, height: 80 },
-  { src: '/manus-storage/coveteur-logo-cropped_eaacd874.svg', alt: 'Coveteur', invert: false },
-  { src: '/manus-storage/CNBC-193x40-1_40120200.svg', alt: 'CNBC', invert: false },
-  { src: '/manus-storage/A-LIST-Black2026_3e5a65af.png', alt: 'Travel + Leisure A-List 2026', invert: false },
+  { src: '', alt: 'Virtuoso', invert: true },
+  { src: '', alt: 'Fan Club', invert: true },
+  { src: '', alt: 'Pen Club', invert: true },
+  { src: '', alt: 'Forbes', invert: false },
+  { src: '', alt: 'Ensemble', invert: true },
+  { src: '', alt: 'EF Education First', invert: false, height: 80 },
+  { src: '', alt: 'Coveteur', invert: false },
+  { src: '', alt: 'CNBC', invert: false },
+  { src: '', alt: 'Travel + Leisure A-List 2026', invert: false },
 ];
 
 export default function PartnerLogos() {

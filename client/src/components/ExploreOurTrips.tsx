@@ -89,7 +89,7 @@ export default function ExploreOurTrips() {
       className="w-full py-16 md:py-24 relative overflow-hidden"
       style={{
         minHeight: '700px',
-        backgroundImage: 'url(/manus-storage/hero-snow-mountain_6d85634a.avif)',
+        backgroundImage: '',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',

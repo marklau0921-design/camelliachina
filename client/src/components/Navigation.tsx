@@ -54,7 +54,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
 
   // 动态加载 Brand Assets logo
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
-  const logoUrl = homepageAssets?.logo?.url || '/manus-storage/wayseek-logo-pink2_a5317c72.png';
+  const logoUrl = homepageAssets?.logo?.url || '';
 
   // 动态加载体验类型及其子项
   const { data: navData } = trpc.cms.listExperienceTypesWithNav.useQuery();
@@ -63,7 +63,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
     return navData.map(type => ({
       id: String(type.id),
       name: type.name,
-      previewImage: type.coverImage || '/manus-storage/sichuan-1-main_d212b850.avif',
+      previewImage: type.coverImage || '',
       items: type.items.map(item => ({
         label: item.name,
         route: `/experiences/${toSlug(type.name)}/${item.slug}`,
@@ -78,7 +78,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
     return citiesData.map(city => ({
       id: String(city.id),
       name: city.name,
-      previewImage: city.coverImage || '/manus-storage/sichuan-1-main_d212b850.avif',
+      previewImage: city.coverImage || '',
       route: `/destinations/${city.slug}`,
       experiences: city.experiences
         .filter(e => e.name)

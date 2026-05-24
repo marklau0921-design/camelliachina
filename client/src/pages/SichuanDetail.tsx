@@ -9,7 +9,7 @@ export default function SichuanDetail() {
       title: "Panda Encounter in Chengdu",
       location: "Chengdu Research Base",
       description: "Watch giant pandas munch bamboo, play, and lounge in their natural habitat. An intimate glimpse into conservation efforts protecting these beloved national treasures.",
-      image: "/manus-storage/sichuan-hero-panda_c8d88dfa.avif",
+      image: "",
       duration: "Half Day",
       bestTime: "Morning (8:00-10:00 AM)",
       layout: "horizontal-left" // Image left, text right
@@ -19,7 +19,7 @@ export default function SichuanDetail() {
       title: "Authentic Sichuan Hotpot",
       location: "Chengdu City",
       description: "Master the art of Sichuan hotpot with a local chef. Experience the numbing sensation of Sichuan peppercorns and fiery chilies.",
-      image: "/manus-storage/sichuan-hotpot-making_93eebcff.avif",
+      image: "",
       duration: "3-4 Hours",
       bestTime: "Evening",
       layout: "vertical" // Vertical card
@@ -29,7 +29,7 @@ export default function SichuanDetail() {
       title: "Rural Baba Banquet",
       location: "Sichuan Countryside",
       description: "Join village families for an outdoor feast under the open sky. Toast with locals and discover authentic rural Sichuan hospitality.",
-      image: "/manus-storage/sichuan-rural-banquet_d8a0c362.avif",
+      image: "",
       duration: "Full Day",
       bestTime: "Weekends & Festivals",
       layout: "vertical" // Vertical card
@@ -39,7 +39,7 @@ export default function SichuanDetail() {
       title: "Traditional Tea Culture",
       location: "Chengdu Teahouse",
       description: "Experience Chengdu's leisurely pace at a traditional teahouse. Watch gongfu tea ceremonies and sip fragrant jasmine tea while locals play mahjong.",
-      image: "/manus-storage/sichuan-tea-culture_60ab5e76.avif",
+      image: "",
       duration: "2-3 Hours",
       bestTime: "Afternoon",
       layout: "horizontal-right" // Text left, image right
@@ -49,7 +49,7 @@ export default function SichuanDetail() {
       title: "Leshan Giant Buddha",
       location: "Leshan City",
       description: "Stand before the world's largest stone Buddha, carved 1,200 years ago. This 71-meter UNESCO World Heritage masterpiece overlooks three rivers.",
-      image: "/manus-storage/sichuan-leshan-buddha_2747b566.avif",
+      image: "",
       duration: "Full Day",
       bestTime: "Spring & Autumn",
       layout: "vertical" // Vertical card
@@ -59,7 +59,7 @@ export default function SichuanDetail() {
       title: "Jiuzhaigou Valley Paradise",
       location: "Jiuzhaigou National Park",
       description: "Enter a fairy-tale landscape of turquoise lakes, cascading waterfalls, and snow-capped peaks. UNESCO World Heritage site showcasing nature's artistry.",
-      image: "/manus-storage/sichuan-jiuzhaigou_ebc0a5ea.avif",
+      image: "",
       duration: "2-3 Days",
       bestTime: "Autumn (Sept-Nov)",
       layout: "vertical" // Vertical card
@@ -191,7 +191,7 @@ export default function SichuanDetail() {
       <section 
         className="relative h-[70vh] w-full"
         style={{
-          backgroundImage: 'url(/manus-storage/sichuan-hero-western_a11f94fd.avif), url(/manus-storage/sichuan-hero-western_a11f94fd.avif)',
+          backgroundImage: ', ',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

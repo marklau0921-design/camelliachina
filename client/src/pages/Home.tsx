@@ -29,12 +29,12 @@ interface HeroSlide {
 const heroSlides: HeroSlide[] = [
   {
     id: 1,
-    image: '/manus-storage/hero-rural-life_08356dd8.avif',
+    image: '',
     title: 'Rural Life',
   },
   {
     id: 2,
-    image: '/manus-storage/home-banner_91093653.webp',
+    image: '',
     title: 'Mountain Majesty',
   },
 ];
@@ -93,8 +93,8 @@ export default function Home() {
     image: itin.coverImage || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
   }));
   // 始终使用静态图片作为 fallback，只有 API 返回且有数据时才替换
-  const FALLBACK_BANNER = '/manus-storage/home-banner_91093653.webp';
-  const FALLBACK_LOGO = '/manus-storage/wayseek-logo-pink2_a5317c72.png';
+  const FALLBACK_BANNER = '';
+  const FALLBACK_LOGO = '';
   const apiBanners = homepageAssets?.banners as Array<{ url: string; id: number }> | undefined;
   const activeLogo = homepageAssets?.logo?.url ?? FALLBACK_LOGO;
   // 若 homepage_hero 有 backgroundImage，优先使用；否则回退到 media assets banners
@@ -249,7 +249,7 @@ export default function Home() {
         <div className="absolute inset-0 flex items-center justify-center z-20">
           <div className="flex flex-col items-center gap-4">
             <img
-              src={activeLogo || '/manus-storage/wayseek-logo-pink2_a5317c72.png'}
+              src={activeLogo || ''}
               alt="Wayseek 未远"
               style={{ height: 'clamp(60px, 12vw, 160px)', width: 'auto', maxWidth: '60vw', objectFit: 'contain' }}
             />

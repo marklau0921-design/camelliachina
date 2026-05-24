@@ -27,7 +27,7 @@ const categories: ExperienceCategory[] = [
   {
     id: 'nature',
     name: 'Nature',
-    previewImage: '/manus-storage/sichuan-1-main_d212b850.avif',
+    previewImage: '',
     items: [
       "Tea Mountains of Ya'an",
       'Panda Habitat Walks',
@@ -41,7 +41,7 @@ const categories: ExperienceCategory[] = [
   {
     id: 'culture',
     name: 'Culture',
-    previewImage: '/manus-storage/xian-1-main_2d53ee78.avif',
+    previewImage: '',
     items: [
       'Thangka Painting',
       'Sichuan Opera',
@@ -55,7 +55,7 @@ const categories: ExperienceCategory[] = [
   {
     id: 'history',
     name: 'History',
-    previewImage: '/manus-storage/beijing-1-main_46ed2ee1.avif',
+    previewImage: '',
     items: [
       'Leshan Giant Buddha',
       'Ancient Towns',
@@ -68,7 +68,7 @@ const categories: ExperienceCategory[] = [
   {
     id: 'adventure',
     name: 'Adventure',
-    previewImage: '/manus-storage/hero-snow-mountain_f75c5878.avif',
+    previewImage: '',
     items: [
       'Western Sichuan Road Trips',
       'Tibetan Highland Trekking',
@@ -81,7 +81,7 @@ const categories: ExperienceCategory[] = [
   {
     id: 'local-life',
     name: 'Local Life',
-    previewImage: '/manus-storage/hero-rural-life_08356dd8.avif',
+    previewImage: '',
     items: [
       'Mahjong with Locals',
       'Local Markets',
@@ -96,7 +96,7 @@ const categories: ExperienceCategory[] = [
   {
     id: 'food',
     name: 'Food',
-    previewImage: '/manus-storage/guilin-1-main_a6634a5f.avif',
+    previewImage: '',
     items: [
       'Sichuan Cooking Classes',
       'Hotpot Experiences',
@@ -110,7 +110,7 @@ const categories: ExperienceCategory[] = [
   {
     id: 'wellness',
     name: 'Wellness',
-    previewImage: '/manus-storage/yunnan-1-main_e8e0ebf5.avif',
+    previewImage: '',
     items: [
       'Traditional Chinese Medicine',
       'Meditation Retreats',

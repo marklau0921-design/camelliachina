@@ -52,7 +52,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
       <div style={{ width: "100%", maxWidth: "360px" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: "40px" }}>
           <img
-            src="/manus-storage/wayseek-logo_8d6c4e06.png"
+            src=""
             alt="Logo"
             style={{ height: "52px", width: "auto", objectFit: "contain" }}
             onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -147,7 +147,7 @@ function Sidebar({ onLogout }: { onLogout: () => void }) {
       <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <a href="/" style={{ display: "block", height: "36px" }}>
           <img
-            src="/manus-storage/wayseek-logo-pink2_a5317c72.png"
+            src=""
             alt="Logo"
             style={{ height: "36px", width: "auto", objectFit: "contain" }}
             onError={e => { (e.target as HTMLImageElement).style.visibility = "hidden"; }}

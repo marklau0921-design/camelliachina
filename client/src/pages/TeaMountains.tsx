@@ -646,7 +646,7 @@ export default function TeaMountains() {
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: 'url(/manus-storage/texture-buried_038ce46e.png)',
+            backgroundImage: '',
             backgroundSize: '400px 400px',
             backgroundRepeat: 'repeat',
             opacity: 0.65,

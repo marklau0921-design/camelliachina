@@ -615,7 +615,7 @@ function SimilarExperiencesSection() {
     buttonText: 'Explore Trip',
     image: itin.coverImage || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
   }));
-  const FALLBACK_BANNER = '/manus-storage/home-banner_91093653.webp';
+  const FALLBACK_BANNER = '';
   const apiBanners = homepageAssets?.banners as Array<{ url: string; id: number }> | undefined;
   const activeBanners = (apiBanners && apiBanners.length > 0) ? apiBanners.map((b) => b.url) : [FALLBACK_BANNER];
   const activeCta = homepageAssets?.cta?.url;
@@ -926,7 +926,7 @@ export default function YunnanDetail() {
       {/* ── HERO ── */}
       <div ref={heroRef} className="relative w-full h-screen overflow-hidden">
         <img
-          src="/manus-storage/yunnan-banner_2d1cc899.webp"
+          src=""
           alt="Yunnan landscape"
           className="w-full h-full object-cover"
         />
@@ -1159,7 +1159,7 @@ export default function YunnanDetail() {
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: 'url(/manus-storage/texture-buried_038ce46e.png)',
+            backgroundImage: '',
             backgroundSize: '400px 400px',
             backgroundRepeat: 'repeat',
             opacity: 0.65,

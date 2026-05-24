@@ -633,7 +633,7 @@ export default function CityPage() {
             <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.35)' }} />
           </>
         ) : (
-          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/manus-storage/texture-buried_038ce46e.png)', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: '', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
         )}
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: '12px', textAlign: 'left', flex: 1 }}>
           <h2 style={{ fontFamily: 'AlternateGotNo1D', fontSize: '32px', fontWeight: 800, color: '#ffffff', letterSpacing: '0.05em', textTransform: 'uppercase', margin: 0, lineHeight: 1.1 }}>

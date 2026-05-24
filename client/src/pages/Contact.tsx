@@ -8,15 +8,15 @@ import CustomSelect from '@/components/CustomSelect';
 
 // ── Contact Partner Logos with drag scroll ──
 const CONTACT_LOGOS = [
-  { src: '/manus-storage/VirtuosoPart-of_-150x150_55a260ef.png', alt: 'Virtuoso', height: undefined as number | undefined },
-  { src: '/manus-storage/Fan-ClubPart-of_-150x150_f293bc50.png', alt: 'Fan Club', height: undefined as number | undefined },
-  { src: '/manus-storage/PenClubPart-of_-150x150_d0bbd11a.png', alt: 'Pen Club', height: undefined as number | undefined },
-  { src: '/manus-storage/Forbes-193x40-1_bda291d3.svg', alt: 'Forbes', height: undefined as number | undefined },
-  { src: '/manus-storage/EnsemblePart-of_-150x150_40c6d44f.png', alt: 'Ensemble', height: undefined as number | undefined },
-  { src: '/manus-storage/EF_Education_First_logo.svg_c374a76a.png', alt: 'EF Education First', height: 80 as number | undefined },
-  { src: '/manus-storage/coveteur-logo-cropped_eaacd874.svg', alt: 'Coveteur', height: undefined as number | undefined },
-  { src: '/manus-storage/CNBC-193x40-1_40120200.svg', alt: 'CNBC', height: undefined as number | undefined },
-  { src: '/manus-storage/A-LIST-Black2026_3e5a65af.png', alt: 'Travel + Leisure A-List 2026', height: undefined as number | undefined },
+  { src: '', alt: 'Virtuoso', height: undefined as number | undefined },
+  { src: '', alt: 'Fan Club', height: undefined as number | undefined },
+  { src: '', alt: 'Pen Club', height: undefined as number | undefined },
+  { src: '', alt: 'Forbes', height: undefined as number | undefined },
+  { src: '', alt: 'Ensemble', height: undefined as number | undefined },
+  { src: '', alt: 'EF Education First', height: 80 as number | undefined },
+  { src: '', alt: 'Coveteur', height: undefined as number | undefined },
+  { src: '', alt: 'CNBC', height: undefined as number | undefined },
+  { src: '', alt: 'Travel + Leisure A-List 2026', height: undefined as number | undefined },
 ];
 
 function ContactPartnerLogos() {
@@ -96,7 +96,7 @@ function ContactPartnerLogos() {
 
   return (
     <section style={{ position: 'relative', width: '100%', height: '260px', backgroundColor: '#315c00', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/manus-storage/texture-buried_038ce46e.png)', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: '', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
       <div style={{ position: 'relative', zIndex: 1, width: '100%', overflow: 'hidden' }}>
         <div
           ref={trackRef}

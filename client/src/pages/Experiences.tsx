@@ -29,7 +29,7 @@ const experiences: Experience[] = [
       'Wine and tea pairing sessions',
       'Dinner in historic imperial kitchens',
     ],
-    image: '/manus-storage/xU3Z1k1TTXSG_efe4d129.avif',
+    image: '',
   },
   {
     id: 2,
@@ -43,7 +43,7 @@ const experiences: Experience[] = [
       'Visits to artisan workshops',
       'Exclusive museum tours with expert historians',
     ],
-    image: '/manus-storage/fF6fvDhSO1V4_417b505c.avif',
+    image: '',
   },
   {
     id: 3,
@@ -57,7 +57,7 @@ const experiences: Experience[] = [
       'Meditation and mindfulness retreats',
       'Yoga sessions in mountain temples',
     ],
-    image: '/manus-storage/MUKm78KwPQEA_52ca0f8f.avif',
+    image: '',
   },
   {
     id: 4,
@@ -71,7 +71,7 @@ const experiences: Experience[] = [
       'Wildlife observation in nature reserves',
       'Luxury glamping in remote locations',
     ],
-    image: '/manus-storage/7QgucNsF5n2h_efe4d129.avif',
+    image: '',
   },
 ];
 
@@ -85,7 +85,7 @@ export default function Experiences() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('/manus-storage/cKNNGGcYAuYR_67291337.avif'), url('/manus-storage/cKNNGGcYAuYR_67291337.avif')`
+            backgroundImage: `url(''), url('')`
           }}
         >
           <div className="absolute inset-0 bg-black/50"></div>
