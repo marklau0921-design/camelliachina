@@ -912,21 +912,18 @@ export default function YunnanDetail() {
         </p>
 
         {/* WHEN / PRICE / HOW LONG */}
-        <div className="grid grid-cols-3 gap-8 border-t border-b border-gray-200 py-10">
-          <div>
-            <p className="text-xs tracking-widest uppercase mb-3 font-semibold" style={{ fontFamily: 'sans-serif', color: '#2d6a4f' }}>WHEN</p>
-            <p className="text-gray-700" style={{ fontSize: '16px', fontStyle: 'italic' }}>Apr – Jun, Sep – Nov</p>
-          </div>
-          <div>
-            <p className="text-xs tracking-widest uppercase mb-3 font-semibold" style={{ fontFamily: 'sans-serif', color: '#2d6a4f' }}>PRICE</p>
-            <p className="text-gray-700" style={{ fontSize: '16px', fontStyle: 'italic' }}>From £4,800pp</p>
-            <p className="text-gray-400 text-xs mt-1" style={{ fontFamily: 'sans-serif' }}>(based on 2 ppl sharing)</p>
-          </div>
-          <div>
-            <p className="text-xs tracking-widest uppercase mb-3 font-semibold" style={{ fontFamily: 'sans-serif', color: '#2d6a4f' }}>HOW LONG</p>
-            <p className="text-gray-700" style={{ fontSize: '16px', fontStyle: 'italic' }}>10 nights</p>
-            <p className="text-gray-400 text-xs mt-1" style={{ fontFamily: 'sans-serif' }}>Ideal length</p>
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px' }}>
+          {[
+            { label: 'WHEN', value: 'Apr – Jun, Sep – Nov', color: '#f49e0b' },
+            { label: 'PRICE', value: 'From £4,800pp', sub: '(based on 2 ppl sharing)', color: '#1d902b' },
+            { label: 'HOW LONG', value: '10 nights', color: '#2c6faa' },
+          ].map(m => (
+            <div key={m.label} style={{ textAlign: 'center', flex: 1 }}>
+              <p style={{ fontSize: 18, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: m.color, marginBottom: 10 }}>{m.label}</p>
+              <p style={{ fontFamily: 'Manrope', fontStyle: 'italic', fontSize: 15, color: '#6B6B6B', lineHeight: 1.5 }}>{m.value}</p>
+              {m.sub && <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 13, color: '#888', marginTop: 4 }}>{m.sub}</p>}
+            </div>
+          ))}
         </div>
       </div>
 
