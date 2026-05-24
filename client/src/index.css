@@ -385,6 +385,7 @@ html {
   align-items: flex-start;
   margin-left: auto;
   margin-right: 33.33%;
+  justify-content: flex-end;
 }
 
 @media (max-width: 767px) {
