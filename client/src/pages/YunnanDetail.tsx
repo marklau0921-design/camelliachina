@@ -726,21 +726,16 @@ function SimilarExperiencesSection() {
         minHeight: '680px',
         paddingTop: '50px',
         paddingBottom: '50px',
-        backgroundImage: `url(${activeCta || activeBanners[0]})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'scroll',
+        backgroundColor: '#FFFFFF',
       }}
     >
-      {/* Dark frosted glass overlay */}
-      <div className="absolute inset-0" style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', backgroundColor: 'rgba(10,10,10,0.85)', zIndex: 0 }} />
 
       {/* Mobile: Title above carousel */}
       <div className="lg:hidden w-full px-6 mb-6 relative z-10">
-        <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: 400, fontSize: '28px', color: 'white', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: '12px', lineHeight: 1.1 }}>
+        <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: 400, fontSize: '28px', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: '12px', lineHeight: 1.1 }}>
           Explore Our Trips
         </h2>
-        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', fontStyle: 'italic', lineHeight: 1.6 }}>
+        <p style={{ fontSize: '13px', color: 'rgba(0,0,0,0.6)', fontStyle: 'italic', lineHeight: 1.6 }}>
           Explore our sample trips or get in touch to begin your bespoke adventure.
         </p>
       </div>
@@ -774,10 +769,10 @@ function SimilarExperiencesSection() {
           {/* Title block - Desktop only (JS controlled) */}
           {isDesktop && (
             <div style={{ width: '260px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingTop: '8px' }}>
-              <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: '700', fontSize: '32px', color: 'white', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: '16px', lineHeight: 1.1 }}>
+              <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: '700', fontSize: '32px', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: '16px', lineHeight: 1.1 }}>
                 Explore Our Trips
               </h2>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', fontStyle: 'italic', lineHeight: 1.6 }}>
+              <p style={{ fontSize: '14px', color: 'rgba(0,0,0,0.6)', fontStyle: 'italic', lineHeight: 1.6 }}>
                 Explore our sample trips or get in touch to begin your bespoke adventure.
               </p>
             </div>
