@@ -814,9 +814,30 @@ function SimilarExperiencesSection() {
           {/* View More */}
           <div className="flex-shrink-0" style={{ width: '155px', height: '550px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
             <button
-              className="px-6 py-3 rounded-sm transition-all duration-300 bg-white/20 border border-white/50 text-white font-semibold uppercase tracking-wider text-sm"
-              onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#000000'; }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = '#ffffff'; }}
+              style={{
+                backgroundColor: '#111111',
+                color: '#ffffff',
+                fontFamily: 'Lato, sans-serif',
+                fontSize: '13px',
+                fontWeight: 700,
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                padding: '14px 36px',
+                border: '2px solid #111111',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s, color 0.2s, transform 0.1s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.backgroundColor = '#ffffff';
+                e.currentTarget.style.color = '#111111';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.backgroundColor = '#111111';
+                e.currentTarget.style.color = '#ffffff';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+              onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.95)')}
+              onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
             >View More</button>
           </div>
         </div>
