@@ -866,30 +866,8 @@ export default function YunnanDetail() {
       {/* ── TRIP SECTION NAV ── */}
       {/* Wrapper: in normal flow; when stickyFixed, inner nav becomes fixed at top */}
       <div ref={tripNavRef} style={{ height: '48px', position: 'relative', zIndex: 39 }}>
-        <style>{`
-          .trip-tab-underline {
-            position: relative;
-            padding-bottom: 2px;
-            display: inline-block;
-          }
-          .trip-tab-underline::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 2px;
-            background: #F5569B;
-            transition: width 0.25s ease;
-          }
-          .trip-tab-underline:hover::after,
-          .trip-tab-underline.trip-tab-active::after {
-            width: 100%;
-          }
-        `}</style>
         <div
-          className="w-full h-full"
+          className="w-full"
           style={{
             position: stickyFixed ? 'fixed' : 'relative',
             top: stickyFixed ? 0 : 'auto',
@@ -899,21 +877,19 @@ export default function YunnanDetail() {
             background: 'rgba(245,245,245,0.97)',
           }}
         >
-          <div className="flex items-center justify-center px-2 md:px-16 h-full">
+          <div className="flex items-center justify-center px-2 md:px-16">
             {sections.map((s) => (
               <button
                 key={s.id}
                 onClick={() => scrollToSection(s.id)}
-                className={`trip-tab-underline uppercase transition-colors text-xs font-semibold tracking-wider ${
-                  activeSection === s.id ? 'trip-tab-active' : ''
-                }`}
+                className="relative px-2 md:px-5 py-3 uppercase transition-colors"
                 style={{
                   fontFamily: 'sans-serif',
                   fontSize: 'clamp(8px, 2vw, 12px)',
                   letterSpacing: '0.1em',
                   whiteSpace: 'nowrap',
                   color: activeSection === s.id ? '#111' : '#888',
-                  padding: '0 8px',
+                  borderBottom: activeSection === s.id ? '2px solid #111' : '2px solid transparent',
                 }}
               >
                 {s.label}
