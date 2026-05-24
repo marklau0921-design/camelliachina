@@ -2,6 +2,7 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import ImageUploader from "@/components/ImageUploader";
+import AdminLayout from "@/components/AdminLayout";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface StoryForm {
@@ -116,7 +117,7 @@ function StoryModal({ initial, onSave, onClose }: { initial?: StoryForm & { id?:
           )}
         </Field>
         <Field label="Thumbnail Image">
-          <ImageUploader value={form.thumbnailUrl} onChange={v => set("thumbnailUrl", v ?? "")} compact />
+          <ImageUploader value={form.thumbnailUrl} onChange={v => set("thumbnailUrl", v ?? "")} category="homepage" />
         </Field>
         <Field label="Sort Order">
           <input style={inputStyle} type="number" value={form.sortOrder} onChange={e => set("sortOrder", Number(e.target.value))} />
@@ -151,7 +152,7 @@ function SponsorModal({ initial, onSave, onClose }: { initial?: SponsorForm & { 
           <input style={inputStyle} value={form.name} onChange={e => set("name", e.target.value)} placeholder="e.g. Cathay Pacific" />
         </Field>
         <Field label="Logo Image">
-          <ImageUploader value={form.logoUrl} onChange={v => set("logoUrl", v ?? "")} compact />
+          <ImageUploader value={form.logoUrl} onChange={v => set("logoUrl", v ?? "")} category="homepage" />
         </Field>
         <Field label="Website URL (optional)">
           <input style={inputStyle} value={form.websiteUrl} onChange={e => set("websiteUrl", e.target.value)} placeholder="https://..." />
@@ -228,10 +229,8 @@ export default function AdminHomepage() {
   };
 
   return (
+    <AdminLayout title="Homepage Management">
     <div style={{ maxWidth: 800, margin: "0 auto", padding: "32px 24px", fontFamily: "Lato, sans-serif" }}>
-      <h1 style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#1a1a1a", marginBottom: 40 }}>
-        Homepage Management
-      </h1>
 
       {/* ── Hero Banner ─────────────────────────────────────────────────────── */}
       <div style={{ ...cardStyle, marginBottom: 32 }}>
@@ -241,7 +240,7 @@ export default function AdminHomepage() {
           onToggle={() => { setHero("isVisible", !heroEdit.isVisible); updateHero.mutate({ isVisible: !heroEdit.isVisible }); }}
         />
         <Field label="Background Image">
-          <ImageUploader value={heroEdit.backgroundImage} onChange={v => setHero("backgroundImage", v ?? "")} compact />
+          <ImageUploader value={heroEdit.backgroundImage} onChange={v => setHero("backgroundImage", v ?? "")} category="homepage" />
         </Field>
         <Field label="Main Title">
           <input style={inputStyle} value={heroEdit.title} onChange={e => setHero("title", e.target.value)} placeholder="THE LUXURY TRAVEL EXPERTS" />
@@ -341,5 +340,6 @@ export default function AdminHomepage() {
         <SponsorModal initial={sponsorModal} onSave={handleSponsorSave} onClose={() => setSponsorModal(null)} />
       )}
     </div>
+    </AdminLayout>
   );
 }
