@@ -905,6 +905,7 @@ export default function YunnanDetail() {
                 className={`trip-tab-underline text-xs font-semibold uppercase tracking-wider text-black flex-shrink-0 ${
                   activeSection === s.id ? 'trip-tab-active' : ''
                 }`}
+                style={{ fontFamily: 'Lato, sans-serif' }}
               >
                 {s.label}
               </button>
