@@ -34,27 +34,6 @@ function GalleryStrip({ images }: { images: string[] }) {
   const lastX = useRef(0);
   const velocity = useRef(0);
   const rafId = useRef<number | null>(null);
-  const oneSectionWidth = useRef(0);
-
-  const tripleImages = [...images, ...images, ...images];
-
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    requestAnimationFrame(() => {
-      const totalWidth = track.scrollWidth;
-      oneSectionWidth.current = totalWidth / 3;
-      track.scrollLeft = totalWidth / 3;
-    });
-  }, [images]);
-
-  const checkLoop = () => {
-    const track = trackRef.current;
-    if (!track || oneSectionWidth.current === 0) return;
-    const w = oneSectionWidth.current;
-    if (track.scrollLeft >= w * 2) track.scrollLeft -= w;
-    else if (track.scrollLeft <= 0) track.scrollLeft += w;
-  };
 
   const cancelInertia = () => {
     if (rafId.current !== null) { cancelAnimationFrame(rafId.current); rafId.current = null; }
@@ -67,7 +46,6 @@ function GalleryStrip({ images }: { images: string[] }) {
       velocity.current *= 0.92;
       if (Math.abs(velocity.current) < 0.5) { velocity.current = 0; return; }
       track.scrollLeft -= velocity.current;
-      checkLoop();
       rafId.current = requestAnimationFrame(step);
     };
     rafId.current = requestAnimationFrame(step);
@@ -108,7 +86,7 @@ function GalleryStrip({ images }: { images: string[] }) {
     cancelInertia();
     const track = trackRef.current;
     if (!track) return;
-    const target = track.scrollLeft + delta;
+    const target = Math.max(0, Math.min(track.scrollWidth - track.clientWidth, track.scrollLeft + delta));
     const duration = 420;
     const start = track.scrollLeft;
     const startTime = performance.now();
@@ -116,7 +94,6 @@ function GalleryStrip({ images }: { images: string[] }) {
     const animStep = (now: number) => {
       const t = Math.min((now - startTime) / duration, 1);
       track.scrollLeft = start + (target - start) * ease(t);
-      checkLoop();
       if (t < 1) rafId.current = requestAnimationFrame(animStep);
     };
     rafId.current = requestAnimationFrame(animStep);
@@ -142,7 +119,7 @@ function GalleryStrip({ images }: { images: string[] }) {
       <div ref={trackRef} onMouseDown={onMouseDown} onMouseLeave={onMouseLeave} onMouseUp={onMouseUp} onMouseMove={onMouseMove}
         className="gallery-track"
         style={{ display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'scroll', overflowY: 'hidden', width: '100%', height: '100%', paddingLeft: '56px', paddingRight: '56px', cursor: 'grab', userSelect: 'none', overscrollBehaviorX: 'none' } as React.CSSProperties}>
-        {tripleImages.map((img, idx) => (
+        {images.map((img, idx) => (
           <div key={idx} className="gallery-img-responsive" style={{ flexShrink: 0, overflow: 'hidden', borderRadius: '4px' }}>
             <img src={img} alt="" draggable={false} style={{ height: '100%', width: 'auto', display: 'block', pointerEvents: 'none' }} />
           </div>
