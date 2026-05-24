@@ -870,12 +870,14 @@ export default function YunnanDetail() {
           .trip-tab-underline {
             position: relative;
             padding-bottom: 2px;
+            display: inline-block;
           }
           .trip-tab-underline::after {
             content: '';
             position: absolute;
             bottom: 0;
-            left: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 0;
             height: 2px;
             background: #F5569B;
@@ -902,7 +904,7 @@ export default function YunnanDetail() {
               <button
                 key={s.id}
                 onClick={() => scrollToSection(s.id)}
-                className={`trip-tab-underline px-2 md:px-5 uppercase transition-colors text-xs font-semibold tracking-wider ${
+                className={`trip-tab-underline uppercase transition-colors text-xs font-semibold tracking-wider ${
                   activeSection === s.id ? 'trip-tab-active' : ''
                 }`}
                 style={{
@@ -911,6 +913,7 @@ export default function YunnanDetail() {
                   letterSpacing: '0.1em',
                   whiteSpace: 'nowrap',
                   color: activeSection === s.id ? '#111' : '#888',
+                  padding: '0 8px',
                 }}
               >
                 {s.label}
