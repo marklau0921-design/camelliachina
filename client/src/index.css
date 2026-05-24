@@ -379,11 +379,12 @@ html {
   }
 }
 
-/* Day section container: desktop positioned at 20% from left, mobile centered */
+/* Day section container: desktop right-aligned at 2/3, mobile centered */
 .day-section-container {
   display: flex;
   align-items: flex-start;
-  margin-left: 20%;
+  margin-left: auto;
+  margin-right: 33.33%;
 }
 
 @media (max-width: 767px) {

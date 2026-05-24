@@ -931,6 +931,25 @@ export default function YunnanDetail() {
       {days.map((section, si) => (
         <React.Fragment key={section.section}>
         {/* Each section wrapped in its own relative container for sticky sidebar */}
+        <div style={{ position: 'relative' }}>
+          {/* Right-side sticky route marker — only visible on desktop, bounded to this section */}
+          <div className="hidden sm:block" style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: '33.33%',
+            pointerEvents: 'none',
+            zIndex: 10,
+          }}>
+            <div style={{ position: 'sticky', top: '120px', display: 'flex', justifyContent: 'center', paddingTop: '80px' }}>
+              <img
+                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663313440852/9vw75P8eDmCGGYvHEDTM7H/yunnan-route-marker-hMM5swcUXyUvxVtUgmXAeE.webp"
+                alt="Yunnan Route: Lijiang to Shangri-La"
+                style={{ width: '220px', opacity: 0.92, filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.10))' }}
+              />
+            </div>
+          </div>
         <div id={section.section} style={{backgroundColor: '#ededed', position: 'relative', scrollMarginTop: '60px'}}>
           {/* Left timeline column + Right content column — right edge at 2/3 of page */}
           <div className="day-section-container">
@@ -1032,6 +1051,7 @@ export default function YunnanDetail() {
             </div> {/* end right column */}
           </div> {/* end flex row */}
         </div> {/* end section div */}
+        </div> {/* end outer relative wrapper */}
         {/* Gallery strip — outside the sticky sidebar wrapper, after each section */}
         <GalleryStrip />
         </React.Fragment>
