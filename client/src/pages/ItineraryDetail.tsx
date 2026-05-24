@@ -133,17 +133,18 @@ function GalleryStrip({ images }: { images: string[] }) {
   };
 
   return (
-    <div style={{ width: '100%', background: '#222', display: 'flex', alignItems: 'center', overflow: 'hidden', position: 'relative', height: '280px' }}>
+    <div className="gallery-strip-container" style={{ width: '100%', background: '#222', display: 'flex', alignItems: 'center', overflow: 'hidden', position: 'relative' }}>
       <button style={{ ...btnStyle, left: '16px' }} onClick={() => scrollBy(-600)}
         onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.7)')}
         onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.45)')}>
         <ChevronLeft size={20} color="white" strokeWidth={2} />
       </button>
       <div ref={trackRef} onMouseDown={onMouseDown} onMouseLeave={onMouseLeave} onMouseUp={onMouseUp} onMouseMove={onMouseMove}
+        className="gallery-track"
         style={{ display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'scroll', overflowY: 'hidden', width: '100%', height: '100%', paddingLeft: '56px', paddingRight: '56px', cursor: 'grab', userSelect: 'none', overscrollBehaviorX: 'none' } as React.CSSProperties}>
         {tripleImages.map((img, idx) => (
-          <div key={idx} style={{ flexShrink: 0, height: '220px', overflow: 'hidden', borderRadius: '4px' }}>
-            <img src={img} alt="" draggable={false} style={{ height: '100%', width: 'auto', display: 'block', pointerEvents: 'none', objectFit: 'cover' }} />
+          <div key={idx} className="gallery-img-responsive" style={{ flexShrink: 0, overflow: 'hidden', borderRadius: '4px' }}>
+            <img src={img} alt="" draggable={false} style={{ height: '100%', width: 'auto', display: 'block', pointerEvents: 'none' }} />
           </div>
         ))}
       </div>
@@ -244,7 +245,7 @@ function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
 
   return (
     <div style={{ background: '#fff', padding: '64px 40px' }}>
-      <h2 style={{ fontFamily: 'sans-serif', fontSize: '13px', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#888', marginBottom: '32px', textAlign: 'center' }}>
+      <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#888', marginBottom: '32px', textAlign: 'center' }}>
         Similar Itineraries
       </h2>
       <div style={{ display: 'flex', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -254,7 +255,7 @@ function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
               {itin.coverImage && <img src={itin.coverImage} alt={itin.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
             </div>
             {itin.place && <p style={{ fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F5569B', marginBottom: '4px' }}>{itin.place}</p>}
-            <h3 style={{ fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#1a1a1a', marginBottom: '8px' }}>{itin.name}</h3>
+            <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#1a1a1a', marginBottom: '8px' }}>{itin.name}</h3>
             {itin.shortDescription && <p style={{ fontSize: '13px', color: '#888', lineHeight: 1.5 }}>{itin.shortDescription}</p>}
           </div>
         ))}
@@ -338,7 +339,7 @@ export default function ItineraryDetail() {
   }
 
   return (
-    <div style={{ background: '#fff', minHeight: '100vh', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+    <div className="bg-white min-h-screen" style={{ fontFamily: 'var(--font-serif)' }}>
       <style>{`
         @keyframes slideOut {
           from { transform: translateX(0); }
@@ -348,8 +349,6 @@ export default function ItineraryDetail() {
           from { transform: translateX(var(--enter-from)); }
           to { transform: translateX(0); }
         }
-        .gallery-track::-webkit-scrollbar { display: none; }
-        .gallery-track { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
       <Navigation forceHide={stickyFixed} />
@@ -364,15 +363,15 @@ export default function ItineraryDetail() {
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.38)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 24px' }}>
           {itin.place && (
-            <p style={{ fontSize: '13px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', marginBottom: '16px', fontFamily: 'sans-serif' }}>
+            <p style={{ fontSize: '13px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', marginBottom: '16px', fontFamily: 'var(--font-sans)' }}>
               {itin.place}
             </p>
           )}
-          <h1 style={{ color: '#fff', fontSize: 'clamp(28px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.15, letterSpacing: '0.02em', maxWidth: '800px', marginBottom: '20px' }}>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(28px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.15, letterSpacing: '0.02em', maxWidth: '800px', marginBottom: '20px', fontFamily: 'var(--font-serif)' }}>
             {itin.name}
           </h1>
           {itin.shortDescription && (
-            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'clamp(14px, 2vw, 18px)', fontStyle: 'italic', maxWidth: '560px', lineHeight: 1.6 }}>
+            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'clamp(14px, 2vw, 18px)', fontStyle: 'italic', maxWidth: '560px', lineHeight: 1.6, fontFamily: 'var(--font-serif)' }}>
               {itin.shortDescription}
             </p>
           )}
@@ -385,7 +384,7 @@ export default function ItineraryDetail() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px', overflowX: 'auto' }}>
             {navSections.map(s => (
               <button key={s.id} onClick={() => scrollToSection(s.id)}
-                style={{ position: 'relative', padding: '12px 20px', fontSize: 'clamp(8px, 2vw, 12px)', letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'sans-serif', color: activeSection === s.id ? '#111' : '#888', borderBottom: activeSection === s.id ? '2px solid #111' : '2px solid transparent', transition: 'color 0.2s' }}>
+                style={{ position: 'relative', padding: '12px 20px', fontSize: 'clamp(8px, 2vw, 12px)', letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans)', color: activeSection === s.id ? '#111' : '#888', borderBottom: activeSection === s.id ? '2px solid #111' : '2px solid transparent', transition: 'color 0.2s' }}>
                 {s.label}
               </button>
             ))}
@@ -395,11 +394,11 @@ export default function ItineraryDetail() {
 
       {/* ── OVERVIEW ── */}
       <div id="overview" style={{ maxWidth: '720px', margin: '0 auto', padding: '64px 24px', textAlign: 'center', scrollMarginTop: '60px' }}>
-        <h2 style={{ fontSize: 'clamp(26px, 4vw, 44px)', fontWeight: 300, lineHeight: 1.2, marginBottom: '32px', color: '#1a1a1a' }}>
+        <h2 style={{ fontSize: 'clamp(26px, 4vw, 44px)', fontWeight: 300, lineHeight: 1.2, marginBottom: '32px', color: '#1a1a1a', fontFamily: 'var(--font-serif)' }}>
           {itin.overviewTitle || itin.name}
         </h2>
         {itin.description && (
-          <p style={{ fontSize: '17px', color: '#555', lineHeight: 1.8, fontFamily: 'Georgia, serif', marginBottom: '48px' }}>
+          <p style={{ fontSize: '17px', color: '#555', lineHeight: 1.8, fontFamily: 'var(--font-serif)', marginBottom: '48px' }}>
             {itin.description}
           </p>
         )}
@@ -409,20 +408,20 @@ export default function ItineraryDetail() {
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px', borderTop: '1px solid #eee', paddingTop: '40px' }}>
             {itin.when && (
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#f49e0b', marginBottom: '10px', fontFamily: 'sans-serif' }}>WHEN</p>
-                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5 }}>{itin.when}</p>
+                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#f49e0b', marginBottom: '10px', fontFamily: 'var(--font-sans)' }}>WHEN</p>
+                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5, fontFamily: 'var(--font-serif)' }}>{itin.when}</p>
               </div>
             )}
             {itin.price && (
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#1d902b', marginBottom: '10px', fontFamily: 'sans-serif' }}>PRICE</p>
-                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5 }}>{itin.price}</p>
+                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#1d902b', marginBottom: '10px', fontFamily: 'var(--font-sans)' }}>PRICE</p>
+                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5, fontFamily: 'var(--font-serif)' }}>{itin.price}</p>
               </div>
             )}
             {itin.howLong && (
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#2c6faa', marginBottom: '10px', fontFamily: 'sans-serif' }}>HOW LONG</p>
-                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5 }}>{itin.howLong}</p>
+                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#2c6faa', marginBottom: '10px', fontFamily: 'var(--font-sans)' }}>HOW LONG</p>
+                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5, fontFamily: 'var(--font-serif)' }}>{itin.howLong}</p>
               </div>
             )}
           </div>
@@ -451,16 +450,16 @@ export default function ItineraryDetail() {
               <div style={{ flex: 1, minWidth: 0, maxWidth: '964px' }}>
                 {/* Section header */}
                 <div style={{ paddingTop: '64px', paddingBottom: '32px' }}>
-                  <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'sans-serif', marginBottom: '16px', color: '#1a1a1a' }}>
+                  <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)', marginBottom: '16px', color: '#1a1a1a' }}>
                     {section.title}
                   </h2>
                   {section.description && (
-                    <p style={{ fontSize: '17px', color: '#555', lineHeight: 1.75, fontFamily: 'Georgia, serif', maxWidth: '640px' }}>
+                    <p style={{ fontSize: '17px', color: '#555', lineHeight: 1.75, fontFamily: 'var(--font-serif)', maxWidth: '640px' }}>
                       {section.description}
                     </p>
                   )}
                   {section.daysRange && (
-                    <p style={{ marginTop: '16px', fontSize: '12px', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600, fontFamily: 'sans-serif', color: '#2d6a4f' }}>
+                    <p style={{ marginTop: '16px', fontSize: '12px', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600, fontFamily: 'var(--font-sans)', color: '#2d6a4f' }}>
                       {section.daysRange}
                     </p>
                   )}
@@ -488,13 +487,13 @@ export default function ItineraryDetail() {
                             )}
                             {/* Text side */}
                             <div style={{ flex: 1, padding: '40px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', overflow: 'hidden' }}>
-                              <p style={{ fontFamily: 'sans-serif', fontSize: '12px', letterSpacing: '0.15em', color: '#2d6a4f', fontWeight: 700, textTransform: 'uppercase', marginBottom: '10px' }}>
+                              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', letterSpacing: '0.15em', color: '#2d6a4f', fontWeight: 700, textTransform: 'uppercase', marginBottom: '10px' }}>
                                 DAY {block.dayNumber}
                               </p>
-                              <h3 style={{ fontFamily: 'sans-serif', fontSize: 'clamp(15px, 1.8vw, 21px)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '18px', lineHeight: 1.2, color: '#111' }}>
+                              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(15px, 1.8vw, 21px)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '18px', lineHeight: 1.2, color: '#111' }}>
                                 {block.title}
                               </h3>
-                              <p style={{ fontFamily: 'Georgia, serif', fontSize: '16px', color: '#555', lineHeight: 1.75 }}>
+                              <p style={{ fontFamily: 'var(--font-serif)', fontSize: '16px', color: '#555', lineHeight: 1.75 }}>
                                 {block.description}
                               </p>
                             </div>
@@ -522,11 +521,11 @@ export default function ItineraryDetail() {
       <section style={{ position: 'relative', width: '100%', height: 'clamp(260px, 30vw, 275px)', backgroundColor: '#a84900', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/manus-storage/texture-buried_038ce46e.png)', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '28px', textAlign: 'center', padding: '0 24px' }}>
-          <h2 style={{ fontFamily: 'sans-serif', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, color: '#fff', letterSpacing: '0.05em', textTransform: 'uppercase', margin: 0, lineHeight: 1.1 }}>
+          <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, color: '#fff', letterSpacing: '0.05em', textTransform: 'uppercase', margin: 0, lineHeight: 1.1 }}>
             Ready to start your journey?
           </h2>
           <a href="/make-an-enquiry">
-            <button style={{ padding: '14px 40px', fontSize: '13px', letterSpacing: '0.15em', textTransform: 'uppercase', background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.6)', cursor: 'pointer', fontFamily: 'sans-serif', transition: 'background 0.2s, border-color 0.2s' }}
+            <button style={{ padding: '14px 40px', fontSize: '13px', letterSpacing: '0.15em', textTransform: 'uppercase',               background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.6)', cursor: 'pointer', fontFamily: 'var(--font-sans)', transition: 'background 0.2s, border-color 0.2s' }}
               onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.borderColor = '#fff'; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}>
               Enquire Now
