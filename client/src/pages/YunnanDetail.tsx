@@ -864,7 +864,8 @@ export default function YunnanDetail() {
       </div>
 
       {/* ── TRIP SECTION NAV ── */}
-      <div ref={tripNavRef} className="w-full" style={{ height: '48px', backgroundColor: '#F3F3F3', position: 'relative', zIndex: 39 }}>
+      {/* Wrapper: in normal flow; when stickyFixed, inner nav becomes fixed at top */}
+      <div ref={tripNavRef} style={{ height: '48px', position: 'relative', zIndex: 39 }}>
         <style>{`
           .trip-tab-underline {
             position: relative;
@@ -886,31 +887,34 @@ export default function YunnanDetail() {
           }
         `}</style>
         <div
-          className="h-full flex items-center justify-center px-4 md:px-0"
+          className="w-full"
           style={{
             position: stickyFixed ? 'fixed' : 'relative',
             top: stickyFixed ? 0 : 'auto',
             left: 0,
             right: 0,
-            width: '100%',
             zIndex: 39,
-            backgroundColor: '#F3F3F3',
+            background: 'rgba(245,245,245,0.97)',
           }}
         >
-          <nav className="flex gap-3 md:gap-12 h-full items-center flex-wrap md:flex-nowrap justify-center">
+          <div className="flex items-center justify-center px-2 md:px-16">
             {sections.map((s) => (
               <button
                 key={s.id}
                 onClick={() => scrollToSection(s.id)}
-                className={`trip-tab-underline text-xs font-semibold uppercase tracking-wider text-black flex-shrink-0 ${
-                  activeSection === s.id ? 'trip-tab-active' : ''
-                }`}
-                style={{ fontFamily: 'Lato, sans-serif' }}
+                className="trip-tab-underline relative px-2 md:px-5 py-3 uppercase transition-colors"
+                style={{
+                  fontFamily: 'sans-serif',
+                  fontSize: 'clamp(8px, 2vw, 12px)',
+                  letterSpacing: '0.1em',
+                  whiteSpace: 'nowrap',
+                  color: activeSection === s.id ? '#111' : '#888',
+                }}
               >
                 {s.label}
               </button>
             ))}
-          </nav>
+          </div>
         </div>
       </div>
 
