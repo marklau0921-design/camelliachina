@@ -53,7 +53,7 @@ export default function WhatWeDoAndPursuitOfFeeling() {
           {/* Left: Image */}
           <div className="relative w-full h-full flex items-center justify-center order-2 md:order-1">
             <img
-              src="https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/bG7rJVbLwiLK7dsHpKL0t7-img-1_1770213061000_na1fn_cHVyc3VpdC1vZi1mZWVsaW5n.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvclJHM2ZtNUdGcW9jc2RkUU9yU3hpVi9zYW5kYm94L2JHN3JKVmJMd2lMSzdkc0hwS0wwdDctaW1nLTFfMTc3MDIxMzA2MTAwMF9uYTFmbl9jSFZ5YzNWcGRDMXZaaTFtWldWc2FXNW4uanBnP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=MCHSgcssuLUqo1WqoxJhFlwKV60Nn8fgCn3l2eCTOHwAmMxB5i-IRmKwuqXwaygC-c0Zlw9rswlZPCtc2hMZCyJcYnoHkRJyyiJjq5m3W3eO7FhSkqXfZVDVON7S6xgZ~VAtpn18E4kkVdHs~cR0qvxP0l7z-h~4CJENKBy2v8bQ9HLTydVeTuwID5IG90LCYkRyMNb2iAfR6wo32mCnYCA348TyA2zjTuaEgYG1LNlO5yKFxEU27T9V-gHaDX-PJS7nTwT75riqQkyC7Q-nXhitc3a5eWdweiLTfJHT5b3xEgY~bRn-SAYHeZfvEfflWk~jjMZn-shf-oRiAWXAgg__"
+              src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=800&fit=crop"
               alt="Person experiencing emotional travel moment overlooking misty mountains"
               className="w-full max-w-[1354px] h-auto object-cover"
               style={{ aspectRatio: '1354/900' }}

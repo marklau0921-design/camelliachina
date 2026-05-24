@@ -16,7 +16,7 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="flex items-center">
             <img 
-              src="https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/Y2VHqUU8b8fiChiLcfK4Ag_1770363159285_na1fn_bW9yYS1sb2dvLXRyYW5zcGFyZW50.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvclJHM2ZtNUdGcW9jc2RkUU9yU3hpVi9zYW5kYm94L1kyVkhxVVU4YjhmaUNoaUxjZks0QWdfMTc3MDM2MzE1OTI4NV9uYTFmbl9iVzl5WVMxc2IyZHZMWFJ5WVc1emNHRnlaVzUwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSx3XzE5MjAsaF8xOTIwL2Zvcm1hdCx3ZWJwL3F1YWxpdHkscV84MCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5ODc2MTYwMH19fV19&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=q7yXxNA-ovS64UfhD9PC42HrcNxLabtThkL9FcuuOHuoYaJWHOGExV7IckXT0Ej0hVDVb9I6tTv3~K-UJdisgD1jlUA28dfkQjSbYmuZxUQ48dcY2MxGmk58Olym73DH9iALYLtbTUZPCBHcswi7zx2LuZ7J8r52OR3Q1hfxHNmERkaitxJU9qhRgieVX5IOB9ZGUuDWE3DRm2yYgGzToYVUaZGiMH0HKtKkJyAv5zzPddQkNFCgGjCj1sJvqbSrwFaR6XfE1tuyKYZn3IISEraont3LuXxI7Je9K-tDO7DArLjqtDeQHRQd4dWm0iBWCbQ4cpE3dHzI1nGXDYtftg__"
+              src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=800&fit=crop"
               alt="MORA"
               className="h-20 object-contain"
               style={{ backgroundColor: 'transparent' }}

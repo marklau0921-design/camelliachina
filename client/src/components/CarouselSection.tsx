@@ -15,25 +15,25 @@ const fallbackImageItems: CarouselItem[] = [
     id: 1,
     name: 'GUILIN',
     description: 'Misty karst mountains and serene rivers.',
-    image: 'https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/aGetsU6WzDik5Fd30KgLRf-img-1_1770122853000_na1fn_Z3VpbGluLWJlbG92ZWQ.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600'
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
   },
   {
     id: 2,
     name: 'ZHANGJIAJIE',
     description: 'Towering stone pillars pierce the clouds.',
-    image: 'https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/aGetsU6WzDik5Fd30KgLRf-img-2_1770122861000_na1fn_emhhbmdqaWFqaWUtYmVsb3ZlZA.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600'
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
   },
   {
     id: 3,
     name: 'YUNNAN',
     description: 'Terraced rice fields cascade down mountainsides.',
-    image: 'https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/aGetsU6WzDik5Fd30KgLRf-img-3_1770122854000_na1fn_eXVubmFuLWJlbG92ZWQ.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600'
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
   },
   {
     id: 4,
     name: 'TIBET',
     description: 'Stand at the roof of the world.',
-    image: 'https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/aGetsU6WzDik5Fd30KgLRf-img-4_1770122859000_na1fn_dGliZXQtYmVsb3ZlZA.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600'
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
   }
 ];
 
@@ -43,28 +43,28 @@ const fallbackVideoItems: CarouselItem[] = [
     name: 'GUILIN',
     videoId: 'dQw4w9WgXcQ',
     description: 'Misty karst mountains and serene rivers.',
-    image: 'https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/aGetsU6WzDik5Fd30KgLRf-img-1_1770122853000_na1fn_Z3VpbGluLWJlbG92ZWQ.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600'
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
   },
   {
     id: 2,
     name: 'ZHANGJIAJIE',
     videoId: 'jNQXAC9IVRw',
     description: 'Towering stone pillars pierce the clouds.',
-    image: 'https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/aGetsU6WzDik5Fd30KgLRf-img-2_1770122861000_na1fn_emhhbmdqaWFqaWUtYmVsb3ZlZA.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600'
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
   },
   {
     id: 3,
     name: 'YUNNAN',
     videoId: '9bZkp7q19f0',
     description: 'Terraced rice fields cascade down mountainsides.',
-    image: 'https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/aGetsU6WzDik5Fd30KgLRf-img-3_1770122854000_na1fn_eXVubmFuLWJlbG92ZWQ.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600'
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
   },
   {
     id: 4,
     name: 'TIBET',
     videoId: 'M7lc1BCxL00',
     description: 'Stand at the roof of the world.',
-    image: 'https://private-us-east-1.manuscdn.com/sessionFile/rRG3fm5GFqocsddQOrSxiV/sandbox/aGetsU6WzDik5Fd30KgLRf-img-4_1770122859000_na1fn_dGliZXQtYmVsb3ZlZA.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600'
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
   }
 ];
 

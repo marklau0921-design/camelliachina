@@ -199,7 +199,7 @@ export default function Sichuan() {
       
       {/* Hero Section with Background Image */}
       <div className="relative w-full bg-cover bg-center" style={{
-        backgroundImage: 'url(https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/sUnRzqjbIuMDGHCp.avif)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop)',
         backgroundAttachment: 'scroll',
         backgroundPosition: 'center',
         backgroundSize: 'cover',
@@ -419,7 +419,7 @@ export default function Sichuan() {
           {/* Mobile: Image on top, text below */}
           <div className="lg:hidden w-full">
             <img
-              src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
               alt="Sichuan scenic landscape"
               className="w-full object-cover"
               style={{ height: '375px', objectFit: 'cover' }}
@@ -455,7 +455,7 @@ export default function Sichuan() {
             
             <div className="flex items-center" style={{ minHeight: '380px', marginRight: '-9999px', paddingRight: '9999px', width: 'calc(50% + 9999px)' }}>
               <img
-                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+                src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
                 alt="Sichuan scenic landscape"
                 className="object-cover"
                 style={{ width: '940px', height: '630px', objectFit: 'cover' }}
@@ -471,7 +471,7 @@ export default function Sichuan() {
           {/* Mobile: Image on top, text below */}
           <div className="lg:hidden w-full">
             <img
-              src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
               alt="Giant Pandas"
               className="w-full object-cover"
               style={{ height: '375px', objectFit: 'cover' }}
@@ -493,7 +493,7 @@ export default function Sichuan() {
           <div className="hidden lg:flex items-center" style={{ minHeight: '380px' }}>
             <div className="flex items-center" style={{ minHeight: '380px', marginLeft: '-9999px', paddingLeft: '9999px', width: 'calc(50% + 9999px)' }}>
               <img
-                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+                src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
                 alt="Giant Pandas"
                 className="object-cover"
                 style={{ width: '940px', height: '630px', objectFit: 'cover' }}
@@ -525,7 +525,7 @@ export default function Sichuan() {
           {/* Mobile: Image on top, text below */}
           <div className="lg:hidden w-full">
             <img
-              src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
               alt="Sichuan Cuisine"
               className="w-full object-cover"
               style={{ height: '375px', objectFit: 'cover' }}
@@ -561,7 +561,7 @@ export default function Sichuan() {
             
             <div className="flex items-center" style={{ minHeight: '380px', marginRight: '-9999px', paddingRight: '9999px', width: 'calc(50% + 9999px)' }}>
               <img
-                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+                src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
                 alt="Sichuan Cuisine"
                 className="object-cover"
                 style={{ width: '940px', height: '630px', objectFit: 'cover' }}
@@ -580,7 +580,7 @@ export default function Sichuan() {
             {/* Mobile: Image on top, text below */}
             <div className="lg:hidden w-full">
               <img
-                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+                src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
                 alt="Sichuan scenic landscape"
                 className="w-full object-cover"
                 style={{ height: '375px', objectFit: 'cover' }}
@@ -602,7 +602,7 @@ export default function Sichuan() {
             <div className="hidden lg:flex items-center" style={{ minHeight: '380px' }}>
               <div className="flex items-center" style={{ minHeight: '380px', marginLeft: '-9999px', paddingLeft: '9999px', width: 'calc(50% + 9999px)' }}>
                 <img
-                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+                  src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
                   alt="Sichuan scenic landscape"
                   className="object-cover"
                   style={{ width: '940px', height: '630px', objectFit: 'cover' }}
@@ -632,7 +632,7 @@ export default function Sichuan() {
             {/* Mobile: Image on top, text below */}
             <div className="lg:hidden w-full">
               <img
-                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+                src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
                 alt="Giant Pandas"
                 className="w-full object-cover"
                 style={{ height: '375px', objectFit: 'cover' }}
@@ -668,7 +668,7 @@ export default function Sichuan() {
               
               <div className="flex items-center" style={{ minHeight: '380px', marginRight: '-9999px', paddingRight: '9999px', width: 'calc(50% + 9999px)' }}>
                 <img
-                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+                  src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
                   alt="Giant Pandas"
                   className="object-cover"
                   style={{ width: '940px', height: '630px', objectFit: 'cover' }}
@@ -684,7 +684,7 @@ export default function Sichuan() {
             {/* Mobile: Image on top, text below */}
             <div className="lg:hidden w-full">
               <img
-                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+                src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
                 alt="Sichuan Cuisine"
                 className="w-full object-cover"
                 style={{ height: '375px', objectFit: 'cover' }}
@@ -706,7 +706,7 @@ export default function Sichuan() {
             <div className="hidden lg:flex items-center" style={{ minHeight: '380px' }}>
               <div className="flex items-center" style={{ minHeight: '380px', marginLeft: '-9999px', paddingLeft: '9999px', width: 'calc(50% + 9999px)' }}>
                 <img
-                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+                  src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
                   alt="Sichuan Cuisine"
                   className="object-cover"
                   style={{ width: '940px', height: '630px', objectFit: 'cover' }}
@@ -870,7 +870,7 @@ function CulinaryTravel() {
           {/* Image Left - 60% */}
           <div className="flex items-center bg-gray-100" style={{ width: '60%', height: '640px', flex: '0 0 auto' }}>
             <img
-              src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
               alt="Sichuan Cuisine"
               className="object-cover"
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -893,7 +893,7 @@ function CulinaryTravel() {
         {/* Mobile Layout */}
         <div className="xl:hidden w-full bg-gray-100">
           <img
-            src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ngoXHYUleibMVyzm.jpg"
+            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
             alt="Sichuan Cuisine"
             className="w-full object-cover"
             style={{ height: '375px', objectFit: 'cover' }}

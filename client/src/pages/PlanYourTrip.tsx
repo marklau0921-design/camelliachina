@@ -33,7 +33,7 @@ const PlanYourTrip: React.FC = () => {
     return citiesData.map(city => ({
       id: String(city.id),
       title: city.name.toUpperCase(),
-      image: city.coverImage || 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/sPqPFdwAGdLYPuPY.jpg',
+      image: city.coverImage || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
       category: 'destination' as const,
       route: `/destinations/${city.slug}`,
     }));
@@ -47,7 +47,7 @@ const PlanYourTrip: React.FC = () => {
       return {
         id: String(exp.id),
         title: exp.name.toUpperCase(),
-        image: exp.recommendationImage || 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/QjsoLwKicsuvVypZ.jpg',
+        image: exp.recommendationImage || 'https://images.unsplash.com/photo-1548013146-72479768bada?w=800&h=400&fit=crop',
         category: 'experience' as const,
         route: `/experiences/${typeSlug}/${exp.slug}`,
       };
