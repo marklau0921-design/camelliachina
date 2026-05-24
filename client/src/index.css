@@ -1,4 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
 @import "tailwindcss";
+@import "tw-animate-css";
 
 /* Tea Mountains body: centered on wide screens */
 .tea-body {
@@ -100,8 +102,6 @@
     object-fit: cover;
   }
 }
-@import "tw-animate-css";
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
