@@ -85,47 +85,34 @@ function TextArea({ value, onChange, placeholder, rows = 4 }: { value: string; o
   );
 }
 
-export default function AdminCityEdit() {
-  const params = useParams<{ id: string }>();
-  const cityId = parseInt(params.id || "0");
+export default function AdminCityNew() {
   const [, navigate] = useLocation();
   const utils = trpc.useUtils();
 
-  const { data: city, isLoading } = trpc.admin.getCity.useQuery({ id: cityId }, { enabled: !!cityId });
-  // 城市体验库（AdminExperiencesByCity 管理）
-  const { data: cityExperiences = [] } = trpc.admin.listCityExperiences.useQuery(
-    { cityId },
-    { enabled: !!cityId }
-  );
-  // What to See and Do 展示列表（从城市体验库中选择）
-  const { data: whatToSeeItems = [], refetch: refetchWhatToSee } = trpc.admin.listCityWhatToSee.useQuery(
-    { cityId },
-    { enabled: !!cityId }
-  );
-
-  const updateCity = trpc.admin.updateCity.useMutation({
-    onSuccess: () => {
+  const createCity = trpc.admin.createCity.useMutation({
+    onSuccess: (result) => {
       utils.admin.listCities.invalidate();
       setSaving(false);
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      setTimeout(() => {
+        navigate(`/admin/cities/${(result as any).id}/edit`);
+      }, 1000);
     },
     onError: () => setSaving(false),
   });
 
-  const addWhatToSee = trpc.admin.addCityWhatToSee.useMutation({
-    onSuccess: () => refetchWhatToSee(),
-  });
-  const removeWhatToSee = trpc.admin.removeCityWhatToSee.useMutation({
-    onSuccess: () => refetchWhatToSee(),
-  });
-  const updateWhatToSee = trpc.admin.updateCityWhatToSee.useMutation({
-    onSuccess: () => refetchWhatToSee(),
-  });
+
 
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [deleteConfirmExp, setDeleteConfirmExp] = useState<number | null>(null);
+  const [addExpId, setAddExpId] = useState<number | null>(null);
+  const [whatToSeeItems, setWhatToSeeItems] = useState<any[]>([]);
+  const [cityExperiences, setCityExperiences] = useState<any[]>([]);
+  
+  // 可选体验：城市体验库中未添加到 What to See and Do 的体验
+  const addedWhatToSeeIds = new Set(whatToSeeItems.map(item => (item as any).experienceId));
+  const availableExps = cityExperiences.filter(ce => !addedWhatToSeeIds.has((ce as any).experienceId));
 
   // Form state
   const [form, setForm] = useState({
@@ -149,73 +136,34 @@ export default function AdminCityEdit() {
     isActive: true,
   });
 
-  useEffect(() => {
-    if (city) {
-      setForm({
-        name: city.name || "",
-        slug: city.slug || "",
-        coverImage: city.coverImage || "",
-        cityCardImage: (city as any).cityCardImage || "",
-        introductionTitle: (city as any).introductionTitle || "",
-        introductionDescription: (city as any).introductionDescription || "",
-        culinaryTravelLargeImage: (city as any).culinaryTravelLargeImage || "",
-        culinaryTravelLargeTitle: (city as any).culinaryTravelLargeTitle || "",
-        culinaryTravelLargeDescription: (city as any).culinaryTravelLargeDescription || "",
-        culinaryTravelSmall1Image: (city as any).culinaryTravelSmall1Image || "",
-        culinaryTravelSmall1Title: (city as any).culinaryTravelSmall1Title || "",
-        culinaryTravelSmall1Description: (city as any).culinaryTravelSmall1Description || "",
-        culinaryTravelSmall2Image: (city as any).culinaryTravelSmall2Image || "",
-        culinaryTravelSmall2Title: (city as any).culinaryTravelSmall2Title || "",
-        culinaryTravelSmall2Description: (city as any).culinaryTravelSmall2Description || "",
-        ctaBgColor: (city as any).ctaBgColor || "#a84900",
-        sortOrder: city.sortOrder ?? 0,
-        isActive: city.isActive,
-      });
-    }
-  }, [city]);
+
 
   const set = (k: keyof typeof form, v: any) => setForm(f => ({ ...f, [k]: v }));
 
   const handleSave = () => {
     setSaving(true);
-    updateCity.mutate({ id: cityId, ...form });
+    createCity.mutate(form);
   };
-
-  const [addExpId, setAddExpId] = useState<number | null>(null);
 
   const handleAddExperience = () => {
     if (!addExpId) return;
-    addWhatToSee.mutate({
-      cityId,
-      experienceId: addExpId,
-      sortOrder: whatToSeeItems.length,
-    });
-    setAddExpId(null);
+    // 新增模式下，直接添加到本地状态
+    const selectedExp = cityExperiences.find(ce => (ce as any).experienceId === addExpId);
+    if (selectedExp) {
+      setWhatToSeeItems([...whatToSeeItems, { ...selectedExp, id: Date.now() }]);
+      setAddExpId(null);
+    }
   };
 
-  if (isLoading) {
-    return (
-      <AdminLayout title="Edit City">
-        <div style={{ padding: "48px", textAlign: "center", color: "#888", fontSize: "13px" }}>Loading...</div>
-      </AdminLayout>
-    );
-  }
+  const handleRemoveExperience = (itemId: number) => {
+    setWhatToSeeItems(whatToSeeItems.filter(item => (item as any).id !== itemId));
+    setDeleteConfirmExp(null);
+  };
 
-  if (!city) {
-    return (
-      <AdminLayout title="Edit City">
-        <div style={{ padding: "48px", textAlign: "center", color: "#888", fontSize: "13px" }}>City not found.</div>
-      </AdminLayout>
-    );
-  }
 
-  // What to See and Do 中已添加的体验 ID
-  const addedWhatToSeeIds = new Set(whatToSeeItems.map(item => item.experienceId));
-  // 可选体验：城市体验库中未添加到 What to See and Do 的体验
-  const availableExps = cityExperiences.filter(ce => !addedWhatToSeeIds.has(ce.experienceId));
 
   return (
-    <AdminLayout title={`Edit City: ${city.name}`}>
+    <AdminLayout title="New City">
       <div style={{ padding: "32px", maxWidth: "900px" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
@@ -229,7 +177,7 @@ export default function AdminCityEdit() {
               <ArrowLeft size={14} /> Back
             </button>
             <h1 style={{ fontSize: "20px", fontWeight: "300", letterSpacing: "0.1em", textTransform: "uppercase", color: "#1a1a1a", margin: 0 }}>
-              {city.name}
+              New City
             </h1>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -367,7 +315,7 @@ export default function AdminCityEdit() {
                     {deleteConfirmExp === item.id ? (
                       <>
                         <button
-                          onClick={() => { removeWhatToSee.mutate({ id: item.id }); setDeleteConfirmExp(null); }}
+                          onClick={() => handleRemoveExperience((item as any).id)}
                           style={{ background: "none", border: "none", cursor: "pointer", color: "#e53e3e", padding: "4px" }}
                         ><Check size={14} /></button>
                         <button
@@ -563,9 +511,9 @@ export default function AdminCityEdit() {
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
-          {city?.slug && (
+          {form.slug && (
             <button
-              onClick={() => window.open(`/destinations/${city.slug}`, '_blank')}
+              onClick={() => window.open(`/destinations/${form.slug}`, '_blank')}
               style={{
                 display: "flex", alignItems: "center", gap: "8px",
                 padding: "10px 28px", fontSize: "12px", letterSpacing: "0.1em", textTransform: "uppercase",

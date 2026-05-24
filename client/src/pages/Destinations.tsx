@@ -1,59 +1,73 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { MapView } from '@/components/Map';
+import { trpc } from '@/lib/trpc';
 
 /**
  * Destinations Page
  * Design: White background with left content and right map (2/3 width)
+ * Data: Dynamically loaded from backend API
  */
 
 interface DestinationDetail {
   id: number;
   name: string;
-  region: string;
   description: string;
+  cityCardImage: string;
   lat: number;
   lng: number;
 }
 
-const destinationDetails: DestinationDetail[] = [
-  {
-    id: 1,
-    name: 'The Great Wall',
-    region: 'Beijing & Hebei',
-    description: 'Stretching over 13,000 miles, the Great Wall is humanity\'s most ambitious architectural achievement. Walk along ancient ramparts with breathtaking mountain vistas, explore watchtowers that have guarded empires, and immerse yourself in centuries of history.',
-    lat: 40.4319,
-    lng: 116.5704,
-  },
-  {
-    id: 2,
-    name: 'Guilin & Yangshuo',
-    region: 'Guangxi',
-    description: 'Emerge into a landscape of towering karst peaks rising from emerald waters. This UNESCO World Heritage site has inspired artists and poets for millennia. Experience traditional cormorant fishing, bamboo raft journeys, and the timeless beauty of rural China.',
-    lat: 25.2830,
-    lng: 110.2965,
-  },
-  {
-    id: 3,
-    name: 'Forbidden City',
-    region: 'Beijing',
-    description: 'Step into the heart of imperial China. This sprawling palace complex served as home to emperors for nearly 500 years. With nearly 1,000 buildings, intricate courtyards, and priceless artifacts, the Forbidden City reveals the grandeur and complexity of Chinese imperial life.',
-    lat: 39.9163,
-    lng: 116.3972,
-  },
-  {
-    id: 4,
-    name: 'West Lake',
-    region: 'Hangzhou',
-    description: 'Encircled by misty mountains and classical gardens, West Lake embodies the essence of Chinese aesthetic philosophy. Stroll along ancient causeways, visit serene temples, and experience the refined culture that has flourished here for over 1,000 years.',
-    lat: 30.2741,
-    lng: 120.1551,
-  },
-];
-
 export default function Destinations() {
-  const [selectedDestination, setSelectedDestination] = useState(destinationDetails[0]);
+  const [selectedDestination, setSelectedDestination] = useState<DestinationDetail | null>(null);
+  const [destinations, setDestinations] = useState<DestinationDetail[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch cities with experiences from backend
+  const { data: citiesData } = trpc.cms.listCitiesWithExperiences.useQuery();
+
+  useEffect(() => {
+    if (citiesData && citiesData.length > 0) {
+      // Transform backend data to destination format
+      const transformedDestinations: DestinationDetail[] = citiesData.map((city: any) => ({
+        id: city.id,
+        name: city.name,
+        description: city.description || 'Discover the beauty and culture of this enchanting destination.',
+        cityCardImage: city.cityCardImage || '',
+        lat: city.latitude || 30.5728,
+        lng: city.longitude || 114.3055,
+      }));
+
+      setDestinations(transformedDestinations);
+      setSelectedDestination(transformedDestinations[0]);
+      setIsLoading(false);
+    }
+  }, [citiesData]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#F5F3EF]">
+        <Navigation />
+        <section className="flex-1 flex items-center justify-center">
+          <p className="text-gray-600">Loading destinations...</p>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!selectedDestination) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#F5F3EF]">
+        <Navigation />
+        <section className="flex-1 flex items-center justify-center">
+          <p className="text-gray-600">No destinations available</p>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F5F3EF]">
@@ -84,7 +98,7 @@ export default function Destinations() {
                     Select Destination
                   </h2>
                   <div className="space-y-3">
-                    {destinationDetails.map((dest) => (
+                    {destinations.map((dest) => (
                       <button
                         key={dest.id}
                         onClick={() => setSelectedDestination(dest)}
@@ -94,9 +108,6 @@ export default function Destinations() {
                             : 'bg-gray-100 text-black hover:bg-gray-200'
                         }`}
                       >
-                        <p className="font-sans text-sm uppercase tracking-widest opacity-75 mb-1">
-                          {dest.region}
-                        </p>
                         <p className="font-display text-lg font-normal">
                           {dest.name}
                         </p>
@@ -114,6 +125,17 @@ export default function Destinations() {
                     {selectedDestination.description}
                   </p>
                 </div>
+
+                {/* City Card Image */}
+                {selectedDestination.cityCardImage && (
+                  <div className="pt-6 border-t border-gray-200">
+                    <img
+                      src={selectedDestination.cityCardImage}
+                      alt={selectedDestination.name}
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 

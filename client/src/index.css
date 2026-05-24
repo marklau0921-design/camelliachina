@@ -24,14 +24,14 @@
   box-sizing: border-box;
 }
 
-/* Text column: 50%, text inner container anchored toward image side */
+/* Text column: 50%, text inner container centered */
 .tea-detail-text {
   flex: 0 0 calc(50% - 12px);
   min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   align-self: stretch;
 }
 
@@ -42,10 +42,10 @@
   text-align: left;
 }
 
-/* When image is on the left (mirror layout), text container aligns to the left (toward image) */
+/* When image is on the left (mirror layout), text container still centered */
 .tea-detail-row.mirror .tea-detail-text {
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
 }
 
 /* Image column: 50%, image fills 70% of this column, anchored to left */

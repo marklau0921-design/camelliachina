@@ -754,7 +754,7 @@ export default function AdminExperienceEdit() {
         {exp?.slug && (
           <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: "12px" }}>
             <button
-              onClick={() => navigate(`/experience-preview/${exp.slug}`)}
+              onClick={() => window.open(`/experience-preview/${exp.slug}`, '_blank')}
               style={{
                 display: "flex", alignItems: "center", gap: "8px",
                 padding: "12px 32px", fontSize: "12px", letterSpacing: "0.1em", textTransform: "uppercase",

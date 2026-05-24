@@ -30,7 +30,7 @@ export default function CMSAdmin() {
   // Load CMS data
   const { data: teamMembers = [] } = trpc.cms.listTeamMembers.useQuery();
   const { data: cities = [] } = trpc.cms.listCities.useQuery();
-  const { data: experiences = [] } = trpc.cms.listExperiences.useQuery();
+  const { data: experiences = [] } = trpc.cms.listExperiences.useQuery({});
   const { data: itineraries = [] } = trpc.cms.listItineraries.useQuery();
   const { data: stories = [] } = trpc.cms.listStories.useQuery();
   const { data: videos = [] } = trpc.cms.listVideos.useQuery();

@@ -936,6 +936,57 @@ export const appRouter = router({
     listCityWhatToSee: publicProcedure
       .input(z.object({ cityId: z.number() }))
       .query(({ input }) => listCityWhatToSee(input.cityId)),
+    // Team Members (by ID)
+    getTeamMember: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const member = await getTeamMemberById(input.id);
+        if (!member) throw new TRPCError({ code: "NOT_FOUND" });
+        return member;
+      }),
+    // City by ID
+    getCity: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const city = await getCityById(input.id);
+        if (!city) throw new TRPCError({ code: "NOT_FOUND" });
+        return city;
+      }),
+    // Experience by ID
+    getExperience: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const exp = await getExperienceById(input.id);
+        if (!exp) throw new TRPCError({ code: "NOT_FOUND" });
+        return exp;
+      }),
+    // Itinerary by ID
+    getItinerary: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const itin = await getItineraryById(input.id);
+        if (!itin) throw new TRPCError({ code: "NOT_FOUND" });
+        const tagIds = await getItineraryTagIds(input.id);
+        return { ...itin, tagIds };
+      }),
+    // Story by ID
+    getStory: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const story = await getStoryById(input.id);
+        if (!story) throw new TRPCError({ code: "NOT_FOUND" });
+        const tagIds = await getStoryTagIds(input.id);
+        return { ...story, tagIds };
+      }),
+    // Video by ID
+    getVideo: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const video = await getVideoById(input.id);
+        if (!video) throw new TRPCError({ code: "NOT_FOUND" });
+        const tagIds = await getVideoTagIds(input.id);
+        return { ...video, tagIds };
+      }),
   }),
 
   // ─── Image upload (multipart handled in Express) ─────────────────────────
@@ -1101,91 +1152,7 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
-  // ─── Public CMS API (for frontend) ─────────────────────────────────────
-  cms: router({
-    // Team Members
-    listTeamMembers: publicProcedure.query(async () => {
-      return listTeamMembers(true);
-    }),
-
-    getTeamMember: publicProcedure
-      .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        const member = await getTeamMemberById(input.id);
-        if (!member) throw new TRPCError({ code: "NOT_FOUND" });
-        return member;
-      }),
-
-    // Cities
-    listCities: publicProcedure.query(async () => {
-      return listCities(true);
-    }),
-
-    getCity: publicProcedure
-      .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        const city = await getCityById(input.id);
-        if (!city) throw new TRPCError({ code: "NOT_FOUND" });
-        return city;
-      }),
-
-    // Experiences
-    listExperiences: publicProcedure.query(async () => {
-      return listExperiences(true);
-    }),
-
-    getExperience: publicProcedure
-      .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        const exp = await getExperienceById(input.id);
-        if (!exp) throw new TRPCError({ code: "NOT_FOUND" });
-        return exp;
-      }),
-
-    // Itineraries
-    listItineraries: publicProcedure.query(async () => {
-      return listItineraries(true);
-    }),
-
-    getItinerary: publicProcedure
-      .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        const itin = await getItineraryById(input.id);
-        if (!itin) throw new TRPCError({ code: "NOT_FOUND" });
-        const tagIds = await getItineraryTagIds(input.id);
-        return { ...itin, tagIds };
-      }),
-
-    // Stories
-    listStories: publicProcedure.query(async () => {
-      return listStories(true);
-    }),
-
-    getStory: publicProcedure
-      .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        const story = await getStoryById(input.id);
-        if (!story) throw new TRPCError({ code: "NOT_FOUND" });
-        const tagIds = await getStoryTagIds(input.id);
-        return { ...story, tagIds };
-      }),
-
-    // Videos
-    listVideos: publicProcedure.query(async () => {
-      return listVideos(true);
-    }),
-
-    getVideo: publicProcedure
-      .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        const video = await getVideoById(input.id);
-        if (!video) throw new TRPCError({ code: "NOT_FOUND" });
-        const tagIds = await getVideoTagIds(input.id);
-        return { ...video, tagIds };
-      }),
-  }),
-
-  // ─── Contact form ────────────────────────────────────────────────────────
+    // ─── Contact form ────────────────────────────────────────────────────────
   contact: router({
     submit: publicProcedure
       .input(z.object({
