@@ -900,8 +900,7 @@ export default function YunnanDetail() {
       </div>
 
       {/* ── OVERVIEW ── */}
-      <div id="overview" className="max-w-3xl mx-auto px-6 py-20 text-center" style={{ scrollMarginTop: '60px' }}>
-        <p className="text-xs tracking-widest uppercase mb-6 text-gray-400" style={{ fontFamily: 'sans-serif' }}>OVERVIEW</p>
+      <div id="overview" className="max-w-3xl mx-auto px-6 py-12 text-center" style={{ scrollMarginTop: '60px' }}>
         <h2 className="font-light mb-8 leading-tight" style={{ fontSize: 'clamp(28px, 4vw, 48px)' }}>
           Where Ancient Kingdoms Meet the Himalayas
         </h2>
