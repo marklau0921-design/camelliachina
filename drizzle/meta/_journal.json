@@ -15,6 +15,13 @@
       "when": 1779537003077,
       "tag": "0001_moaning_iron_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1779613789161,
+      "tag": "0002_living_wasp",
+      "breakpoints": true
     }
   ]
 }

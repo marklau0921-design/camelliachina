@@ -1,4 +1,4 @@
-import { boolean, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -205,16 +205,19 @@ export type InsertTeamMember = typeof teamMembers.$inferInsert;
 // ─── CMS: Itineraries ────────────────────────────────────────────────────────
 export const itineraries = mysqlTable("itineraries", {
   id: int("id").autoincrement().primaryKey(),
+  place: varchar("place", { length: 200 }),
   name: varchar("name", { length: 200 }).notNull(),
   slug: varchar("slug", { length: 200 }).notNull().unique(),
   shortDescription: varchar("shortDescription", { length: 500 }),
-  description: text("description"),
+  bannerImage: varchar("bannerImage", { length: 512 }),
   coverImage: varchar("coverImage", { length: 512 }),
+  overviewTitle: varchar("overviewTitle", { length: 300 }),
+  description: text("description"),
+  when: varchar("when", { length: 200 }),
+  price: varchar("price", { length: 100 }),
+  howLong: varchar("howLong", { length: 200 }),
   days: int("days").notNull().default(1),
-  price: varchar("price", { length: 50 }),
-  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).default("easy"),
-  maxPeople: int("maxPeople"),
-  details: text("details"),
+  sections: json("sections"),
   isActive: boolean("isActive").default(true).notNull(),
   sortOrder: int("sortOrder").default(0),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
