@@ -954,8 +954,8 @@ export default function YunnanDetail() {
           {/* Left timeline column + Right content column — right edge at 2/3 of page */}
           <div className="day-section-container">
             {/* Left: timeline (line + dots) */}
-            <div className="hidden lg:flex" style={{ width: '55px', flexShrink: 0, position: 'relative', alignSelf: 'stretch' }}>
-              {/* Vertical dashed line: 1px line + 0.5px gap */}
+            <div style={{ position: 'relative', alignSelf: 'stretch' }}>
+              {/* Vertical dashed line: always visible */}
               <div style={{
                 position: 'absolute',
                 left: '20px',
@@ -966,30 +966,34 @@ export default function YunnanDetail() {
                 transform: 'translateX(-50%)',
                 zIndex: 0,
               }} />
-              {/* Dots */}
-              {section.items.map((item, i) => {
-                const HEADER = 210;
-                const GAP = 50;
-                let topOffset = HEADER;
-                for (let j = 0; j < i; j++) {
-                  topOffset += (j % 2 === 0 ? 480 : 510) + GAP;
-                }
-                return (
-                  <div key={`dot-${i}`} style={{
-                    position: 'absolute',
-                    left: '20px',
-                    top: `${topOffset + 24}px`,
-                    width: '15px',
-                    height: '15px',
-                    borderRadius: '50%',
-                    background: '#52b788',
-                    zIndex: 3,
-                    transform: 'translateX(-50%)',
-                    pointerEvents: 'none',
-                  }} />
-                );
-              })}
+              {/* Dots: hidden on mobile, visible on desktop */}
+              <div className="hidden lg:block">
+                {section.items.map((item, i) => {
+                  const HEADER = 210;
+                  const GAP = 50;
+                  let topOffset = HEADER;
+                  for (let j = 0; j < i; j++) {
+                    topOffset += (j % 2 === 0 ? 480 : 510) + GAP;
+                  }
+                  return (
+                    <div key={`dot-${i}`} style={{
+                      position: 'absolute',
+                      left: '20px',
+                      top: `${topOffset + 24}px`,
+                      width: '15px',
+                      height: '15px',
+                      borderRadius: '50%',
+                      background: '#52b788',
+                      zIndex: 3,
+                      transform: 'translateX(-50%)',
+                      pointerEvents: 'none',
+                    }} />
+                  );
+                })}
+              </div>
             </div>
+            {/* Timeline width container: only on desktop */}
+            <div className="hidden lg:flex" style={{ width: '55px', flexShrink: 0 }} />
 
             {/* Right: section header + cards */}
             <div style={{ flex: 1, minWidth: 0, maxWidth: '964px' }}>
