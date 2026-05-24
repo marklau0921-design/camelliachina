@@ -978,7 +978,7 @@ export default function YunnanDetail() {
                   <div key={`dot-${i}`} style={{
                     position: 'absolute',
                     left: '20px',
-                    top: `${topOffset + 24}px`,
+                    top: `${topOffset + 40}px`,
                     width: '15px',
                     height: '15px',
                     borderRadius: '50%',
