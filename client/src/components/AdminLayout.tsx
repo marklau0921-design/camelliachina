@@ -224,7 +224,10 @@ function Sidebar({ onLogout }: { onLogout: () => void }) {
 // ── Main Layout ──
 export default function AdminLayout({ children, title }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { data: authData, isLoading: authLoading } = trpc.admin.check.useQuery();
+  const { data: authData, isLoading: authLoading, isError: authError } = trpc.admin.check.useQuery(
+    undefined,
+    { retry: false, refetchOnWindowFocus: false }
+  );
   const logout = trpc.admin.logout.useMutation({
     onSuccess: () => {
       localStorage.removeItem("admin_token");
@@ -246,7 +249,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
     );
   }
 
-  if (!authData?.authenticated) {
+  if (!authData?.authenticated || authError) {
     return <LoginForm onSuccess={handleLoginSuccess} />;
   }
 
