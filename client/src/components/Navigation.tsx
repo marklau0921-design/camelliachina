@@ -18,164 +18,6 @@ interface Destination {
   experienceRoutes?: { label: string; route: string }[];
 }
 
-const destinations: Destination[] = [
-  {
-    id: 'chengdu-sichuan',
-    name: 'Chengdu & Sichuan',
-    previewImage: '/manus-storage/sichuan-1-main_d212b850.avif',
-    route: '/destinations/sichuan',
-    experiences: [
-      "Tea Mountains of Ya'an",
-      'Panda Habitat Walks',
-      'Bamboo Forest Hikes',
-      'Countryside Villages',
-      'Mount Emei',
-      'Western Sichuan Landscapes',
-      'Rural Farming Experiences',
-    ],
-  },
-  {
-    id: 'chongqing',
-    name: 'Chongqing',
-    previewImage: '/manus-storage/hero-rural-life_08356dd8.avif',
-    experiences: [
-      'Yangtze River Cruises',
-      'Hotpot Culture',
-      'Ancient Town Walks',
-      'Night Views of the City',
-      'Three Gorges Exploration',
-      'Local Street Food',
-      'Mountain Village Hikes',
-    ],
-  },
-  {
-    id: 'yunnan',
-    name: 'Yunnan (Dali, Lijiang, Shangri-La)',
-    previewImage: '/manus-storage/yunnan-1-main_e8e0ebf5.avif',
-    experiences: [
-      'Ancient Town Walks',
-      'Tiger Leaping Gorge',
-      'Naxi Culture',
-      'Tibetan Border Villages',
-      'Tea Horse Road',
-      'Bai Minority Villages',
-      'Jade Dragon Snow Mountain',
-    ],
-  },
-  {
-    id: 'tibet',
-    name: 'Tibet / Xizang',
-    previewImage: '/manus-storage/tibet-1-main_e4d1c3b2.avif',
-    experiences: [
-      'Potala Palace',
-      'Tibetan Monastery Stays',
-      'High Altitude Trekking',
-      'Nomadic Life',
-      'Sacred Lake Visits',
-      'Tibetan Cuisine',
-      'Barkhor Street',
-    ],
-  },
-  {
-    id: 'guizhou',
-    name: 'Guizhou',
-    previewImage: '/manus-storage/hero-rural-life_08356dd8.avif',
-    experiences: [
-      'Miao & Dong Villages',
-      'Huangguoshu Waterfall',
-      'Rice Terrace Landscapes',
-      'Ancient Town Walks',
-      'Ethnic Minority Festivals',
-      'Karst Cave Exploration',
-      'Local Cuisine & Baijiu',
-    ],
-  },
-  {
-    id: 'yangshuo-guilin',
-    name: 'Yangshuo & Guilin',
-    previewImage: '/manus-storage/guilin-1-main_5e5f3d7d.avif',
-    experiences: [
-      'Li River Cruise',
-      'Karst Mountain Hikes',
-      'Rice Terrace Walks',
-      'Zhuang Minority Culture',
-      'Bamboo Rafting',
-      'Cave Exploration',
-      'Village Cycling',
-    ],
-  },
-  {
-    id: 'zhangjiajie',
-    name: 'Zhangjiajie',
-    previewImage: '/manus-storage/hero-rural-life_08356dd8.avif',
-    experiences: [
-      'Avatar Mountains',
-      'Glass Bridge Walks',
-      'Tianmen Mountain',
-      'Cable Car Rides',
-      'Forest Trekking',
-      'Tujia Minority Culture',
-      'Zhangjiajie Grand Canyon',
-    ],
-  },
-  {
-    id: 'xian',
-    name: "Xi'an",
-    previewImage: '/manus-storage/hero-rural-life_08356dd8.avif',
-    experiences: [
-      'Terracotta Warriors',
-      'Ancient City Wall Cycling',
-      'Muslim Quarter Food Tour',
-      'Tang Dynasty Culture',
-      'Huaqing Hot Springs',
-      'Shaanxi Cuisine',
-      'Silk Road History',
-    ],
-  },
-  {
-    id: 'xinjiang',
-    name: 'Xinjiang',
-    previewImage: '/manus-storage/hero-rural-life_08356dd8.avif',
-    experiences: [
-      'Silk Road Landscapes',
-      'Uyghur Culture & Cuisine',
-      'Tianshan Mountain Trekking',
-      'Kashgar Old City',
-      'Grape Valley Turpan',
-      'Desert Camel Rides',
-      'Heavenly Lake',
-    ],
-  },
-  {
-    id: 'beijing',
-    name: 'Beijing',
-    previewImage: '/manus-storage/beijing-1-main_46ed2ee1.avif',
-    experiences: [
-      'Great Wall Hikes',
-      'Forbidden City',
-      'Hutong Life',
-      'Imperial Cuisine',
-      'Temple of Heaven',
-      'Summer Palace',
-      'Night Markets',
-    ],
-  },
-  {
-    id: 'shanghai',
-    name: 'Shanghai',
-    previewImage: '/manus-storage/shanghai-1-main_a89c2c46.avif',
-    experiences: [
-      'The Bund at Night',
-      'French Concession Walks',
-      'Art Deco Architecture',
-      'Contemporary Art Scene',
-      'Xintiandi',
-      'Yu Garden',
-      'Culinary Tours',
-    ],
-  },
-];
-
 // ── Slug helper ────────────────────────────────────────────────────────────
 function toSlug(str: string): string {
   return str
@@ -229,10 +71,10 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
     }));
   }, [navData]);
 
-  // 动态加载城市列表及其体验
+  // 动态加载城市列表及其体验（不使用静态 fallback，避免闪现）
   const { data: citiesData } = trpc.cms.listCitiesWithExperiences.useQuery();
-  const dynamicDestinations: Destination[] = useMemo(() => {
-    if (!citiesData || citiesData.length === 0) return destinations;
+  const activeDestinations: Destination[] = useMemo(() => {
+    if (!citiesData) return []; // 加载中 → 空数组，不显示静态数据
     return citiesData.map(city => ({
       id: String(city.id),
       name: city.name,
@@ -247,12 +89,11 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
     }));
   }, [citiesData]);
 
-  const activeDestinations = dynamicDestinations.length > 0 ? dynamicDestinations : destinations;
-  const [activeDestination, setActiveDestination] = useState<Destination>(destinations[0]);
+  const [activeDestination, setActiveDestination] = useState<Destination | null>(null);
 
-  // 当动态数据加载完成后，更新 activeDestination
+  // 当动态数据加载完成后，默认选中第一个
   useEffect(() => {
-    if (activeDestinations.length > 0 && activeDestination.id === destinations[0]?.id) {
+    if (activeDestinations.length > 0 && !activeDestination) {
       setActiveDestination(activeDestinations[0]);
     }
   }, [activeDestinations]);
@@ -323,7 +164,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
     } else {
       setActiveMenu(menu);
       if (menu === 'destinations') {
-        setActiveDestination(activeDestinations[0] || destinations[0]);
+        setActiveDestination(activeDestinations[0] ?? null);
         setDestPortraitPage(1);
       } else if (menu === 'experiences') {
         setActiveCategory(null); // 重置为 null，自动选中第一个
@@ -621,7 +462,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
           </button>
 
           {/* ── DESTINATIONS panel ── */}
-          {activeMenu === 'destinations' && (
+          {activeMenu === 'destinations' && activeDestination && (
             <>
               {/* Landscape */}
               <div className="bt-landscape-layout" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
