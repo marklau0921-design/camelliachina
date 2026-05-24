@@ -203,17 +203,7 @@ export default function LuxuryTravelExperts() {
             </button>
           </div>
 
-          {/* Trustpilot badge */}
-          <div className="flex justify-center mt-12">
-            <div className="text-center">
-              <div className="flex justify-center gap-1 mb-2">
-                {[...Array(5)].map((_, i) => (
-                  <span key={i} className="text-lg text-gray-700">★</span>
-                ))}
-              </div>
-              <p className="text-xs text-gray-600">Trustpilot</p>
-            </div>
-          </div>
+
         </div>
 
         {/* Mobile: Single testimonial */}
@@ -261,17 +251,7 @@ export default function LuxuryTravelExperts() {
             </button>
           </div>
 
-          {/* Trustpilot badge */}
-          <div className="flex justify-center">
-            <div className="text-center">
-              <div className="flex justify-center gap-1 mb-2">
-                {[...Array(5)].map((_, i) => (
-                  <span key={i} className="text-lg text-gray-700">★</span>
-                ))}
-              </div>
-              <p className="text-xs text-gray-600">Trustpilot</p>
-            </div>
-          </div>
+
         </div>
       </div>
     </section>
