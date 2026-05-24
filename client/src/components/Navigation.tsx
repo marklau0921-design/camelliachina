@@ -210,6 +210,10 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
   const lastScrollY = useRef(0);
   const [location, setLocation] = useLocation();
 
+  // 动态加载 Brand Assets logo
+  const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const logoUrl = homepageAssets?.logo?.url || '/manus-storage/wayseek-logo-pink2_a5317c72.png';
+
   // 动态加载体验类型及其子项
   const { data: navData } = trpc.cms.listExperienceTypesWithNav.useQuery();
   const categories: ExperienceCategory[] = useMemo(() => {
@@ -464,7 +468,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
               style={{ left: 'clamp(28px, calc(-645px + 49.82vw), 305px)' }}
             >
               <img
-                src="/manus-storage/wayseek-logo-pink2_a5317c72.png"
+                src={logoUrl}
                 alt="Wayseek 未远"
                 className="group-hover:opacity-70 transition-opacity"
                 style={{ height: '40px', width: 'auto', objectFit: 'contain' }}
