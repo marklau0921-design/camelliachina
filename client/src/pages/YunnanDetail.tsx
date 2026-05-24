@@ -1061,19 +1061,92 @@ export default function YunnanDetail() {
       <SimilarExperiencesSection />
 
       {/* ── ENQUIRE CTA ── */}
-      <div className="w-full py-20 text-center" style={{ background: '#008f8c' }}>
-        <p className="text-white/60 text-xs tracking-widest uppercase mb-4" style={{ fontFamily: 'sans-serif' }}>READY TO START?</p>
-        <h2 className="text-white font-light mb-8" style={{ fontSize: 'clamp(28px, 4vw, 52px)' }}>
-          Let's plan your Yunnan journey
-        </h2>
-        <a
-          href="mailto:enquiry@intochina.com"
-          className="inline-block px-10 py-4 text-sm tracking-widest uppercase text-white transition-colors"
-          style={{ fontFamily: 'sans-serif', background: '#2d6a4f', letterSpacing: '0.2em' }}
+      <section
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: 'clamp(260px, 30vw, 275px)',
+          backgroundColor: '#a84900',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {/* Texture overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: 'url(/manus-storage/texture-buried_038ce46e.png)',
+            backgroundSize: '400px 400px',
+            backgroundRepeat: 'repeat',
+            opacity: 0.65,
+            mixBlendMode: 'multiply',
+          }}
+        />
+
+        {/* Content */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '28px',
+            textAlign: 'center',
+            padding: '0 24px',
+          }}
         >
-          ENQUIRE NOW
-        </a>
-      </div>
+          <h2
+            style={{
+              fontFamily: 'AlternateGotNo1D',
+              fontSize: 'clamp(28px, 4vw, 48px)',
+              fontWeight: 800,
+              color: '#ffffff',
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+              margin: 0,
+              lineHeight: 1.1,
+            }}
+          >
+            So, ready to start?
+          </h2>
+
+          <a href="/make-an-enquiry">
+            <button
+              style={{
+                backgroundColor: '#111111',
+                color: '#ffffff',
+                fontFamily: 'Lato, sans-serif',
+                fontSize: '13px',
+                fontWeight: 700,
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                padding: '14px 36px',
+                border: '2px solid #111111',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s, color 0.2s, transform 0.1s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.backgroundColor = '#ffffff';
+                e.currentTarget.style.color = '#111111';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.backgroundColor = '#111111';
+                e.currentTarget.style.color = '#ffffff';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+              onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.95)')}
+              onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
+            >
+              Get in Touch
+            </button>
+          </a>
+        </div>
+      </section>
 
       {/* ── FOOTER ── */}
       <Footer />
