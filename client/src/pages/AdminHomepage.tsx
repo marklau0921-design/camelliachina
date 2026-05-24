@@ -1,17 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import ImageUploader from "@/components/ImageUploader";
 import AdminLayout from "@/components/AdminLayout";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-interface ImageStoryForm {
-  title: string;
-  thumbnailUrl: string;
-  isVisible: boolean;
-  sortOrder: number;
-}
-
 interface VideoStoryForm {
   title: string;
   youtubeId: string;
@@ -28,7 +21,6 @@ interface SponsorForm {
   sortOrder: number;
 }
 
-const emptyImageStory: ImageStoryForm = { title: "", thumbnailUrl: "", isVisible: true, sortOrder: 0 };
 const emptyVideoStory: VideoStoryForm = { title: "", youtubeId: "", thumbnailUrl: "", isVisible: true, sortOrder: 0 };
 const emptySponsor: SponsorForm = { name: "", logoUrl: "", websiteUrl: "", isVisible: true, sortOrder: 0 };
 
@@ -101,45 +93,6 @@ const btnDanger: React.CSSProperties = {
 const cardStyle: React.CSSProperties = {
   background: "#fff", border: "1px solid #f0f0f0", borderRadius: 8, padding: 20, marginBottom: 12,
 };
-
-// ─── Image Story Modal ────────────────────────────────────────────────────────
-function ImageStoryModal({ initial, onSave, onClose }: {
-  initial?: ImageStoryForm & { id?: number };
-  onSave: (data: ImageStoryForm & { id?: number }) => void;
-  onClose: () => void;
-}) {
-  const [form, setForm] = useState<ImageStoryForm>(initial ?? emptyImageStory);
-  const set = (k: keyof ImageStoryForm, v: any) => setForm(f => ({ ...f, [k]: v }));
-
-  return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ background: "#fff", borderRadius: 8, padding: 32, width: 480, maxWidth: "90vw", maxHeight: "80vh", overflowY: "auto" }}>
-        <h3 style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 24, color: "#1a1a1a" }}>
-          {initial?.id ? "Edit Image Card" : "Add Image Card"}
-        </h3>
-        <Field label="Title (internal label)">
-          <input style={inputStyle} value={form.title} onChange={e => set("title", e.target.value)} placeholder="e.g. Guilin Landscape" />
-        </Field>
-        <Field label="Image">
-          <ImageUploader value={form.thumbnailUrl} onChange={v => set("thumbnailUrl", v ?? "")} category="homepage" />
-        </Field>
-        <Field label="Sort Order">
-          <input style={inputStyle} type="number" value={form.sortOrder} onChange={e => set("sortOrder", Number(e.target.value))} />
-        </Field>
-        <Field label="Visible">
-          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-            <input type="checkbox" checked={form.isVisible} onChange={e => set("isVisible", e.target.checked)} />
-            <span style={{ fontFamily: "Lato, sans-serif", fontSize: 13 }}>Show on homepage</span>
-          </label>
-        </Field>
-        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 8 }}>
-          <button style={btnSecondary} onClick={onClose}>Cancel</button>
-          <button style={btnPrimary} onClick={() => { if (!form.title) return; onSave({ ...form, id: initial?.id }); }}>Save</button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─── Video Story Modal ────────────────────────────────────────────────────────
 function VideoStoryModal({ initial, onSave, onClose }: {
@@ -273,10 +226,46 @@ export default function AdminHomepage() {
   const setImageSection = (k: string, v: any) => setImageSectionForm(f => ({ ...(f ?? imageSectionEdit), [k]: v }));
 
   const imageStoriesQuery = trpc.homepage.listStoriesByType.useQuery({ type: "image" });
-  const createImageStory = trpc.homepage.createStory.useMutation({ onSuccess: () => { imageStoriesQuery.refetch(); setImageStoryModal(null); toast.success("Image card added"); } });
-  const updateImageStory = trpc.homepage.updateStory.useMutation({ onSuccess: () => { imageStoriesQuery.refetch(); setImageStoryModal(null); toast.success("Image card updated"); } });
-  const deleteImageStory = trpc.homepage.deleteStory.useMutation({ onSuccess: () => { imageStoriesQuery.refetch(); toast.success("Image card deleted"); } });
-  const [imageStoryModal, setImageStoryModal] = useState<(ImageStoryForm & { id?: number }) | null>(null);
+  const createImageStory = trpc.homepage.createStory.useMutation({ onSuccess: () => { imageStoriesQuery.refetch(); } });
+  const deleteImageStory = trpc.homepage.deleteStory.useMutation({ onSuccess: () => { imageStoriesQuery.refetch(); toast.success("Image deleted"); } });
+  const uploadImageMutation = trpc.media.upload.useMutation();
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageDragOver, setImageDragOver] = useState(false);
+  const imageFileRef = useRef<HTMLInputElement>(null);
+
+  const handleImageFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setImageUploading(true);
+    let addedCount = 0;
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) continue;
+      try {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve((reader.result as string).split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        const result = await uploadImageMutation.mutateAsync({
+          filename: file.name, base64, mimeType: file.type, fileSize: file.size,
+          source: "homepage", assetType: "general",
+        });
+        await createImageStory.mutateAsync({
+          title: file.name.replace(/\.[^.]+$/, ""),
+          type: "image",
+          thumbnailUrl: result.url,
+          isVisible: true,
+          sortOrder: 0,
+        });
+        addedCount++;
+      } catch (e: any) {
+        toast.error(e.message || "Upload failed");
+      }
+    }
+    setImageUploading(false);
+    if (imageFileRef.current) imageFileRef.current.value = "";
+    if (addedCount > 0) toast.success(`${addedCount} image${addedCount > 1 ? "s" : ""} added`);
+  };
 
   // ── Video Stories Section ─────────────────────────────────────────────────
   const videoSectionQuery = trpc.homepage.getStorySection.useQuery({ sectionType: "video" });
@@ -303,14 +292,6 @@ export default function AdminHomepage() {
   const imageStories = imageStoriesQuery.data ?? [];
   const videoStories = videoStoriesQuery.data ?? [];
   const sponsors = sponsorsQuery.data ?? [];
-
-  const handleImageStorySave = (data: ImageStoryForm & { id?: number }) => {
-    if (data.id) {
-      updateImageStory.mutate({ id: data.id, title: data.title, thumbnailUrl: data.thumbnailUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
-    } else {
-      createImageStory.mutate({ title: data.title, type: "image", thumbnailUrl: data.thumbnailUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
-    }
-  };
 
   const handleVideoStorySave = (data: VideoStoryForm & { id?: number }) => {
     if (data.id) {
@@ -408,32 +389,68 @@ export default function AdminHomepage() {
         <div style={{ fontFamily: "Lato, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: "#888", textTransform: "uppercase", marginBottom: 10 }}>
           Image Cards
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
-          {imageStories.length === 0 && (
-            <div style={{ color: "#aaa", fontFamily: "Lato, sans-serif", fontSize: 13, padding: "20px 0", textAlign: "center" }}>
-              No image cards yet. Add one below.
-            </div>
+        {imageStories.length === 0 && !imageUploading && (
+          <div style={{ color: "#aaa", fontFamily: "Lato, sans-serif", fontSize: 13, padding: "12px 0", textAlign: "center" }}>
+            No images yet. Upload below.
+          </div>
+        )}
+        {imageStories.length > 0 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
+            {imageStories.map(s => (
+              <div key={s.id} style={{ position: "relative", width: 100, height: 70, borderRadius: 4, overflow: "hidden", border: "1px solid #eee", background: "#f5f5f5", flexShrink: 0 }}>
+                {s.image && (
+                  <img src={s.image} alt={s.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                )}
+                <button
+                  onClick={() => { if (confirm("Delete this image?")) deleteImageStory.mutate({ id: s.id }); }}
+                  style={{ position: "absolute", top: 3, right: 3, width: 20, height: 20, borderRadius: "50%", background: "rgba(0,0,0,0.55)", border: "none", cursor: "pointer", color: "#fff", fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Direct upload area */}
+        <div
+          onDrop={e => { e.preventDefault(); setImageDragOver(false); handleImageFiles(e.dataTransfer.files); }}
+          onDragOver={e => { e.preventDefault(); setImageDragOver(true); }}
+          onDragLeave={() => setImageDragOver(false)}
+          onClick={() => !imageUploading && imageFileRef.current?.click()}
+          style={{
+            border: `1px dashed ${imageDragOver ? "#F5569B" : "#ccc"}`,
+            borderRadius: 4,
+            padding: "14px 16px",
+            cursor: imageUploading ? "default" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            color: imageDragOver ? "#F5569B" : "#888",
+            fontSize: 12,
+            letterSpacing: "0.05em",
+            background: imageDragOver ? "#fff0f6" : "#fafafa",
+            transition: "all 0.18s",
+            userSelect: "none",
+          }}
+        >
+          {imageUploading ? (
+            <span style={{ fontFamily: "Lato, sans-serif" }}>Uploading...</span>
+          ) : (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span style={{ fontFamily: "Lato, sans-serif" }}>Upload images (drag & drop or click) — multiple files supported</span>
+            </>
           )}
-          {imageStories.map(s => (
-            <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", border: "1px solid #f0f0f0", borderRadius: 6, background: "#fafafa" }}>
-              {s.image && (
-                <img src={s.image} alt={s.name} style={{ width: 80, height: 50, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} />
-              )}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 600, color: "#1a1a1a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.name}</div>
-                <div style={{ fontFamily: "Lato, sans-serif", fontSize: 11, color: "#aaa", marginTop: 2 }}>Image card</div>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                <span style={{ fontSize: 11, color: s.isVisible ? "#F5569B" : "#aaa", fontFamily: "Lato, sans-serif", fontWeight: 600 }}>
-                  {s.isVisible ? "Visible" : "Hidden"}
-                </span>
-                <button style={btnSecondary} onClick={() => setImageStoryModal({ id: s.id, title: s.name, thumbnailUrl: s.image ?? "", isVisible: s.isVisible ?? true, sortOrder: s.sortOrder ?? 0 })}>Edit</button>
-                <button style={btnDanger} onClick={() => { if (confirm("Delete this image card?")) deleteImageStory.mutate({ id: s.id }); }}>Delete</button>
-              </div>
-            </div>
-          ))}
         </div>
-        <button style={btnPrimary} onClick={() => setImageStoryModal(emptyImageStory)}>+ Add Image Card</button>
+        <input
+          ref={imageFileRef}
+          type="file"
+          accept="image/*"
+          multiple
+          style={{ display: "none" }}
+          onChange={e => handleImageFiles(e.target.files)}
+        />
       </div>
 
       {/* ── Section 2: Video Stories ─────────────────────────────────────────── */}
@@ -525,9 +542,6 @@ export default function AdminHomepage() {
       </div>
 
       {/* ── Modals ────────────────────────────────────────────────────────────── */}
-      {imageStoryModal !== null && (
-        <ImageStoryModal initial={imageStoryModal} onSave={handleImageStorySave} onClose={() => setImageStoryModal(null)} />
-      )}
       {videoStoryModal !== null && (
         <VideoStoryModal initial={videoStoryModal} onSave={handleVideoStorySave} onClose={() => setVideoStoryModal(null)} />
       )}
