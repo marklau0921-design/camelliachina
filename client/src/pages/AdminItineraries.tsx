@@ -251,29 +251,31 @@ function SectionEditor({ section, onChange, onDelete, index }: {
               <ImageIcon size={13} color="#888" />
               <label style={{ ...labelStyle, marginBottom: 0 }}>Section Gallery</label>
             </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
-              {section.galleryImages.map((img, i) => (
-                <div key={i} style={{ position: "relative", width: "80px", height: "60px", background: "#eee", overflow: "hidden" }}>
-                  <img src={img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  <button
-                    onClick={() => set("galleryImages", section.galleryImages.filter((_, j) => j !== i))}
-                    style={{ position: "absolute", top: "2px", right: "2px", background: "rgba(0,0,0,0.6)", border: "none", cursor: "pointer", color: "#fff", borderRadius: "50%", width: "18px", height: "18px", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
-                  >
-                    <X size={10} />
-                  </button>
-                </div>
-              ))}
-              <div style={{ width: "80px", height: "60px" }}>
-                <ImageUploader
-                  value=""
-                  onChange={url => { if (url) set("galleryImages", [...section.galleryImages, url]); }}
-                  category="itinerary"
-                  label=""
-                  compact
-                />
+            {/* Existing gallery thumbnails */}
+            {section.galleryImages.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "12px" }}>
+                {section.galleryImages.map((img, i) => (
+                  <div key={i} style={{ position: "relative", width: "80px", height: "60px", background: "#eee", overflow: "hidden" }}>
+                    <img src={img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <button
+                      onClick={() => set("galleryImages", section.galleryImages.filter((_, j) => j !== i))}
+                      style={{ position: "absolute", top: "2px", right: "2px", background: "rgba(0,0,0,0.6)", border: "none", cursor: "pointer", color: "#fff", borderRadius: "50%", width: "18px", height: "18px", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
+                    >
+                      <X size={10} />
+                    </button>
+                  </div>
+                ))}
               </div>
-            </div>
-            <p style={{ fontSize: "11px", color: "#aaa", margin: 0 }}>{section.galleryImages.length} image{section.galleryImages.length !== 1 ? "s" : ""}</p>
+            )}
+            {/* Add image — same style as standard ImageUploader */}
+            <ImageUploader
+              value=""
+              onChange={url => { if (url) set("galleryImages", [...section.galleryImages, url]); }}
+              category="itinerary"
+              label=""
+              placeholder="Paste image URL or upload file"
+            />
+            <p style={{ fontSize: "11px", color: "#aaa", marginTop: "6px", marginBottom: 0 }}>{section.galleryImages.length} image{section.galleryImages.length !== 1 ? "s" : ""} in gallery</p>
           </div>
         </div>
       )}
