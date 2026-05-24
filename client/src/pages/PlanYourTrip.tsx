@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useLocation } from 'wouter';
+import { trpc } from '@/lib/trpc';
 import './PlanYourTrip.css';
 
 interface TravelCard {
@@ -7,133 +9,49 @@ interface TravelCard {
   subtitle?: string;
   image: string;
   category: 'destination' | 'experience';
+  route?: string;
 }
 
 const PlanYourTrip: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'destination' | 'experience'>('destination');
   const [showAll, setShowAll] = useState(false);
-  const [btnPressed, setBtnPressed] = useState(false);
+  const [, navigate] = useLocation();
 
   const VISIBLE_COUNT = 6;
 
-  const travelCards: TravelCard[] = [
-    {
-      id: 'chengdu-sichuan',
-      title: 'CHENGDU & SICHUAN',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/sPqPFdwAGdLYPuPY.jpg',
-      category: 'destination',
-    },
-    {
-      id: 'chongqing',
-      title: 'CHONGQING',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/QjsoLwKicsuvVypZ.jpg',
-      category: 'destination',
-    },
-    {
-      id: 'yunnan',
-      title: 'YUNNAN',
-      subtitle: 'Dali · Lijiang · Shangri-La',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/XjbZCRWiHBIzkFvl.jpg',
-      category: 'destination',
-    },
-    {
-      id: 'tibet',
-      title: 'TIBET / XIZANG',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/HJFnWKYBxcRssHEw.jpg',
-      category: 'destination',
-    },
-    {
-      id: 'guizhou',
-      title: 'GUIZHOU',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ZwUcQNhHBZtPrNSe.jpg',
-      category: 'destination',
-    },
-    {
-      id: 'yangshuo-guilin',
-      title: 'YANGSHUO & GUILIN',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/sPqPFdwAGdLYPuPY.jpg',
-      category: 'destination',
-    },
-    {
-      id: 'zhangjiajie',
-      title: 'ZHANGJIAJIE',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/QjsoLwKicsuvVypZ.jpg',
-      category: 'destination',
-    },
-    {
-      id: 'xian',
-      title: "XI'AN",
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/HJFnWKYBxcRssHEw.jpg',
-      category: 'destination',
-    },
-    {
-      id: 'xinjiang',
-      title: 'XINJIANG',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/XjbZCRWiHBIzkFvl.jpg',
-      category: 'destination',
-    },
-    {
-      id: 'beijing',
-      title: 'BEIJING',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ZwUcQNhHBZtPrNSe.jpg',
-      category: 'destination',
-    },
-    {
-      id: 'shanghai',
-      title: 'SHANGHAI',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/sPqPFdwAGdLYPuPY.jpg',
-      category: 'destination',
-    },
-    {
-      id: 'guangzhou',
-      title: 'GUANGZHOU',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/QjsoLwKicsuvVypZ.jpg',
-      category: 'destination',
-    },
-    // Experience cards
-    {
-      id: 'nature',
-      title: 'NATURE',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/sPqPFdwAGdLYPuPY.jpg',
-      category: 'experience',
-    },
-    {
-      id: 'culture',
-      title: 'CULTURE',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/QjsoLwKicsuvVypZ.jpg',
-      category: 'experience',
-    },
-    {
-      id: 'history',
-      title: 'HISTORY',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/HJFnWKYBxcRssHEw.jpg',
-      category: 'experience',
-    },
-    {
-      id: 'adventure',
-      title: 'ADVENTURE',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/XjbZCRWiHBIzkFvl.jpg',
-      category: 'experience',
-    },
-    {
-      id: 'local-life',
-      title: 'LOCAL LIFE',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/ZwUcQNhHBZtPrNSe.jpg',
-      category: 'experience',
-    },
-    {
-      id: 'food',
-      title: 'FOOD',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/sPqPFdwAGdLYPuPY.jpg',
-      category: 'experience',
-    },
-    {
-      id: 'wellness',
-      title: 'WELLNESS',
-      image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/QjsoLwKicsuvVypZ.jpg',
-      category: 'experience',
-    },
-  ];
+  // 动态加载城市列表
+  const { data: citiesData = [] } = trpc.cms.listCitiesWithExperiences.useQuery();
+  
+  // 动态加载体验类型列表
+  const { data: experienceTypesData = [] } = trpc.cms.listExperienceTypesWithNav.useQuery();
+
+  // 构建城市卡片
+  const destinationCards: TravelCard[] = useMemo(() => {
+    return citiesData.map(city => ({
+      id: String(city.id),
+      title: city.name.toUpperCase(),
+      image: city.coverImage || 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/sPqPFdwAGdLYPuPY.jpg',
+      category: 'destination' as const,
+      route: `/destinations/${city.slug}`,
+    }));
+  }, [citiesData]);
+
+  // 构建体验卡片
+  const experienceCards: TravelCard[] = useMemo(() => {
+    return experienceTypesData.map(type => {
+      const slug = type.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+      return {
+        id: String(type.id),
+        title: type.name.toUpperCase(),
+        image: type.coverImage || 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663313440852/QjsoLwKicsuvVypZ.jpg',
+        category: 'experience' as const,
+        route: `/experiences/${slug}`,
+      };
+    });
+  }, [experienceTypesData]);
+
+  // 合并所有卡片
+  const travelCards = [...destinationCards, ...experienceCards];
 
   const tabs: { key: 'destination' | 'experience'; label: string }[] = [
     { key: 'destination', label: 'BY DESTINATION' },
@@ -148,6 +66,12 @@ const PlanYourTrip: React.FC = () => {
   const handleTabChange = (key: 'destination' | 'experience') => {
     setActiveTab(key);
     setShowAll(false);
+  };
+
+  const handleCardClick = (card: TravelCard) => {
+    if (card.route) {
+      navigate(card.route);
+    }
   };
 
   return (
@@ -200,6 +124,7 @@ const PlanYourTrip: React.FC = () => {
             <div
               key={card.id}
               className="relative overflow-hidden group cursor-pointer"
+              onClick={() => handleCardClick(card)}
             >
               <img
                 src={card.image}
