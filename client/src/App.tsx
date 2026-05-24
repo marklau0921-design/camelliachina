@@ -68,6 +68,7 @@ function Router() {
       <Route path="/experiences/tea-mountains-yaan" component={TeaMountains} />
       <Route path="/template/experience" component={TeaMountains} />
       <Route path="/template/city" component={Sichuan} />
+      <Route path="/template/itinerary" component={YunnanDetail} />
       <Route path="/about/why-us" component={WhyUs} />
       <Route path="/about/our-team" component={OurTeam} />
       <Route path="/experiences/:categorySlug/:id" component={ExperienceDetail} />

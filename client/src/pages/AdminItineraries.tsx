@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import AdminLayout from "@/components/AdminLayout";
 import ImageUploader from "@/components/ImageUploader";
@@ -119,6 +120,7 @@ function ItineraryForm({ initial, onSave, onCancel, saving }: {
 }
 
 export default function AdminItineraries() {
+  const [, navigate] = useLocation();
   const utils = trpc.useUtils();
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
@@ -141,7 +143,7 @@ export default function AdminItineraries() {
           {!showForm && editId === null && (
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <button
-                onClick={() => window.open("/experiences/2", "_blank")}
+                onClick={() => navigate("/template/itinerary")}
                 style={{
                   display: "flex", alignItems: "center", gap: "8px",
                   padding: "10px 20px", fontSize: "12px", letterSpacing: "0.1em", textTransform: "uppercase",
