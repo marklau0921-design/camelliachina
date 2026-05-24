@@ -622,7 +622,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
               {/* Landscape */}
               <div className="bt-landscape-layout" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
                 {/* Col 1 */}
-                <div style={{ flexShrink: 0, overflowY: 'hidden', paddingTop: '60px', paddingBottom: '40px', paddingRight: '20px', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', minWidth: '220px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+                <div style={{ flexShrink: 0, overflowY: 'hidden', paddingTop: '60px', paddingBottom: '40px', paddingRight: '20px', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', minWidth: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                   {activeDestinations.map(dest => (
                     <div
                       key={dest.id}
@@ -706,7 +706,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
             <>
               {/* Landscape — no preview image, just the two links */}
               <div className="bt-landscape-layout" style={{ flex: 1, overflow: 'hidden' }}>
-                <div style={{ flexShrink: 0, overflowY: 'hidden', paddingTop: '60px', paddingBottom: '40px', paddingRight: '20px', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', minWidth: '220px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+                <div style={{ flexShrink: 0, overflowY: 'hidden', paddingTop: '60px', paddingBottom: '40px', paddingRight: '20px', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', minWidth: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                   {[
                     { label: 'Why Us?', route: '/about/why-us' },
                     { label: 'Our Team', route: '/about/our-team' },
