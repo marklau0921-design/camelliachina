@@ -11,7 +11,13 @@ let _pool: ReturnType<typeof mysql.createPool> | null = null;
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _pool = mysql.createPool(process.env.DATABASE_URL);
+      // On Hostinger, 'localhost' resolves to IPv6 '::1' which MySQL rejects.
+      // Force IPv4 by replacing localhost with 127.0.0.1 in the connection URL.
+      const dbUrl = process.env.DATABASE_URL.replace(
+        /(@)localhost(:\d+\/|\/)/, 
+        '$1127.0.0.1$2'
+      );
+      _pool = mysql.createPool(dbUrl);
       _db = drizzle(_pool as any) as ReturnType<typeof drizzle>;
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
