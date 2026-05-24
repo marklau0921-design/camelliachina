@@ -933,7 +933,7 @@ export default function YunnanDetail() {
         {/* Each section wrapped in its own relative container for sticky sidebar */}
         <div style={{ position: 'relative' }}>
           {/* Right-side sticky route marker — only visible on desktop, bounded to this section */}
-          <div className="hidden" style={{
+          <div className="hidden sm:block" style={{
             position: 'absolute',
             right: 0,
             top: 0,
@@ -954,7 +954,7 @@ export default function YunnanDetail() {
           {/* Left timeline column + Right content column — right edge at 2/3 of page */}
           <div className="day-section-container">
             {/* Left: timeline (line + dots) */}
-            <div style={{ width: '55px', flexShrink: 0, position: 'relative', alignSelf: 'stretch' }}>
+            <div className="hidden md:flex" style={{ width: '55px', flexShrink: 0, position: 'relative', alignSelf: 'stretch' }}>
               {/* Vertical dashed line: 1px line + 0.5px gap */}
               <div style={{
                 position: 'absolute',

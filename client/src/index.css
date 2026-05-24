@@ -389,14 +389,13 @@ html {
   gap: 24px;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 767px) {
   .day-section-container {
     margin-left: auto;
     margin-right: auto;
     max-width: 100%;
     padding: 0 16px;
     justify-content: center;
-    gap: 24px;
   }
 }
 
