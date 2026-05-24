@@ -207,33 +207,9 @@ function HomepageAssetsTab() {
         <UploadZone onUpload={(f) => handleUpload(f, "logo")} loading={uploadMut.isPending} label="Upload new logo (drag & drop or click)" />
       </div>
 
-      {/* Banner */}
+      {/* Background Texture */}
       <div style={sectionStyle}>
-        <div style={sectionTitle}>Homepage Banner</div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
-          {bannersLoading ? <div style={{ color: "#aaa", fontSize: 13 }}>Loading...</div> : banners.length === 0 ? <div style={{ color: "#aaa", fontSize: 13 }}>No banners uploaded yet.</div> : (banners as MediaAsset[]).map((banner, idx) => (
-            <div key={banner.id} style={{ width: 180, border: `2px solid ${banner.isActive ? "#F5569B" : "#e8e8e8"}`, borderRadius: 8, overflow: "hidden", background: "#fafafa", position: "relative" }}>
-              <img src={banner.url} alt={banner.filename} style={{ width: "100%", height: 100, objectFit: "cover" }} />
-              <div style={{ padding: "6px 8px", display: "flex", alignItems: "center", gap: 4, borderTop: "1px solid #f0f0f0" }}>
-                <button onClick={() => handleReorder(banners as MediaAsset[], idx, -1)} disabled={idx === 0} style={{ fontSize: 12, background: "none", border: "none", cursor: idx === 0 ? "default" : "pointer", color: idx === 0 ? "#ccc" : "#555" }}>↑</button>
-                <button onClick={() => handleReorder(banners as MediaAsset[], idx, 1)} disabled={idx === banners.length - 1} style={{ fontSize: 12, background: "none", border: "none", cursor: idx === banners.length - 1 ? "default" : "pointer", color: idx === banners.length - 1 ? "#ccc" : "#555" }}>↓</button>
-                <button onClick={() => setActiveMut.mutate({ id: banner.id, isActive: !banner.isActive, assetType: "banner" })} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, border: "none", background: banner.isActive ? "#F5569B" : "#e8e8e8", color: banner.isActive ? "#fff" : "#888", cursor: "pointer", marginLeft: "auto" }}>
-                  {banner.isActive ? "ON" : "OFF"}
-                </button>
-              </div>
-              <label style={{ display: "block", textAlign: "center", fontSize: 10, color: "#888", padding: "4px", cursor: "pointer", borderTop: "1px solid #f0f0f0" }}>
-                Replace
-                <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleReplace(banner.id, f); e.target.value = ""; }} />
-              </label>
-            </div>
-          ))}
-        </div>
-        <UploadZone onUpload={(f) => handleUpload(f, "banner")} loading={uploadMut.isPending} label="Upload new banner (drag & drop or click)" />
-      </div>
-
-      {/* CTA */}
-      <div style={sectionStyle}>
-        <div style={sectionTitle}>CTA Background Image</div>
+        <div style={sectionTitle}>Background Texture Image</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
           {ctasLoading ? <div style={{ color: "#aaa", fontSize: 13 }}>Loading...</div> : ctas.length === 0 ? <div style={{ color: "#aaa", fontSize: 13 }}>No CTA backgrounds uploaded yet.</div> : (ctas as MediaAsset[]).map((cta) => (
             <div key={cta.id} onClick={() => setActiveMut.mutate({ id: cta.id, isActive: !cta.isActive, assetType: "cta" })}
@@ -337,7 +313,7 @@ export default function AdminMediaLibrary() {
           <h1 style={{ fontSize: 22, fontWeight: 700, color: "#1a1a1a", margin: 0 }}>Media Library</h1>
         </div>
         <div style={{ display: "flex", borderBottom: "1px solid #e8e8e8", marginBottom: 24 }}>
-          <button style={tabStyle(activeTab === "homepage")} onClick={() => setActiveTab("homepage")}>Homepage Assets</button>
+          <button style={tabStyle(activeTab === "homepage")} onClick={() => setActiveTab("homepage")}>Brand Assets</button>
           <button style={tabStyle(activeTab === "all")} onClick={() => setActiveTab("all")}>All Images</button>
         </div>
         {activeTab === "homepage" ? <HomepageAssetsTab /> : <AllImagesTab />}
