@@ -18,31 +18,31 @@ interface FeatureCard {
 const features: FeatureCard[] = [
   {
     id: 1,
-    icon: <Award className="w-12 h-12 text-gray-700" strokeWidth={1.5} />,
+    icon: <Award style={{width: 36, height: 36, color: '#374151'}} strokeWidth={1.5} />,
     title: 'Award-winning planners',
     description: '',
   },
   {
     id: 2,
-    icon: <Lightbulb className="w-12 h-12 text-gray-700" strokeWidth={1.5} />,
+    icon: <Lightbulb style={{width: 36, height: 36, color: '#374151'}} strokeWidth={1.5} />,
     title: 'No-obligation quotes',
     description: '',
   },
   {
     id: 3,
-    icon: <CreditCard className="w-12 h-12 text-gray-700" strokeWidth={1.5} />,
+    icon: <CreditCard style={{width: 36, height: 36, color: '#374151'}} strokeWidth={1.5} />,
     title: 'No planning fees',
     description: '',
   },
   {
     id: 4,
-    icon: <Phone className="w-12 h-12 text-gray-700" strokeWidth={1.5} />,
+    icon: <Phone style={{width: 36, height: 36, color: '#374151'}} strokeWidth={1.5} />,
     title: '24/7 on the ground support',
     description: '',
   },
   {
     id: 5,
-    icon: <Users className="w-12 h-12 text-gray-700" strokeWidth={1.5} />,
+    icon: <Users style={{width: 36, height: 36, color: '#374151'}} strokeWidth={1.5} />,
     title: 'Expert private guides',
     description: '',
   },
@@ -51,9 +51,9 @@ const features: FeatureCard[] = [
 export default function WhyIntoChinaSection() {
   return (
     <section className="relative bg-[#F5F3EF] overflow-hidden" style={{backgroundColor: '#fafafa'}}>
-      <div className="container max-w-7xl mx-auto px-4" style={{paddingTop: '64px', paddingBottom: '64px'}}>
+      <div className="container max-w-7xl mx-auto px-4" style={{paddingTop: '32px', paddingBottom: '32px'}}>
         {/* Section Title */}
-        <div className="flex flex-col items-center justify-center mb-16">
+        <div className="flex flex-col items-center justify-center" style={{marginBottom: '32px'}}>
           <h2 className="font-display text-3xl md:text-4xl text-black text-center uppercase font-semibold" style={{fontSize: '28px', fontFamily: 'Lato, sans-serif', letterSpacing: '0.05em'}}>
             WHY WAYSEEK?
           </h2>
@@ -70,7 +70,7 @@ export default function WhyIntoChinaSection() {
               </div>
 
               {/* Title */}
-              <h3 className="font-sans text-base md:text-lg mb-3 font-semibold tracking-wide" style={{color: '#666666'}}>
+              <h3 className="font-sans mb-3 font-semibold tracking-wide" style={{color: '#666666', fontSize: '12px'}}>
                 {feature.title}
               </h3>
 
