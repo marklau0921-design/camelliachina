@@ -230,15 +230,20 @@ export default function AdminHomepage() {
   const deleteImageStory = trpc.homepage.deleteStory.useMutation({ onSuccess: () => { imageStoriesQuery.refetch(); toast.success("Image deleted"); } });
   const uploadImageMutation = trpc.media.upload.useMutation();
   const [imageUploading, setImageUploading] = useState(false);
+  const [imageUploadProgress, setImageUploadProgress] = useState<{ current: number; total: number } | null>(null);
   const [imageDragOver, setImageDragOver] = useState(false);
   const imageFileRef = useRef<HTMLInputElement>(null);
 
   const handleImageFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
+    const imageFiles = Array.from(files).filter(f => f.type.startsWith("image/"));
+    if (imageFiles.length === 0) return;
     setImageUploading(true);
+    setImageUploadProgress({ current: 0, total: imageFiles.length });
     let addedCount = 0;
-    for (const file of Array.from(files)) {
-      if (!file.type.startsWith("image/")) continue;
+    for (let i = 0; i < imageFiles.length; i++) {
+      const file = imageFiles[i];
+      setImageUploadProgress({ current: i + 1, total: imageFiles.length });
       try {
         const base64 = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
@@ -263,6 +268,7 @@ export default function AdminHomepage() {
       }
     }
     setImageUploading(false);
+    setImageUploadProgress(null);
     if (imageFileRef.current) imageFileRef.current.value = "";
     if (addedCount > 0) toast.success(`${addedCount} image${addedCount > 1 ? "s" : ""} added`);
   };
@@ -435,7 +441,13 @@ export default function AdminHomepage() {
           }}
         >
           {imageUploading ? (
-            <span style={{ fontFamily: "Lato, sans-serif" }}>Uploading...</span>
+            <span style={{ fontFamily: "Lato, sans-serif", display: "flex", alignItems: "center", gap: 8 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              Uploading
+              {imageUploadProgress && imageUploadProgress.total > 1 && (
+                <span style={{ fontWeight: 700, color: "#F5569B" }}>{imageUploadProgress.current}/{imageUploadProgress.total}</span>
+              )}
+            </span>
           ) : (
             <>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
