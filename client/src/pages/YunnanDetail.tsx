@@ -858,14 +858,13 @@ export default function YunnanDetail() {
           <span>/</span>
           <span className="text-white">Yunnan</span>
         </div>
-        {/* Hero text */}
-        <div className="absolute bottom-16 left-10">
-          <p className="text-white/80 tracking-[0.3em] uppercase mb-3" style={{ fontFamily: 'sans-serif', fontSize: '12px' }}>YUNNAN · CHINA</p>
-          <h1 className="text-white font-light leading-none mb-4" style={{ fontSize: 'clamp(42px, 7vw, 88px)', letterSpacing: '-0.01em' }}>
-            Mountains &<br />Minorities
-          </h1>
-          <p className="text-white/75 tracking-widest uppercase" style={{ fontFamily: 'sans-serif', fontSize: '12px' }}>
+        {/* Hero text - centered */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+          <h1 className="text-white leading-tight mb-6" style={{ fontSize: '60px', letterSpacing: '-0.01em', fontFamily: 'Playfair Display, Georgia, serif', fontWeight: 400 }}>
             A Journey Through China's Most Diverse Province
+          </h1>
+          <p className="text-white" style={{ fontSize: '30px', fontFamily: 'Playfair Display, Georgia, serif', fontWeight: 400, letterSpacing: '0.02em' }}>
+            England & Scotland
           </p>
         </div>
         {/* Scroll indicator */}
