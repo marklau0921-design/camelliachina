@@ -76,6 +76,9 @@ async function startServer() {
   });
 
   // Serve uploaded files from the uploads/ directory
+  console.log(`[Startup] cwd: ${process.cwd()}`);
+  console.log(`[Startup] uploadsRoot: ${uploadsRoot}`);
+  console.log(`[Startup] uploads exists: ${fs.existsSync(uploadsRoot)}`);
   app.use("/uploads", express.static(uploadsRoot, {
     maxAge: "1d",
     etag: true,
