@@ -14,9 +14,8 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 
-// uploads 目录位于 Hostinger FTP 根目录（../uploads）
-// 在 Hostinger 上，Node.js 应用目录是 nodejs/，FTP 根目录是上一级
-export const UPLOADS_ROOT = path.join(process.cwd(), "..", "uploads");
+// uploads 目录位于项目根目录（process.cwd()）
+export const UPLOADS_ROOT = path.join(process.cwd(), "uploads");
 console.log(`[Storage] UPLOADS_ROOT initialized: ${UPLOADS_ROOT}`);
 
 function ensureDir(dirPath: string): void {
