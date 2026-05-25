@@ -47,29 +47,8 @@ interface Trip {
   image: string;
 }
 
-// Fallback trips if API fails
-const fallbackTrips: Trip[] = [
-  {
-    id: '1',
-    nights: 12,
-    title: 'Sichuan: Culture & Nature',
-    buttonText: 'Explore Trip',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
-  },
-  {
-    id: '2',
-    nights: 10,
-    title: 'Yunnan: Mountains & Minorities',
-    buttonText: 'Explore Trip',
-    image: 'https://images.unsplash.com/photo-1548013146-72479768bada?w=800&h=400&fit=crop',
-  },
-  {
-    id: '3',
-    title: 'Create Your Own Itinerary',
-    buttonText: 'Create Trip',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
-  },
-];
+
+
 
 export default function Home() {
   // The userAuth hooks provides authentication state
@@ -90,7 +69,7 @@ export default function Home() {
     nights: itin.days,
     title: itin.name,
     buttonText: 'Explore Trip',
-    image: itin.coverImage || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
+    image: itin.coverImage || '',
   }));
   // 始终使用静态图片作为 fallback，只有 API 返回且有数据时才替换
   const FALLBACK_BANNER = '';
@@ -330,7 +309,7 @@ export default function Home() {
               </div>
             )}
             {/* Trip Cards */}
-            {(itineraries && itineraries.length > 0 ? itineraries : fallbackTrips).map((trip) => (
+            {itineraries.map((trip) => (
               <div key={trip.id} className="relative group overflow-hidden flex-shrink-0" style={{ width: '310px', height: '550px', userSelect: 'none' }}>
                 <img src={trip.image} alt={trip.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" draggable={false} />
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />

@@ -10,7 +10,6 @@ import Destinations from '@/pages/Destinations';
 import DestinationsMap from '@/pages/DestinationsMap';
 import Sichuan from '@/pages/Sichuan';
 import Experiences from "./pages/Experiences";
-import Inspiration from "./pages/Inspiration";
 import About from "./pages/About";
 import SichuanDetail from "./pages/SichuanDetail";
 import Contact from "./pages/Contact";
@@ -64,7 +63,6 @@ function Router() {
       <Route path="/destinations/sichuan" component={Sichuan} />
       <Route path="/destinations/:slug" component={CityPage} />
       <Route path="/experiences" component={Experiences} />
-      <Route path="/inspiration" component={Inspiration} />
       <Route path="/about" component={About} />
       <Route path="/make-an-enquiry" component={Contact} />
       <Route path="/plan-your-trip" component={PlanYourTrip} />

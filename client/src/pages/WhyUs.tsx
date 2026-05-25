@@ -29,49 +29,6 @@ interface Slide {
   isCover?: boolean;
 }
 
-const STATIC_SLIDES: Slide[] = [
-  {
-    isCover: true,
-    title: 'WHY US?',
-    subtitle: 'What sets us apart',
-    description: '5 reasons to travel with Wayseek',
-  },
-  {
-    num: '01',
-    title: 'Unmatched Local Knowledge',
-    description:
-      "Our guides and partners have spent decades living and breathing the landscapes, cultures, and hidden corners of China. We don't follow itineraries — we follow curiosity, leading you to places most travellers never find.",
-    image: '',
-  },
-  {
-    num: '02',
-    title: 'Truly Tailor-Made',
-    description:
-      'Every journey we craft is built from scratch around you — your pace, your passions, your idea of luxury. No templates, no group tours. Just a trip that feels like it was made for no one else.',
-    image: '',
-  },
-  {
-    num: '03',
-    title: 'Access Beyond the Obvious',
-    description:
-      "From private tea harvests in Ya'an to dawn ceremonies at remote Tibetan monasteries, we open doors that remain closed to most. Our relationships with local communities give you access that simply cannot be booked elsewhere.",
-    image: '',
-  },
-  {
-    num: '04',
-    title: 'Seamless from Start to Finish',
-    description:
-      'We handle every detail — transfers, accommodation, permits, guides — so you can be fully present. Our team is reachable throughout your journey, ensuring that the unexpected becomes part of the adventure, not a disruption.',
-    image: '',
-  },
-  {
-    num: '05',
-    title: 'Travel That Gives Back',
-    description:
-      'We work exclusively with local operators, stay in family-run guesthouses, and contribute to the communities we visit. When you travel with Wayseek, your journey supports the very people and places that make it extraordinary.',
-    image: '',
-  },
-];
 
 const DURATION = 900;
 const EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
@@ -103,17 +60,18 @@ function preloadImages(slides: Slide[]) {
 export default function WhyUs() {
   const { data: dbSections } = trpc.about.listWhyUsSections.useQuery();
 
-  // Build slides: cover slide + DB sections (or static fallback)
+  // Build slides: cover slide + DB sections only (no static fallback)
+  const dbSlides = dbSections && dbSections.length > 0
+    ? dbSections.map((s, i) => ({
+        num: String(i + 1).padStart(2, '0'),
+        title: s.title,
+        description: s.content,
+        image: s.image ?? undefined,
+      }))
+    : [];
   const SLIDES: Slide[] = [
-    { isCover: true, title: 'WHY US?', subtitle: 'What sets us apart', description: `${dbSections && dbSections.length > 0 ? dbSections.length : STATIC_SLIDES.length - 1} reasons to travel with Wayseek` },
-    ...(dbSections && dbSections.length > 0
-      ? dbSections.map((s, i) => ({
-          num: String(i + 1).padStart(2, '0'),
-          title: s.title,
-          description: s.content,
-          image: s.image ?? undefined,
-        }))
-      : STATIC_SLIDES.slice(1)),
+    { isCover: true, title: 'WHY US?', subtitle: 'What sets us apart', description: `${dbSlides.length} reasons to travel with Wayseek` },
+    ...dbSlides,
   ];
 
   const [current, setCurrent] = useState<SlideState>({ index: 0, role: 'idle', direction: 'forward' });

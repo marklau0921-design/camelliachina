@@ -10,63 +10,7 @@ interface CarouselItem {
   videoId?: string;
 }
 
-const fallbackImageItems: CarouselItem[] = [
-  {
-    id: 1,
-    name: 'GUILIN',
-    description: 'Misty karst mountains and serene rivers.',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
-  },
-  {
-    id: 2,
-    name: 'ZHANGJIAJIE',
-    description: 'Towering stone pillars pierce the clouds.',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
-  },
-  {
-    id: 3,
-    name: 'YUNNAN',
-    description: 'Terraced rice fields cascade down mountainsides.',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
-  },
-  {
-    id: 4,
-    name: 'TIBET',
-    description: 'Stand at the roof of the world.',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
-  }
-];
 
-const fallbackVideoItems: CarouselItem[] = [
-  {
-    id: 1,
-    name: 'GUILIN',
-    videoId: 'dQw4w9WgXcQ',
-    description: 'Misty karst mountains and serene rivers.',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
-  },
-  {
-    id: 2,
-    name: 'ZHANGJIAJIE',
-    videoId: 'jNQXAC9IVRw',
-    description: 'Towering stone pillars pierce the clouds.',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
-  },
-  {
-    id: 3,
-    name: 'YUNNAN',
-    videoId: '9bZkp7q19f0',
-    description: 'Terraced rice fields cascade down mountainsides.',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
-  },
-  {
-    id: 4,
-    name: 'TIBET',
-    videoId: 'M7lc1BCxL00',
-    description: 'Stand at the roof of the world.',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
-  }
-];
 
 // ── Shared drag/scroll logic ──────────────────────────────────────────────────
 function StoriesStrip({
@@ -280,7 +224,7 @@ export default function CarouselSection() {
   const didDragRefVideo = useRef(false);
   const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
 
-  // Image section items
+  // Image section items — empty array if no DB data (section will be hidden)
   const imageItems: CarouselItem[] = (homepageData?.imageStories && homepageData.imageStories.length > 0)
     ? homepageData.imageStories.map(s => ({
         id: s.id,
@@ -289,9 +233,9 @@ export default function CarouselSection() {
         image: s.image || '',
         videoId: undefined,
       }))
-    : fallbackImageItems;
+    : [];
 
-  // Video section items
+  // Video section items — empty array if no DB data (section will be hidden)
   const videoItems: CarouselItem[] = (homepageData?.videoStories && homepageData.videoStories.length > 0)
     ? homepageData.videoStories.map(s => ({
         id: s.id,
@@ -300,7 +244,7 @@ export default function CarouselSection() {
         image: s.image || '',
         videoId: s.videoId || undefined,
       }))
-    : fallbackVideoItems;
+    : [];
 
   // Section titles/subtitles from DB, fallback to defaults
   const imageSectionTitle = homepageData?.imageSection?.title ?? 'Stories From the Road';
@@ -308,9 +252,9 @@ export default function CarouselSection() {
   const videoSectionTitle = homepageData?.videoSection?.title ?? 'Stories From the Road';
   const videoSectionSubtitle = homepageData?.videoSection?.subtitle ?? 'Real stories. Meaningful journeys.';
 
-  // Section visibility (default true if not yet set in DB)
-  const showImageSection = homepageData ? (homepageData.imageSection?.isVisible !== false) : true;
-  const showVideoSection = homepageData ? (homepageData.videoSection?.isVisible !== false) : true;
+  // Section visibility: hide if no items or explicitly hidden in DB
+  const showImageSection = imageItems.length > 0 && (homepageData ? (homepageData.imageSection?.isVisible !== false) : false);
+  const showVideoSection = videoItems.length > 0 && (homepageData ? (homepageData.videoSection?.isVisible !== false) : false);
 
   useEffect(() => {
     if (selectedVideoId) {

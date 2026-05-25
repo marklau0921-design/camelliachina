@@ -18,38 +18,6 @@ interface TeamMember {
   storyImage2?: string | null;
 }
 
-const FALLBACK_MEMBERS: TeamMember[] = [
-  {
-    id: 1,
-    name: 'Lin Wei',
-    role: 'Founder & Lead Curator',
-    bio1: "Growing up between Chengdu and Shanghai, I spent my childhood following my grandmother through morning markets, temple courtyards, and mountain trails that never appeared on any map. That instinct — to go deeper, to ask one more question, to stay one more day — became the foundation of Wayseek.",
-    bio2: "I believe the most extraordinary journeys begin where the guidebook ends. Every trip I design starts with a single conversation: not about logistics, but about what you're really looking for. Over the years, I've learned that the answer is almost never what people say at first — and that's exactly where the adventure begins.",
-    quote: '"The most extraordinary journeys begin where the guidebook ends."',
-    image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663630009306/chKZ3ASBY6hN7TJJn2LUVH/team-member-3-cu7v9cfZdz9wfJQzNrbazA.webp',
-    specialty: 'Yunnan · Sichuan · Tibetan Plateau',
-    storyTitle: "'A LANDSCAPE THAT CHANGES YOU'",
-    storySubtitle: 'A closer look at Yunnan',
-    storyText: "I first drove the mountain roads of Yunnan in my early twenties, with no itinerary and a borrowed car. The light at dusk over the rice terraces of Yuanyang stopped me in my tracks — I pulled over and sat there for two hours, not taking photos, just watching. That moment is the reason Wayseek exists. I've since returned dozens of times, and it still surprises me.",
-    storyImage: 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=800&q=80',
-    storyImage2: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=600&q=80',
-  },
-  {
-    id: 2,
-    name: 'James Carter',
-    role: 'Senior Travel Designer',
-    bio1: "After a decade working in luxury hospitality across Beijing, Shanghai, and Hong Kong, James brings an insider's knowledge of China's most exclusive experiences — from private temple ceremonies in Xi'an to chartered river journeys through the Three Gorges.",
-    bio2: 'His approach is built on relationships cultivated over years: the chef who opens his kitchen before dawn, the calligrapher who accepts only three students per year, the family who has tended the same tea garden for six generations. James turns these connections into moments that cannot be replicated.',
-    quote: '"The rarest experiences are never listed anywhere. They are given."',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80',
-    specialty: 'Beijing · Shanghai · Yangtze River',
-    storyTitle: "'WHERE HISTORY BREATHES'",
-    storySubtitle: 'A closer look at Beijing',
-    storyText: "My first morning in Beijing, I arrived at the Temple of Heaven before sunrise. The gates were still locked, but a groundskeeper let me in — he'd seen my curiosity and decided it was enough. Standing alone in that vast courtyard as the light changed, I understood something about China that no guidebook had prepared me for: its grandeur is most felt in silence.",
-    storyImage: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800&q=80',
-    storyImage2: 'https://images.unsplash.com/photo-1537519646099-335112f03225?w=600&q=80',
-  },
-];
 
 const bioStyle: React.CSSProperties = {
   color: '#333',
@@ -144,7 +112,7 @@ export default function OurTeam() {
   const { data } = trpc.cms.listTeamMembers.useQuery(undefined, { retry: false });
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
   const ctaBg = homepageAssets?.cta?.url;
-  const members = data && data.length > 0 ? data : FALLBACK_MEMBERS;
+  const members = data ?? [];
 
   return (
     <div style={{ fontFamily: 'sans-serif', background: '#f5f2ee', minHeight: '100vh' }}>
