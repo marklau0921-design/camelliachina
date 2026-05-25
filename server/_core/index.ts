@@ -4,6 +4,11 @@ import { createServer } from "http";
 import net from "net";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+// Define __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
@@ -36,7 +41,10 @@ async function startServer() {
   // ── Ensure uploads directory exists on startup ────────────────────────────
   // Hostinger does not create this directory automatically.
   // uploads/ is in .gitignore so it must be created at runtime.
-  const uploadsRoot = path.join(process.cwd(), "uploads");
+  // Use __dirname to get the directory of this file (server/_core/index.ts)
+  // Then go up 2 levels to reach the project root
+  const projectRoot = path.resolve(__dirname, "../..");
+  const uploadsRoot = path.join(projectRoot, "uploads");
   const uploadSubDirs = ["images", "media", "banners"];
   try {
     if (!fs.existsSync(uploadsRoot)) {
