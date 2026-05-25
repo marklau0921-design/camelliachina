@@ -23,12 +23,7 @@ const __dirname = path.dirname(__filename);
 // 这样部署时不会被重置
 // __dirname = server/，向上两级到项目根，再向上一级到项目外
 const projectRoot = path.resolve(__dirname, "..");
-// Hostinger 上的项目结构：
-// /home/u932753542/domains/morachinatravel.com/nodejs (项目)
-// /home/u932753542/domains/morachinatravel.com/uploads (上传文件)
-// 所以 uploads 应该在项目的父目录中
-const parentDir = path.resolve(projectRoot, "..");
-const defaultUploadsPath = path.resolve(parentDir, "uploads");
+const defaultUploadsPath = path.resolve(projectRoot, "..", "uploads");
 export const UPLOADS_ROOT = process.env.UPLOADS_ROOT_PATH || defaultUploadsPath;
 console.log(`[Storage] __dirname: ${__dirname}`);
 console.log(`[Storage] projectRoot: ${projectRoot}`);
