@@ -90,18 +90,7 @@ async function startServer() {
   // Debug middleware for /uploads requests
   app.use("/uploads", (req, res, next) => {
     const requestedFile = path.join(uploadsRoot, req.path);
-    const fileExists = fs.existsSync(requestedFile);
-    console.log(`[/uploads] Request: ${req.path}`);
-    console.log(`[/uploads] Full path: ${requestedFile}`);
-    console.log(`[/uploads] File exists: ${fileExists}`);
-    if (fileExists) {
-      try {
-        const stats = fs.statSync(requestedFile);
-        console.log(`[/uploads] File size: ${stats.size}`);
-      } catch (err) {
-        console.error(`[/uploads] Error reading file stats: ${err}`);
-      }
-    }
+    console.log(`[/uploads] Request: ${req.path}, Full path: ${requestedFile}, Exists: ${fs.existsSync(requestedFile)}`);
     next();
   });
   
