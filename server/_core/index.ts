@@ -99,6 +99,8 @@ async function startServer() {
     maxAge: "1d",
     etag: true,
     lastModified: true,
+    index: false,  // 禁用 index.html 自动查找
+    redirect: false,  // 禁用目录重定向
   }));
 
   // tRPC API
