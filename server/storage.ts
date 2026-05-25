@@ -23,8 +23,12 @@ const __dirname = path.dirname(__filename);
 // 这样部署时不会被重置
 // __dirname = server/，向上两级到项目根，再向上一级到项目外
 const projectRoot = path.resolve(__dirname, "..");
-const parentDir = path.resolve(projectRoot, "..");  // 上升一级到项目外
-export const UPLOADS_ROOT = path.join(parentDir, "uploads");
+const defaultUploadsPath = path.resolve(projectRoot, "..", "uploads");
+export const UPLOADS_ROOT = process.env.UPLOADS_ROOT_PATH || defaultUploadsPath;
+console.log(`[Storage] __dirname: ${__dirname}`);
+console.log(`[Storage] projectRoot: ${projectRoot}`);
+console.log(`[Storage] defaultUploadsPath: ${defaultUploadsPath}`);
+console.log(`[Storage] UPLOADS_ROOT_PATH env: ${process.env.UPLOADS_ROOT_PATH}`);
 console.log(`[Storage] UPLOADS_ROOT initialized: ${UPLOADS_ROOT}`);
 
 function ensureDir(dirPath: string): void {
