@@ -61,6 +61,25 @@ async function startServer() {
     console.error(`[Startup] Image uploads may fail. Check server write permissions.`);
   }
 
+  // ── Auto-create symlink: public_html/uploads → uploads/ ─────────────────
+  // On Hostinger, Apache serves /uploads/ from public_html/uploads.
+  // We create a symlink at startup so it always points to UPLOADS_ROOT.
+  try {
+    const publicHtmlDir = path.resolve(process.cwd(), "..", "public_html");
+    const symlinkPath = path.join(publicHtmlDir, "uploads");
+    if (fs.existsSync(publicHtmlDir)) {
+      // Remove existing symlink or directory if it exists
+      const symlinkExists = fs.existsSync(symlinkPath) || (() => { try { return fs.lstatSync(symlinkPath).isSymbolicLink(); } catch { return false; } })();
+      if (symlinkExists) {
+        fs.rmSync(symlinkPath, { recursive: true, force: true });
+      }
+      fs.symlinkSync(uploadsRoot, symlinkPath);
+      console.log(`[Startup] Symlink created: ${symlinkPath} -> ${uploadsRoot}`);
+    }
+  } catch (err) {
+    console.log(`[Startup] Symlink note: ${err}`);
+  }
+
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
