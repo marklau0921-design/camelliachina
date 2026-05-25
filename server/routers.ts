@@ -1291,6 +1291,11 @@ export const appRouter = router({
       return { hero, intro, stories, sponsors, imageSection, videoSection };
     }),
 
+    // Public: Get all sponsors (for Contact page)
+    getSponsors: publicProcedure.query(async () => {
+      return listHomepageSponsors();
+    }),
+
     // Public: Homepage data for frontend
     getPublicData: publicProcedure.query(async () => {
       const [hero, intro, allStories, sponsors, imageSection, videoSection] = await Promise.all([
@@ -1431,10 +1436,11 @@ export const appRouter = router({
         websiteUrl: z.string().optional(),
         isVisible: z.boolean().default(true),
         sortOrder: z.number().default(0),
+        backgroundTexture: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);
-        return createHomepageSponsor({ name: input.name, logo: input.logoUrl, url: input.websiteUrl, isVisible: input.isVisible, sortOrder: input.sortOrder });
+        return createHomepageSponsor({ name: input.name, logo: input.logoUrl, url: input.websiteUrl, isVisible: input.isVisible, sortOrder: input.sortOrder, backgroundTexture: input.backgroundTexture });
       }),
     updateSponsor: publicProcedure
       .input(z.object({
@@ -1444,13 +1450,15 @@ export const appRouter = router({
         websiteUrl: z.string().optional(),
         isVisible: z.boolean().optional(),
         sortOrder: z.number().optional(),
+        backgroundTexture: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);
-        const { id, logoUrl, websiteUrl, ...rest } = input;
+        const { id, logoUrl, websiteUrl, backgroundTexture, ...rest } = input;
         const data: Record<string, any> = { ...rest };
         if (logoUrl !== undefined) data.logo = logoUrl;
         if (websiteUrl !== undefined) data.url = websiteUrl;
+        if (backgroundTexture !== undefined) data.backgroundTexture = backgroundTexture;
         return updateHomepageSponsor(id, data);
       }),
     deleteSponsor: publicProcedure

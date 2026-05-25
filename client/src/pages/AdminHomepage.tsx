@@ -19,6 +19,7 @@ interface SponsorForm {
   websiteUrl: string;
   isVisible: boolean;
   sortOrder: number;
+  backgroundTexture?: string;
 }
 
 const emptyVideoStory: VideoStoryForm = { title: "", youtubeId: "", thumbnailUrl: "", isVisible: true, sortOrder: 0 };
@@ -178,6 +179,9 @@ function SponsorModal({ initial, onSave, onClose }: { initial?: SponsorForm & { 
         <Field label="Website URL (optional)">
           <input style={inputStyle} value={form.websiteUrl} onChange={e => set("websiteUrl", e.target.value)} placeholder="https://..." />
         </Field>
+        <Field label="Background Texture (optional)">
+          <ImageUploader value={form.backgroundTexture || ""} onChange={v => set("backgroundTexture", v ?? "")} category="homepage" />
+        </Field>
         <Field label="Sort Order">
           <input style={inputStyle} type="number" value={form.sortOrder} onChange={e => set("sortOrder", Number(e.target.value))} />
         </Field>
@@ -189,7 +193,7 @@ function SponsorModal({ initial, onSave, onClose }: { initial?: SponsorForm & { 
         </Field>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 8 }}>
           <button style={btnSecondary} onClick={onClose}>Cancel</button>
-          <button style={btnPrimary} onClick={() => { if (!form.name || !form.logoUrl) return; onSave({ ...form, id: initial?.id }); }}>Save</button>
+          <button style={btnPrimary} onClick={() => { if (!form.name || !form.logoUrl) return; onSave({ ...form, id: initial?.id, backgroundTexture: form.backgroundTexture }); }}>Save</button>
         </div>
       </div>
     </div>
@@ -309,9 +313,9 @@ export default function AdminHomepage() {
 
   const handleSponsorSave = (data: SponsorForm & { id?: number }) => {
     if (data.id) {
-      updateSponsor.mutate({ id: data.id, name: data.name, logoUrl: data.logoUrl, websiteUrl: data.websiteUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
+      updateSponsor.mutate({ id: data.id, name: data.name, logoUrl: data.logoUrl, websiteUrl: data.websiteUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder, backgroundTexture: data.backgroundTexture || undefined });
     } else {
-      createSponsor.mutate({ name: data.name, logoUrl: data.logoUrl, websiteUrl: data.websiteUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
+      createSponsor.mutate({ name: data.name, logoUrl: data.logoUrl, websiteUrl: data.websiteUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder, backgroundTexture: data.backgroundTexture || undefined });
     }
   };
 
