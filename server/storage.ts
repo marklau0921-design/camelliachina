@@ -19,11 +19,12 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// uploads 目录位于项目根目录
-// 使用 __dirname 而不是 process.cwd()，以便在 Hostinger 上也能正常工作
-// __dirname = server/，向上两级到项目根
+// uploads 目录位于项目外（与项目平行）
+// 这样部署时不会被重置
+// __dirname = server/，向上两级到项目根，再向上一级到项目外
 const projectRoot = path.resolve(__dirname, "..");
-export const UPLOADS_ROOT = path.join(projectRoot, "uploads");
+const parentDir = path.resolve(projectRoot, "..");  // 上升一级到项目外
+export const UPLOADS_ROOT = path.join(parentDir, "uploads");
 console.log(`[Storage] UPLOADS_ROOT initialized: ${UPLOADS_ROOT}`);
 
 function ensureDir(dirPath: string): void {
