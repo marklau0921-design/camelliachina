@@ -19,50 +19,12 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// uploads 目录位于项目外（与 nodejs 文件夹同级）
-// Hostinger 结构：
-// /home/u932753542/domains/morachinatravel.com/
-//   ├── nodejs/          ← Node.js 项目（__dirname 会在这里）
-//   ├── uploads/         ← 上传文件（与 nodejs 同级）
-//   └── public_html/
-
-let UPLOADS_ROOT_PATH: string;
-
-const cwd = process.cwd();
-console.log(`[Storage] cwd: ${cwd}`);
-console.log(`[Storage] __dirname: ${__dirname}`);
-
-// 方法1：从 __dirname 推导
-// __dirname = /home/u932753542/domains/morachinatravel.com/nodejs/server/_core
-// 向上两级到 /home/u932753542/domains/morachinatravel.com/nodejs
-// 再向上一级到 /home/u932753542/domains/morachinatravel.com
-const projectDir = path.resolve(__dirname, "..", "..");  // 到 nodejs 文件夹
-const domainRoot = path.resolve(projectDir, "..");       // 到 morachinatravel.com 文件夹
-const uploadsFromDirname = path.join(domainRoot, "uploads");
-
-console.log(`[Storage] projectDir: ${projectDir}`);
-console.log(`[Storage] domainRoot: ${domainRoot}`);
-console.log(`[Storage] uploadsFromDirname: ${uploadsFromDirname}`);
-
-// 方法2：从 cwd 推导（备用）
-let uploadsFromCwd = "";
-if (cwd.includes("/nodejs")) {
-  uploadsFromCwd = path.join(cwd.replace("/nodejs", ""), "uploads");
-  console.log(`[Storage] uploadsFromCwd: ${uploadsFromCwd}`);
-}
-
-// 选择最可靠的路径
-// 优先使用 __dirname 推导，因为它不依赖 process.cwd()
-UPLOADS_ROOT_PATH = uploadsFromDirname;
-
-// 验证路径是否合理
-if (!UPLOADS_ROOT_PATH.includes("uploads")) {
-  console.error(`[Storage] ERROR: UPLOADS_ROOT_PATH 看起来不对: ${UPLOADS_ROOT_PATH}`);
-}
-
-export const UPLOADS_ROOT = UPLOADS_ROOT_PATH;
+// uploads 目录位于项目根目录
+// 使用 __dirname 而不是 process.cwd()，以便在 Hostinger 上也能正常工作
+// __dirname = server/，向上两级到项目根
+const projectRoot = path.resolve(__dirname, "..");
+export const UPLOADS_ROOT = path.join(projectRoot, "uploads");
 console.log(`[Storage] UPLOADS_ROOT initialized: ${UPLOADS_ROOT}`);
-console.log(`[Storage] UPLOADS_ROOT exists: ${fs.existsSync(UPLOADS_ROOT)}`);
 
 function ensureDir(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
