@@ -19,12 +19,39 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// uploads 目录位于项目外（与项目平行）
-// 这样部署时不会被重置
-// __dirname = server/，向上两级到项目根，再向上一级到项目外
-const projectRoot = path.resolve(__dirname, "..");
-const parentDir = path.resolve(projectRoot, "..");  // 上升一级到项目外
-export const UPLOADS_ROOT = path.join(parentDir, "uploads");
+// uploads 目录位于项目外
+// 在 Hostinger 上使用绝对路径，在本地开发使用相对路径
+let UPLOADS_ROOT_PATH: string;
+
+const cwd = process.cwd();
+console.log(`[Storage] Detecting environment - cwd: ${cwd}`);
+
+// 检测是否在 Hostinger 上（cwd 包含 /domains/）
+if (cwd.includes("/domains/")) {
+  // Hostinger: 使用绝对路径
+  // 从 /home/u932753542/domains/morachinatravel.com/nodejs 推导出 /home/u932753542/domains/morachinatravel.com/uploads
+  const cwdParts = cwd.split("/");
+  const domainsIndex = cwdParts.indexOf("domains");
+  if (domainsIndex !== -1 && domainsIndex + 1 < cwdParts.length) {
+    const domainRoot = cwdParts.slice(0, domainsIndex + 2).join("/");
+    UPLOADS_ROOT_PATH = path.join(domainRoot, "uploads");
+    console.log(`[Storage] Hostinger detected - using absolute path: ${UPLOADS_ROOT_PATH}`);
+  } else {
+    // Fallback: 使用相对路径
+    const projectRoot = path.resolve(__dirname, "..");
+    const parentDir = path.resolve(projectRoot, "..");
+    UPLOADS_ROOT_PATH = path.join(parentDir, "uploads");
+    console.log(`[Storage] Fallback to relative path: ${UPLOADS_ROOT_PATH}`);
+  }
+} else {
+  // 本地开发: 使用相对路径
+  const projectRoot = path.resolve(__dirname, "..");
+  const parentDir = path.resolve(projectRoot, "..");
+  UPLOADS_ROOT_PATH = path.join(parentDir, "uploads");
+  console.log(`[Storage] Local development - using relative path: ${UPLOADS_ROOT_PATH}`);
+}
+
+export const UPLOADS_ROOT = UPLOADS_ROOT_PATH;
 console.log(`[Storage] UPLOADS_ROOT initialized: ${UPLOADS_ROOT}`);
 
 function ensureDir(dirPath: string): void {
