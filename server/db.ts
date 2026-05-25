@@ -9,12 +9,15 @@ let _pool: ReturnType<typeof mysql.createPool> | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
+  // CUSTOM_DATABASE_URL takes priority over the system DATABASE_URL.
+  // This allows connecting to Hostinger MySQL from Manus preview environment.
+  const rawUrl = process.env.CUSTOM_DATABASE_URL || process.env.DATABASE_URL;
+  if (!_db && rawUrl) {
     try {
       // On Hostinger, 'localhost' resolves to IPv6 '::1' which MySQL rejects.
       // Force IPv4 by replacing localhost with 127.0.0.1 in the connection URL.
-      const dbUrl = process.env.DATABASE_URL.replace(
-        /(@)localhost(:\d+\/|\/)/, 
+      const dbUrl = rawUrl.replace(
+        /(@)localhost(:\d+\/|\/)/,
         '$1127.0.0.1$2'
       );
       _pool = mysql.createPool(dbUrl);
