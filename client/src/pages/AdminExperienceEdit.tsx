@@ -156,6 +156,8 @@ function GalleryManager({
 }) {
   const [newUrl, setNewUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadImageMut = trpc.images.upload.useMutation();
 
@@ -170,28 +172,51 @@ function GalleryManager({
     onChange(gallery.filter((_, i) => i !== idx));
   }
 
-  async function handleFileUpload(file: File) {
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+  async function handleFileUpload(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const imageFiles = Array.from(files).filter(f => f.type.startsWith("image/"));
+    if (imageFiles.length === 0) { toast.error("No image files selected"); return; }
+    
     setUploading(true);
-    try {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const base64 = (e.target?.result as string).split(",")[1];
+    setUploadProgress({ current: 0, total: imageFiles.length });
+    const newUrls: string[] = [];
+    
+    for (let i = 0; i < imageFiles.length; i++) {
+      const file = imageFiles[i];
+      setUploadProgress({ current: i + 1, total: imageFiles.length });
+      
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} is over 5MB, skipped`);
+        continue;
+      }
+      
+      try {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve((reader.result as string).split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        
         const result = await uploadImageMut.mutateAsync({
           filename: file.name,
           base64,
           mimeType: file.type,
         });
-        onChange([...gallery, result.url]);
-        setUploading(false);
-        toast.success("Image uploaded");
-      };
-      reader.readAsDataURL(file);
-    } catch (err: any) {
-      toast.error(err.message ?? "Upload failed");
-      setUploading(false);
+        newUrls.push(result.url);
+      } catch (err: any) {
+        toast.error(`${file.name}: ${err.message ?? "Upload failed"}`);
+      }
     }
+    
+    if (newUrls.length > 0) {
+      onChange([...gallery, ...newUrls]);
+      toast.success(`${newUrls.length} image${newUrls.length > 1 ? "s" : ""} uploaded`);
+    }
+    
+    setUploading(false);
+    setUploadProgress(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   return (
@@ -245,27 +270,49 @@ function GalleryManager({
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        className="hidden"
-        onChange={e => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); }}
+        multiple
+        style={{ display: "none" }}
+        onChange={e => handleFileUpload(e.target.files)}
       />
-      <button
-        type="button"
-        onClick={() => fileInputRef.current?.click()}
-        disabled={uploading}
-        onDragOver={e => e.preventDefault()}
-        onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) handleFileUpload(f); }}
+      <div
+        onDrop={e => { e.preventDefault(); setDragOver(false); handleFileUpload(e.dataTransfer.files); }}
+        onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onClick={() => !uploading && fileInputRef.current?.click()}
         style={{
-          width: "100%", border: "1px dashed #ccc", color: "#aaa", padding: "16px",
-          fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase",
-          background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center",
-          justifyContent: "center", gap: "8px", transition: "all 0.15s", boxSizing: "border-box",
+          width: "100%",
+          border: `1px dashed ${dragOver ? "#F5569B" : "#ccc"}`,
+          color: dragOver ? "#F5569B" : "#aaa",
+          padding: "16px",
+          fontSize: "11px",
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          background: dragOver ? "#fff0f6" : "#fafafa",
+          cursor: uploading ? "default" : "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "8px",
+          transition: "all 0.15s",
+          boxSizing: "border-box",
+          userSelect: "none",
         }}
-        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#F5569B"; (e.currentTarget as HTMLButtonElement).style.color = "#F5569B"; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#ccc"; (e.currentTarget as HTMLButtonElement).style.color = "#aaa"; }}
       >
-        <Upload size={14} />
-        {uploading ? "Uploading..." : "Upload image (drag & drop or click)"}
-      </button>
+        {uploading ? (
+          <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            Uploading
+            {uploadProgress && uploadProgress.total > 1 && (
+              <span style={{ fontWeight: 700, color: "#F5569B" }}>{uploadProgress.current}/{uploadProgress.total}</span>
+            )}
+          </span>
+        ) : (
+          <>
+            <Upload size={14} />
+            <span>Upload images (drag & drop or click) — multiple files supported</span>
+          </>
+        )}
+      </div>
     </div>
   );
 }
