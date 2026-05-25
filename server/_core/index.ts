@@ -75,13 +75,6 @@ async function startServer() {
     next();
   });
 
-  // Serve uploaded files (images, media, etc.) from the uploads/ directory
-  app.use("/uploads", express.static(uploadsRoot, {
-    maxAge: "1d",
-    etag: true,
-    lastModified: true,
-  }));
-
   // tRPC API
   app.use(
     "/api/trpc",

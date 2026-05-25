@@ -19,7 +19,6 @@ interface SponsorForm {
   websiteUrl: string;
   isVisible: boolean;
   sortOrder: number;
-  backgroundTexture?: string;
 }
 
 const emptyVideoStory: VideoStoryForm = { title: "", youtubeId: "", thumbnailUrl: "", isVisible: true, sortOrder: 0 };
@@ -179,9 +178,6 @@ function SponsorModal({ initial, onSave, onClose }: { initial?: SponsorForm & { 
         <Field label="Website URL (optional)">
           <input style={inputStyle} value={form.websiteUrl} onChange={e => set("websiteUrl", e.target.value)} placeholder="https://..." />
         </Field>
-        <Field label="Background Texture (optional)">
-          <ImageUploader value={form.backgroundTexture || ""} onChange={v => set("backgroundTexture", v ?? "")} category="homepage" />
-        </Field>
         <Field label="Sort Order">
           <input style={inputStyle} type="number" value={form.sortOrder} onChange={e => set("sortOrder", Number(e.target.value))} />
         </Field>
@@ -193,7 +189,7 @@ function SponsorModal({ initial, onSave, onClose }: { initial?: SponsorForm & { 
         </Field>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 8 }}>
           <button style={btnSecondary} onClick={onClose}>Cancel</button>
-          <button style={btnPrimary} onClick={() => { if (!form.name || !form.logoUrl) return; onSave({ ...form, id: initial?.id, backgroundTexture: form.backgroundTexture }); }}>Save</button>
+          <button style={btnPrimary} onClick={() => { if (!form.name || !form.logoUrl) return; onSave({ ...form, id: initial?.id }); }}>Save</button>
         </div>
       </div>
     </div>
@@ -313,9 +309,9 @@ export default function AdminHomepage() {
 
   const handleSponsorSave = (data: SponsorForm & { id?: number }) => {
     if (data.id) {
-      updateSponsor.mutate({ id: data.id, name: data.name, logoUrl: data.logoUrl, websiteUrl: data.websiteUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder, backgroundTexture: data.backgroundTexture || undefined });
+      updateSponsor.mutate({ id: data.id, name: data.name, logoUrl: data.logoUrl, websiteUrl: data.websiteUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
     } else {
-      createSponsor.mutate({ name: data.name, logoUrl: data.logoUrl, websiteUrl: data.websiteUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder, backgroundTexture: data.backgroundTexture || undefined });
+      createSponsor.mutate({ name: data.name, logoUrl: data.logoUrl, websiteUrl: data.websiteUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
     }
   };
 
@@ -556,7 +552,7 @@ export default function AdminHomepage() {
               {sp.logo && <img src={sp.logo} alt={sp.name} style={{ width: 80, height: 48, objectFit: "contain" }} />}
               <div style={{ fontFamily: "Lato, sans-serif", fontSize: 12, color: "#1a1a1a", fontWeight: 600, textAlign: "center" }}>{sp.name}</div>
               <div style={{ display: "flex", gap: 4 }}>
-                <button style={{ ...btnSecondary, padding: "5px 10px", fontSize: 11 }} onClick={() => setSponsorModal({ id: sp.id, name: sp.name, logoUrl: sp.logo ?? "", websiteUrl: sp.url ?? "", isVisible: sp.isVisible ?? true, sortOrder: sp.sortOrder ?? 0, backgroundTexture: sp.backgroundTexture ?? "" })}>Edit</button>
+                <button style={{ ...btnSecondary, padding: "5px 10px", fontSize: 11 }} onClick={() => setSponsorModal({ id: sp.id, name: sp.name, logoUrl: sp.logo ?? "", websiteUrl: sp.url ?? "", isVisible: sp.isVisible ?? true, sortOrder: sp.sortOrder ?? 0 })}>Edit</button>
                 <button style={{ ...btnDanger, padding: "5px 10px", fontSize: 11 }} onClick={() => { if (confirm("Delete this sponsor?")) deleteSponsor.mutate({ id: sp.id }); }}>Del</button>
               </div>
             </div>

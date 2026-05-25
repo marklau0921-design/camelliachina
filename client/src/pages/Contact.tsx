@@ -6,11 +6,20 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import CustomSelect from '@/components/CustomSelect';
 
+// ── Contact Partner Logos with drag scroll ──
+const CONTACT_LOGOS = [
+  { src: '', alt: 'Virtuoso', height: undefined as number | undefined },
+  { src: '', alt: 'Fan Club', height: undefined as number | undefined },
+  { src: '', alt: 'Pen Club', height: undefined as number | undefined },
+  { src: '', alt: 'Forbes', height: undefined as number | undefined },
+  { src: '', alt: 'Ensemble', height: undefined as number | undefined },
+  { src: '', alt: 'EF Education First', height: 80 as number | undefined },
+  { src: '', alt: 'Coveteur', height: undefined as number | undefined },
+  { src: '', alt: 'CNBC', height: undefined as number | undefined },
+  { src: '', alt: 'Travel + Leisure A-List 2026', height: undefined as number | undefined },
+];
 
 function ContactPartnerLogos() {
-  // 从后台获取赞助商 logos 和背景纹理
-  const { data: sponsors = [] } = trpc.homepage.getSponsors.useQuery();
-  const backgroundTexture = sponsors[0]?.backgroundTexture || '';
   const trackRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const startXRef = useRef(0);
@@ -87,7 +96,7 @@ function ContactPartnerLogos() {
 
   return (
     <section style={{ position: 'relative', width: '100%', height: '260px', backgroundColor: '#315c00', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: backgroundTexture ? `url('${backgroundTexture}')` : '', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: '', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
       <div style={{ position: 'relative', zIndex: 1, width: '100%', overflow: 'hidden' }}>
         <div
           ref={trackRef}
@@ -100,9 +109,9 @@ function ContactPartnerLogos() {
           onTouchEnd={onTouchEnd}
           style={{ display: 'flex', flexDirection: 'row', overflowX: 'scroll', msOverflowStyle: 'none', scrollbarWidth: 'none', cursor: 'grab', userSelect: 'none', WebkitOverflowScrolling: 'touch', paddingLeft: '24px', paddingRight: '24px', gap: '56px', alignItems: 'center' }}
         >
-          {sponsors.filter(s => s.isVisible).map((sponsor) => (
-            <div key={sponsor.id} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100px', minWidth: '160px' }}>
-              <img src={sponsor.logo} alt={sponsor.name} draggable={false} style={{ height: '100%', width: 'auto', maxWidth: '280px', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.85, pointerEvents: 'none' }} />
+          {CONTACT_LOGOS.map((logo, i) => (
+            <div key={i} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100px', minWidth: '160px' }}>
+              <img src={logo.src} alt={logo.alt} draggable={false} style={{ height: logo.height ? `${logo.height}px` : '100%', width: 'auto', maxWidth: '280px', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.85, pointerEvents: 'none' }} />
             </div>
           ))}
         </div>
