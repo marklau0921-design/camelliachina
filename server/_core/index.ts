@@ -14,6 +14,7 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { UPLOADS_ROOT } from "../storage.js";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -41,10 +42,8 @@ async function startServer() {
   // ── Ensure uploads directory exists on startup ────────────────────────────
   // Hostinger does not create this directory automatically.
   // uploads/ is in .gitignore so it must be created at runtime.
-  // Use __dirname to get the directory of this file (server/_core/index.ts)
-  // Then go up 2 levels to reach the project root
-  const projectRoot = path.resolve(__dirname, "../..");
-  const uploadsRoot = path.join(projectRoot, "uploads");
+  // Use UPLOADS_ROOT from storage.ts to ensure consistency
+  const uploadsRoot = UPLOADS_ROOT;
   const uploadSubDirs = ["images", "media", "banners"];
   try {
     if (!fs.existsSync(uploadsRoot)) {
