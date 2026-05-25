@@ -200,7 +200,7 @@ function GalleryManager({
       {gallery.length > 0 && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "16px" }}>
           {gallery.map((url, idx) => (
-            <div key={idx} style={{ position: "relative", aspectRatio: "16/9", background: "#f2f2f2", border: "1px solid #ddd", overflow: "hidden" }}>
+            <div key={url} style={{ position: "relative", aspectRatio: "16/9", background: "#f2f2f2", border: "1px solid #ddd", overflow: "hidden" }}>
               <img
                 src={url}
                 alt=""
