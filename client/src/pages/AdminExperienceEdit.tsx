@@ -212,11 +212,9 @@ function GalleryManager({
                 style={{
                   position: "absolute", top: "4px", right: "4px",
                   background: "rgba(0,0,0,0.5)", color: "#fff", border: "none",
-                  cursor: "pointer", padding: "4px", display: "flex", opacity: 0,
+                  cursor: "pointer", padding: "4px", display: "flex", opacity: 1,
                   transition: "opacity 0.15s",
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0"; }}
               >
                 <X size={11} />
               </button>
