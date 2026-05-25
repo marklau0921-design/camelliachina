@@ -106,8 +106,10 @@ export default function AdminCityEdit() {
   const updateCity = trpc.admin.updateCity.useMutation({
     onSuccess: () => {
       utils.admin.listCities.invalidate();
+      utils.admin.getCity.invalidate({ id: cityId });
       setSaving(false);
       setSaved(true);
+      setInitialized(false); // allow form to re-sync after save
       setTimeout(() => setSaved(false), 2000);
     },
     onError: () => setSaving(false),
@@ -125,6 +127,7 @@ export default function AdminCityEdit() {
 
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [initialized, setInitialized] = useState(false);
   const [deleteConfirmExp, setDeleteConfirmExp] = useState<number | null>(null);
 
   // Form state
@@ -150,7 +153,8 @@ export default function AdminCityEdit() {
   });
 
   useEffect(() => {
-    if (city) {
+    if (city && !initialized) {
+      setInitialized(true);
       setForm({
         name: city.name || "",
         slug: city.slug || "",
