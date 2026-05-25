@@ -1294,26 +1294,54 @@ export const appRouter = router({
 
     // Public: Homepage data for frontend
     getPublicData: publicProcedure.query(async () => {
-      const [hero, intro, allStories, sponsors, imageSection, videoSection] = await Promise.all([
-        getHomepageHero(),
-        getHomepageIntro(),
-        listHomepageStories(),
-        listHomepageSponsors(),
-        getHomepageStorySection("image"),
-        getHomepageStorySection("video"),
-      ]);
-      const visibleStories = allStories.filter(s => s.isVisible);
-      return {
-        hero,
-        intro,
-        imageStories: visibleStories.filter(s => s.type === "image"),
-        videoStories: visibleStories.filter(s => s.type === "video"),
-        // legacy: keep stories for backward compat
-        stories: visibleStories,
-        sponsors: sponsors.filter(s => s.isVisible),
-        imageSection,
-        videoSection,
-      };
+      try {
+        console.log('[homepage.getPublicData] Starting query...');
+        
+        const [hero, intro, allStories, sponsors, imageSection, videoSection] = await Promise.all([
+          getHomepageHero().catch(e => {
+            console.error('[homepage.getPublicData] getHomepageHero failed:', e.message);
+            return null;
+          }),
+          getHomepageIntro().catch(e => {
+            console.error('[homepage.getPublicData] getHomepageIntro failed:', e.message);
+            return null;
+          }),
+          listHomepageStories().catch(e => {
+            console.error('[homepage.getPublicData] listHomepageStories failed:', e.message);
+            return [];
+          }),
+          listHomepageSponsors().catch(e => {
+            console.error('[homepage.getPublicData] listHomepageSponsors failed:', e.message);
+            return [];
+          }),
+          getHomepageStorySection("image").catch(e => {
+            console.error('[homepage.getPublicData] getHomepageStorySection(image) failed:', e.message);
+            return null;
+          }),
+          getHomepageStorySection("video").catch(e => {
+            console.error('[homepage.getPublicData] getHomepageStorySection(video) failed:', e.message);
+            return null;
+          }),
+        ]);
+        
+        console.log('[homepage.getPublicData] All queries completed');
+        
+        const visibleStories = (allStories || []).filter(s => s.isVisible);
+        return {
+          hero,
+          intro,
+          imageStories: visibleStories.filter(s => s.type === "image"),
+          videoStories: visibleStories.filter(s => s.type === "video"),
+          // legacy: keep stories for backward compat
+          stories: visibleStories,
+          sponsors: (sponsors || []).filter(s => s.isVisible),
+          imageSection,
+          videoSection,
+        };
+      } catch (error) {
+        console.error('[homepage.getPublicData] Unexpected error:', error);
+        throw error;
+      }
     }),
 
     // Admin: Hero

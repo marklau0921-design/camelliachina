@@ -31,7 +31,7 @@ export function toSlug(str: string): string {
 export async function listTags() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(tags).orderBy(tags.type, tags.name);
+  return await db.select().from(tags).orderBy(tags.type, tags.name);
 }
 
 export async function createTag(data: InsertTag) {
@@ -58,9 +58,9 @@ export async function listCities(includeInactive = false) {
   const db = await getDb();
   if (!db) return [];
   if (!includeInactive) {
-    return db.select().from(cities).where(eq(cities.isActive, true)).orderBy(cities.sortOrder, cities.name);
+    return await db.select().from(cities).where(eq(cities.isActive, true)).orderBy(cities.sortOrder, cities.name);
   }
-  return db.select().from(cities).orderBy(cities.sortOrder, cities.name);
+  return await db.select().from(cities).orderBy(cities.sortOrder, cities.name);
 }
 
 export async function listCitiesWithExperiences() {
@@ -230,7 +230,7 @@ export async function removeCityWhatToSee(id: number) {
 export async function listExperienceTypes() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(experienceTypes).orderBy(experienceTypes.sortOrder, experienceTypes.name);
+  return await db.select().from(experienceTypes).orderBy(experienceTypes.sortOrder, experienceTypes.name);
 }
 
 export async function getExperienceTypeById(id: number) {
@@ -298,21 +298,21 @@ export async function listExperiences(includeInactive = false) {
   const db = await getDb();
   if (!db) return [];
   if (!includeInactive) {
-    return db.select().from(experiences).where(eq(experiences.isActive, true)).orderBy(experiences.sortOrder, experiences.name);
+    return await db.select().from(experiences).where(eq(experiences.isActive, true)).orderBy(experiences.sortOrder, experiences.name);
   }
-  return db.select().from(experiences).orderBy(experiences.sortOrder, experiences.name);
+  return await db.select().from(experiences).orderBy(experiences.sortOrder, experiences.name);
 }
 
 export async function listExperiencesByType(typeId: number) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(experiences).where(eq(experiences.typeId, typeId)).orderBy(experiences.sortOrder, experiences.name);
+  return await db.select().from(experiences).where(eq(experiences.typeId, typeId)).orderBy(experiences.sortOrder, experiences.name);
 }
 
 export async function listExperiencesByCity(cityId: number) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(experiences).where(eq(experiences.cityId, cityId)).orderBy(experiences.sortOrder, experiences.name);
+  return await db.select().from(experiences).where(eq(experiences.cityId, cityId)).orderBy(experiences.sortOrder, experiences.name);
 }
 
 export async function getExperienceById(id: number) {
@@ -379,7 +379,7 @@ export async function reorderExperience(id: number, newSortOrder: number) {
 export async function listExperienceDetails(experienceId: number) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(experienceDetails)
+  return await db.select().from(experienceDetails)
     .where(eq(experienceDetails.experienceId, experienceId))
     .orderBy(experienceDetails.sortOrder);
 }
@@ -478,9 +478,9 @@ export async function listTeamMembers(includeInactive = false) {
   const db = await getDb();
   if (!db) return [];
   if (!includeInactive) {
-    return db.select().from(teamMembers).where(eq(teamMembers.isActive, true)).orderBy(teamMembers.sortOrder, teamMembers.name);
+    return await db.select().from(teamMembers).where(eq(teamMembers.isActive, true)).orderBy(teamMembers.sortOrder, teamMembers.name);
   }
-  return db.select().from(teamMembers).orderBy(teamMembers.sortOrder, teamMembers.name);
+  return await db.select().from(teamMembers).orderBy(teamMembers.sortOrder, teamMembers.name);
 }
 
 export async function getTeamMemberById(id: number) {
@@ -514,9 +514,9 @@ export async function listItineraries(includeInactive = false) {
   const db = await getDb();
   if (!db) return [];
   if (!includeInactive) {
-    return db.select().from(itineraries).where(eq(itineraries.isActive, true)).orderBy(itineraries.sortOrder, itineraries.name);
+    return await db.select().from(itineraries).where(eq(itineraries.isActive, true)).orderBy(itineraries.sortOrder, itineraries.name);
   }
-  return db.select().from(itineraries).orderBy(itineraries.sortOrder, itineraries.name);
+  return await db.select().from(itineraries).orderBy(itineraries.sortOrder, itineraries.name);
 }
 
 export async function getItineraryById(id: number) {
@@ -569,9 +569,9 @@ export async function listStories(includeInactive = false) {
   const db = await getDb();
   if (!db) return [];
   if (!includeInactive) {
-    return db.select().from(stories).where(eq(stories.isActive, true)).orderBy(stories.sortOrder, desc(stories.createdAt));
+    return await db.select().from(stories).where(eq(stories.isActive, true)).orderBy(stories.sortOrder, desc(stories.createdAt));
   }
-  return db.select().from(stories).orderBy(stories.sortOrder, desc(stories.createdAt));
+  return await db.select().from(stories).orderBy(stories.sortOrder, desc(stories.createdAt));
 }
 
 export async function getStoryById(id: number) {
@@ -624,9 +624,9 @@ export async function listVideos(includeInactive = false) {
   const db = await getDb();
   if (!db) return [];
   if (!includeInactive) {
-    return db.select().from(videos).where(eq(videos.isActive, true)).orderBy(videos.sortOrder, desc(videos.createdAt));
+    return await db.select().from(videos).where(eq(videos.isActive, true)).orderBy(videos.sortOrder, desc(videos.createdAt));
   }
-  return db.select().from(videos).orderBy(videos.sortOrder, desc(videos.createdAt));
+  return await db.select().from(videos).orderBy(videos.sortOrder, desc(videos.createdAt));
 }
 
 export async function getVideoById(id: number) {
@@ -679,9 +679,9 @@ export async function listImages(category?: string) {
   const db = await getDb();
   if (!db) return [];
   if (category) {
-    return db.select().from(images).where(eq(images.category, category)).orderBy(desc(images.createdAt));
+    return await db.select().from(images).where(eq(images.category, category)).orderBy(desc(images.createdAt));
   }
-  return db.select().from(images).orderBy(desc(images.createdAt));
+  return await db.select().from(images).orderBy(desc(images.createdAt));
 }
 
 export async function createImageRecord(data: InsertImage) {
@@ -754,7 +754,7 @@ export async function upsertHomepageIntro(data: Partial<HomepageIntro>) {
 export async function listHomepageStories() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(homepageStories).orderBy(homepageStories.sortOrder);
+  return await db.select().from(homepageStories).orderBy(homepageStories.sortOrder);
 }
 export async function createHomepageStory(data: InsertHomepageStory) {
   const db = await getDb();
@@ -779,7 +779,7 @@ export async function deleteHomepageStory(id: number) {
 export async function listHomepageSponsors() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(homepageSponsors).orderBy(homepageSponsors.sortOrder);
+  return await db.select().from(homepageSponsors).orderBy(homepageSponsors.sortOrder);
 }
 export async function createHomepageSponsor(data: InsertHomepageSponsor) {
   const db = await getDb();
@@ -824,14 +824,14 @@ export async function upsertHomepageStorySection(sectionType: "image" | "video",
 export async function listHomepageStoriesByType(type: "image" | "video") {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(homepageStories).where(eq(homepageStories.type, type)).orderBy(homepageStories.sortOrder);
+  return await db.select().from(homepageStories).where(eq(homepageStories.type, type)).orderBy(homepageStories.sortOrder);
 }
 
 // ─── About Page Management ────────────────────────────────────────────────────
 export async function listAboutSections() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(aboutSections).orderBy(aboutSections.sortOrder);
+  return await db.select().from(aboutSections).orderBy(aboutSections.sortOrder);
 }
 
 export async function createAboutSection(data: Omit<InsertAboutSection, "id" | "createdAt" | "updatedAt">) {
@@ -860,7 +860,7 @@ export async function deleteAboutSection(id: number) {
 export async function listWhyUsSections() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(whyUsSections).orderBy(whyUsSections.sortOrder);
+  return await db.select().from(whyUsSections).orderBy(whyUsSections.sortOrder);
 }
 
 export async function createWhyUsSection(data: Omit<InsertWhyUsSection, "id" | "createdAt" | "updatedAt">) {
