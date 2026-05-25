@@ -19,40 +19,50 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// uploads 目录位于项目外
-// 在 Hostinger 上使用绝对路径，在本地开发使用相对路径
+// uploads 目录位于项目外（与 nodejs 文件夹同级）
+// Hostinger 结构：
+// /home/u932753542/domains/morachinatravel.com/
+//   ├── nodejs/          ← Node.js 项目（__dirname 会在这里）
+//   ├── uploads/         ← 上传文件（与 nodejs 同级）
+//   └── public_html/
+
 let UPLOADS_ROOT_PATH: string;
 
 const cwd = process.cwd();
-console.log(`[Storage] Detecting environment - cwd: ${cwd}`);
+console.log(`[Storage] cwd: ${cwd}`);
+console.log(`[Storage] __dirname: ${__dirname}`);
 
-// 检测是否在 Hostinger 上（cwd 包含 /domains/）
-if (cwd.includes("/domains/")) {
-  // Hostinger: 使用绝对路径
-  // 从 /home/u932753542/domains/morachinatravel.com/nodejs 推导出 /home/u932753542/domains/morachinatravel.com/uploads
-  const cwdParts = cwd.split("/");
-  const domainsIndex = cwdParts.indexOf("domains");
-  if (domainsIndex !== -1 && domainsIndex + 1 < cwdParts.length) {
-    const domainRoot = cwdParts.slice(0, domainsIndex + 2).join("/");
-    UPLOADS_ROOT_PATH = path.join(domainRoot, "uploads");
-    console.log(`[Storage] Hostinger detected - using absolute path: ${UPLOADS_ROOT_PATH}`);
-  } else {
-    // Fallback: 使用相对路径
-    const projectRoot = path.resolve(__dirname, "..");
-    const parentDir = path.resolve(projectRoot, "..");
-    UPLOADS_ROOT_PATH = path.join(parentDir, "uploads");
-    console.log(`[Storage] Fallback to relative path: ${UPLOADS_ROOT_PATH}`);
-  }
-} else {
-  // 本地开发: 使用相对路径
-  const projectRoot = path.resolve(__dirname, "..");
-  const parentDir = path.resolve(projectRoot, "..");
-  UPLOADS_ROOT_PATH = path.join(parentDir, "uploads");
-  console.log(`[Storage] Local development - using relative path: ${UPLOADS_ROOT_PATH}`);
+// 方法1：从 __dirname 推导
+// __dirname = /home/u932753542/domains/morachinatravel.com/nodejs/server/_core
+// 向上两级到 /home/u932753542/domains/morachinatravel.com/nodejs
+// 再向上一级到 /home/u932753542/domains/morachinatravel.com
+const projectDir = path.resolve(__dirname, "..", "..");  // 到 nodejs 文件夹
+const domainRoot = path.resolve(projectDir, "..");       // 到 morachinatravel.com 文件夹
+const uploadsFromDirname = path.join(domainRoot, "uploads");
+
+console.log(`[Storage] projectDir: ${projectDir}`);
+console.log(`[Storage] domainRoot: ${domainRoot}`);
+console.log(`[Storage] uploadsFromDirname: ${uploadsFromDirname}`);
+
+// 方法2：从 cwd 推导（备用）
+let uploadsFromCwd = "";
+if (cwd.includes("/nodejs")) {
+  uploadsFromCwd = path.join(cwd.replace("/nodejs", ""), "uploads");
+  console.log(`[Storage] uploadsFromCwd: ${uploadsFromCwd}`);
+}
+
+// 选择最可靠的路径
+// 优先使用 __dirname 推导，因为它不依赖 process.cwd()
+UPLOADS_ROOT_PATH = uploadsFromDirname;
+
+// 验证路径是否合理
+if (!UPLOADS_ROOT_PATH.includes("uploads")) {
+  console.error(`[Storage] ERROR: UPLOADS_ROOT_PATH 看起来不对: ${UPLOADS_ROOT_PATH}`);
 }
 
 export const UPLOADS_ROOT = UPLOADS_ROOT_PATH;
 console.log(`[Storage] UPLOADS_ROOT initialized: ${UPLOADS_ROOT}`);
+console.log(`[Storage] UPLOADS_ROOT exists: ${fs.existsSync(UPLOADS_ROOT)}`);
 
 function ensureDir(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
