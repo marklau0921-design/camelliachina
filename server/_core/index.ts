@@ -79,6 +79,14 @@ async function startServer() {
   console.log(`[Startup] cwd: ${process.cwd()}`);
   console.log(`[Startup] uploadsRoot: ${uploadsRoot}`);
   console.log(`[Startup] uploads exists: ${fs.existsSync(uploadsRoot)}`);
+  
+  // Debug middleware for /uploads requests
+  app.use("/uploads", (req, res, next) => {
+    const requestedFile = path.join(uploadsRoot, req.path);
+    console.log(`[/uploads] Request: ${req.path}, Full path: ${requestedFile}, Exists: ${fs.existsSync(requestedFile)}`);
+    next();
+  });
+  
   app.use("/uploads", express.static(uploadsRoot, {
     maxAge: "1d",
     etag: true,

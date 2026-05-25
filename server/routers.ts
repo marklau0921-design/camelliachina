@@ -1113,6 +1113,7 @@ export const appRouter = router({
         await requireAdmin(ctx);
         const buffer = Buffer.from(input.base64, "base64");
         const ext = path.extname(input.filename) || ".jpg";
+        console.log(`[media.upload] filename: "${input.filename}", path.extname result: "${path.extname(input.filename)}", final ext: "${ext}"`);
         const storageKey = `media/${nanoid()}${ext}`;
         const { key, url } = await storagePut(storageKey, buffer, input.mimeType);
         const asset = await createMediaAsset({

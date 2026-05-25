@@ -45,8 +45,13 @@ export async function storagePut(
   data: Buffer | Uint8Array | string,
   _contentType = "application/octet-stream",
 ): Promise<{ key: string; url: string }> {
-  const key = appendHashSuffix(normalizeKey(relKey));
+  const normalized = normalizeKey(relKey);
+  console.log(`[Storage.storagePut] relKey: "${relKey}", normalized: "${normalized}"`);
+  const key = appendHashSuffix(normalized);
+  console.log(`[Storage.storagePut] after appendHashSuffix: "${key}"`);
   const filePath = path.join(UPLOADS_ROOT, key);
+  console.log(`[Storage.storagePut] filePath: "${filePath}"`);
+
 
   ensureDir(path.dirname(filePath));
 
