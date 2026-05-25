@@ -16,6 +16,7 @@ import path from "path";
 
 // uploads 目录位于项目根目录（process.cwd()）
 export const UPLOADS_ROOT = path.join(process.cwd(), "uploads");
+console.log(`[Storage] UPLOADS_ROOT initialized: ${UPLOADS_ROOT}`);
 
 function ensureDir(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
@@ -53,7 +54,11 @@ export async function storagePut(
     typeof data === "string"
       ? Buffer.from(data, "utf-8")
       : Buffer.from(data as Uint8Array);
+  
+  console.log(`[Storage] Writing file: ${filePath}`);
   fs.writeFileSync(filePath, buffer);
+  console.log(`[Storage] File written successfully: ${filePath} (${buffer.byteLength} bytes)`);
+  console.log(`[Storage] File exists: ${fs.existsSync(filePath)}`);
 
   return { key, url: `/uploads/${key}` };
 }
