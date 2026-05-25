@@ -373,7 +373,7 @@ export const homepageStorySections = mysqlTable("homepage_story_sections", {
 export type HomepageStorySection = typeof homepageStorySections.$inferSelect;
 export type InsertHomepageStorySection = typeof homepageStorySections.$inferInsert;
 
-// 赞助商 Logo（多行，可排序）+ 背景纹理
+// 赞助商 Logo（多行，可排序）
 export const homepageSponsors = mysqlTable("homepage_sponsors", {
   id: int("id").autoincrement().primaryKey(),
   isVisible: boolean("isVisible").default(true).notNull(),
@@ -381,7 +381,6 @@ export const homepageSponsors = mysqlTable("homepage_sponsors", {
   logo: varchar("logo", { length: 512 }).notNull(),
   url: varchar("url", { length: 512 }),
   sortOrder: int("sortOrder").default(0).notNull(),
-  backgroundTexture: varchar("backgroundTexture", { length: 512 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
