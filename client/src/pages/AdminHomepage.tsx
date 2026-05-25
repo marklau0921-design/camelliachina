@@ -556,7 +556,7 @@ export default function AdminHomepage() {
               {sp.logo && <img src={sp.logo} alt={sp.name} style={{ width: 80, height: 48, objectFit: "contain" }} />}
               <div style={{ fontFamily: "Lato, sans-serif", fontSize: 12, color: "#1a1a1a", fontWeight: 600, textAlign: "center" }}>{sp.name}</div>
               <div style={{ display: "flex", gap: 4 }}>
-                <button style={{ ...btnSecondary, padding: "5px 10px", fontSize: 11 }} onClick={() => setSponsorModal({ id: sp.id, name: sp.name, logoUrl: sp.logo ?? "", websiteUrl: sp.url ?? "", isVisible: sp.isVisible ?? true, sortOrder: sp.sortOrder ?? 0 })}>Edit</button>
+                <button style={{ ...btnSecondary, padding: "5px 10px", fontSize: 11 }} onClick={() => setSponsorModal({ id: sp.id, name: sp.name, logoUrl: sp.logo ?? "", websiteUrl: sp.url ?? "", isVisible: sp.isVisible ?? true, sortOrder: sp.sortOrder ?? 0, backgroundTexture: sp.backgroundTexture ?? "" })}>Edit</button>
                 <button style={{ ...btnDanger, padding: "5px 10px", fontSize: 11 }} onClick={() => { if (confirm("Delete this sponsor?")) deleteSponsor.mutate({ id: sp.id }); }}>Del</button>
               </div>
             </div>
