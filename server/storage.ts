@@ -19,12 +19,25 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// uploads 目录位于项目根目录
-// 使用 __dirname 而不是 process.cwd()，以便在 Hostinger 上也能正常工作
-// __dirname = server/，向上两级到项目根
-const projectRoot = path.resolve(__dirname, "..");
-export const UPLOADS_ROOT = path.join(projectRoot, "uploads");
-console.log(`[Storage] UPLOADS_ROOT initialized: ${UPLOADS_ROOT}`);
+// uploads 目录位于 nodejs 文件夹外（与 nodejs 同级）
+// Hostinger 结构：
+//   /home/u932753542/domains/morachinatravel.com/
+//     ├── nodejs/          ← 项目代码
+//     │   └── server/      ← __dirname 在这里
+//     └── uploads/         ← 目标位置
+//
+// __dirname = .../nodejs/server
+// 向上一级 = nodejs
+// 向上两级 = morachinatravel.com
+// 加上 uploads = morachinatravel.com/uploads ✅
+const projectRoot = path.resolve(__dirname, "..");       // nodejs/
+const domainRoot = path.resolve(projectRoot, "..");      // morachinatravel.com/
+export const UPLOADS_ROOT = path.join(domainRoot, "uploads");
+console.log(`[Storage] __dirname: ${__dirname}`);
+console.log(`[Storage] projectRoot: ${projectRoot}`);
+console.log(`[Storage] domainRoot: ${domainRoot}`);
+console.log(`[Storage] UPLOADS_ROOT: ${UPLOADS_ROOT}`);
+console.log(`[Storage] UPLOADS_ROOT exists: ${fs.existsSync(UPLOADS_ROOT)}`);
 
 function ensureDir(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
