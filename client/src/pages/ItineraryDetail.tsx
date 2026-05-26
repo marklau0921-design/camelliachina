@@ -257,7 +257,20 @@ export default function ItineraryDetail() {
     { enabled: !!slug }
   );
 
-  const sections: ItinerarySection[] = Array.isArray(itin?.sections) ? (itin.sections as ItinerarySection[]) : [];
+  // Parse sections - handle both JSON string and array formats
+  let sections: ItinerarySection[] = [];
+  if (itin?.sections) {
+    try {
+      let parsed = itin.sections;
+      // Handle multiple levels of JSON stringification
+      while (typeof parsed === 'string') {
+        parsed = JSON.parse(parsed);
+      }
+      sections = Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      sections = [];
+    }
+  }
   const navSections = [
     { id: 'overview', label: 'OVERVIEW' },
     ...sections.map(s => ({ id: `section-${s.id}`, label: s.title.toUpperCase() || 'SECTION' })),
