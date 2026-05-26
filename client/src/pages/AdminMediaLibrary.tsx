@@ -98,82 +98,80 @@ function ImageCard({
   const handleCopy = () => {
     navigator.clipboard.writeText(asset.url);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 1500);
   };
 
-  const handleReplace = async (file: File) => {
+  const handleReplaceFile = async (file: File) => {
+    if (!onReplace) return;
     setReplaceLoading(true);
-    try {
-      await onReplace?.(asset.id, file);
-    } finally {
-      setReplaceLoading(false);
-    }
+    await onReplace(asset.id, file);
+    setReplaceLoading(false);
   };
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      <img src={asset.url} alt={asset.filename} style={{ width: "100%", height: 200, objectFit: "cover" }} />
-      <div style={{ padding: 12, background: "#fff", borderTop: "1px solid #f0f0f0" }}>
-        <div style={{ fontSize: 11, color: "#888", marginBottom: 6, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{asset.filename}</div>
-        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-          <button onClick={handleCopy} style={{ flex: 1, minWidth: 50, padding: "4px 8px", fontSize: 10, background: copied ? "#4CAF50" : "#f0f0f0", color: copied ? "#fff" : "#666", border: "none", borderRadius: 3, cursor: "pointer", transition: "all 0.2s" }}>
-            {copied ? "Copied" : "Copy"}
-          </button>
-          <button onClick={() => setShowUsage(!showUsage)} style={{ flex: 1, minWidth: 50, padding: "4px 8px", fontSize: 10, background: "#f0f0f0", color: "#666", border: "none", borderRadius: 3, cursor: "pointer" }}>
-            Usage
+    <div style={{ background: "#fff", border: "1px solid #e8e8e8", borderRadius: 10, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+      <div style={{ width: "100%", aspectRatio: "4/3", background: "#f2f2f2", overflow: "hidden" }}>
+        <img src={asset.url} alt={asset.filename} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+      </div>
+      <div style={{ padding: "10px 12px", flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: "#1a1a1a", wordBreak: "break-all", lineHeight: 1.4 }}>{asset.filename}</div>
+        <div style={{ fontSize: 11, color: "#888", wordBreak: "break-all", lineHeight: 1.4 }}>{asset.url}</div>
+        <div>
+          {isInUse ? (
+            <button onClick={() => setShowUsage(!showUsage)} style={{ fontSize: 11, color: "#F5569B", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}>
+              {showUsage ? "Hide usage" : "Used in 1 page ▾"}
+            </button>
+          ) : (
+            <span style={{ fontSize: 11, color: "#bbb" }}>Not in use</span>
+          )}
+          {showUsage && isInUse && (
+            <div style={{ marginTop: 4, fontSize: 11, color: "#555", background: "#f9f9f9", borderRadius: 4, padding: "4px 8px" }}>
+              {asset.sourceLabel && <div style={{ fontWeight: 600 }}>{asset.sourceLabel}</div>}
+              <div style={{ color: "#888" }}>{asset.sourceUrl}</div>
+            </div>
+          )}
+        </div>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 4 }}>
+          <button onClick={handleCopy} style={{ fontSize: 11, padding: "3px 10px", borderRadius: 4, border: "1px solid #ddd", background: copied ? "#e8f5e9" : "#f2f2f2", color: copied ? "#388e3c" : "#555", cursor: "pointer" }}>
+            {copied ? "Copied!" : "Copy URL"}
           </button>
           {onReplace && (
-            <label style={{ flex: 1, minWidth: 50, padding: "4px 8px", fontSize: 10, background: "#f0f0f0", color: "#666", border: "none", borderRadius: 3, cursor: replaceLoading ? "not-allowed" : "pointer", textAlign: "center", display: "block" }}>
-              {replaceLoading ? "..." : "Replace"}
-              <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleReplace(f); e.target.value = ""; }} />
+            <label style={{ fontSize: 11, padding: "3px 10px", borderRadius: 4, border: "1px solid #ddd", background: "#f2f2f2", color: "#555", cursor: replaceLoading ? "not-allowed" : "pointer" }}>
+              {replaceLoading ? "Replacing..." : "Replace"}
+              <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleReplaceFile(f); e.target.value = ""; }} />
             </label>
           )}
           {onDelete && (
-            <button onClick={() => onDelete(asset.id)} style={{ flex: 1, minWidth: 50, padding: "4px 8px", fontSize: 10, background: "#ffebee", color: "#c62828", border: "none", borderRadius: 3, cursor: "pointer" }}>
+            <button
+              onClick={() => { if (isInUse) { alert("This image is currently in use."); return; } if (confirm("Delete this image?")) onDelete(asset.id); }}
+              title={isInUse ? "This image is currently in use." : "Delete"}
+              style={{ fontSize: 11, padding: "3px 10px", borderRadius: 4, border: "1px solid #ddd", background: "#f2f2f2", color: isInUse ? "#ccc" : "#e53935", cursor: isInUse ? "not-allowed" : "pointer" }}
+            >
               Delete
             </button>
           )}
         </div>
       </div>
-      {showUsage && (
-        <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#f9f9f9", border: "1px solid #e0e0e0", borderRadius: 4, padding: 8, marginTop: 4, fontSize: 11, color: "#666", zIndex: 10 }}>
-          {isInUse ? (
-            <>
-              <div><strong>Used in:</strong> {asset.sourceLabel}</div>
-              {asset.sourceUrl && <div style={{ marginTop: 4, wordBreak: "break-all", color: "#999" }}>{asset.sourceUrl}</div>}
-            </>
-          ) : (
-            <div style={{ color: "#aaa" }}>Not in use</div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
 
 function HomepageAssetsTab() {
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const utils = trpc.useUtils();
+  const { data: logos = [], isLoading: logosLoading } = trpc.media.listByType.useQuery({ assetType: "logo" });
+  const { data: banners = [], isLoading: bannersLoading } = trpc.media.listByType.useQuery({ assetType: "banner" });
+  const { data: ctas = [], isLoading: ctasLoading } = trpc.media.listByType.useQuery({ assetType: "cta" });
 
-  const { data: assets = [], isLoading: assetsLoading } = trpc.media.list.useQuery({ search: debouncedSearch, assetType: "logo" });
-  const { data: banners = [], isLoading: bannersLoading } = trpc.media.list.useQuery({ search: debouncedSearch, assetType: "banner" });
-  const { data: ctas = [], isLoading: ctasLoading } = trpc.media.list.useQuery({ search: debouncedSearch, assetType: "cta" });
-  const uploadMut = trpc.media.upload.useMutation({ onSuccess: () => utils.media.list.invalidate() });
-  const replaceMut = trpc.media.replace.useMutation({ onSuccess: () => utils.media.list.invalidate() });
-  const deleteMut = trpc.media.delete.useMutation({ onSuccess: () => utils.media.list.invalidate(), onError: (err) => alert(err.message) });
-  const setActiveMut = trpc.media.setActive.useMutation({ onSuccess: () => utils.media.list.invalidate() });
+  const invalidate = () => { utils.media.listByType.invalidate(); utils.media.list.invalidate(); };
 
-  const handleSearch = (val: string) => {
-    setSearch(val);
-    if (searchTimer.current) clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => setDebouncedSearch(val), 400);
-  };
+  const uploadMut = trpc.media.upload.useMutation({ onSuccess: invalidate });
+  const setActiveMut = trpc.media.setActive.useMutation({ onSuccess: () => utils.media.listByType.invalidate() });
+  const updateSortMut = trpc.media.updateSortOrder.useMutation({ onSuccess: () => utils.media.listByType.invalidate() });
+  const replaceMut = trpc.media.replace.useMutation({ onSuccess: invalidate });
 
   const handleUpload = async (file: File, assetType: "logo" | "banner" | "cta") => {
     const base64 = await fileToBase64(file);
-    await uploadMut.mutateAsync({ filename: file.name, base64, mimeType: file.type || "image/jpeg", fileSize: file.size, source: "homepage", assetType });
+    await uploadMut.mutateAsync({ filename: file.name, base64, mimeType: file.type || "image/jpeg", fileSize: file.size, source: assetType, assetType });
   };
 
   const handleReplace = async (id: number, file: File) => {
@@ -181,18 +179,25 @@ function HomepageAssetsTab() {
     await replaceMut.mutateAsync({ id, filename: file.name, base64, mimeType: file.type || "image/jpeg" });
   };
 
-  const sectionStyle: React.CSSProperties = { marginBottom: 32, background: "#fff", padding: 20, borderRadius: 8 };
-  const sectionTitle: React.CSSProperties = { fontSize: 14, fontWeight: 700, color: "#1a1a1a", marginBottom: 16 };
+  const handleReorder = (items: MediaAsset[], idx: number, dir: -1 | 1) => {
+    const swapIdx = idx + dir;
+    if (swapIdx < 0 || swapIdx >= items.length) return;
+    updateSortMut.mutate({ id: items[idx].id, sortOrder: swapIdx });
+    updateSortMut.mutate({ id: items[swapIdx].id, sortOrder: idx });
+  };
+
+  const sectionStyle: React.CSSProperties = { background: "#fff", border: "1px solid #e8e8e8", borderRadius: 10, padding: "24px 28px", marginBottom: 24 };
+  const sectionTitle: React.CSSProperties = { fontSize: 14, fontWeight: 700, color: "#1a1a1a", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 16, borderBottom: "1px solid #f0f0f0", paddingBottom: 10 };
 
   return (
     <div>
-      {/* Logos */}
+      {/* Logo */}
       <div style={sectionStyle}>
         <div style={sectionTitle}>Logo</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
-          {assetsLoading ? <div style={{ color: "#aaa", fontSize: 13 }}>Loading...</div> : assets.length === 0 ? <div style={{ color: "#aaa", fontSize: 13 }}>No logos uploaded yet.</div> : (assets as MediaAsset[]).map((logo) => (
+          {logosLoading ? <div style={{ color: "#aaa", fontSize: 13 }}>Loading...</div> : logos.length === 0 ? <div style={{ color: "#aaa", fontSize: 13 }}>No logos uploaded yet.</div> : (logos as MediaAsset[]).map((logo) => (
             <div key={logo.id} onClick={() => setActiveMut.mutate({ id: logo.id, isActive: !logo.isActive, assetType: "logo" })}
-              style={{ width: 160, border: `2px solid ${logo.isActive ? "#F5569B" : "#e8e8e8"}`, borderRadius: 8, overflow: "hidden", cursor: "pointer", background: logo.isActive ? "#fff0f6" : "#fafafa", position: "relative", transition: "all 0.2s" }}>
+              style={{ width: 120, border: `2px solid ${logo.isActive ? "#F5569B" : "#e8e8e8"}`, borderRadius: 8, overflow: "hidden", cursor: "pointer", background: logo.isActive ? "#fff0f6" : "#fafafa", position: "relative", transition: "all 0.2s" }}>
               <img src={logo.url} alt={logo.filename} style={{ width: "100%", height: 80, objectFit: "contain", padding: 8 }} />
               {logo.isActive && <div style={{ position: "absolute", top: 4, right: 4, background: "#F5569B", color: "#fff", fontSize: 10, borderRadius: 4, padding: "1px 5px" }}>Active</div>}
               <div style={{ fontSize: 10, color: "#888", padding: "4px 6px", textAlign: "center", borderTop: "1px solid #f0f0f0" }}>{logo.filename.length > 16 ? logo.filename.slice(0, 14) + "…" : logo.filename}</div>
@@ -200,22 +205,6 @@ function HomepageAssetsTab() {
           ))}
         </div>
         <UploadZone onUpload={(f) => handleUpload(f, "logo")} loading={uploadMut.isPending} label="Upload new logo (drag & drop or click)" />
-      </div>
-
-      {/* Banners */}
-      <div style={sectionStyle}>
-        <div style={sectionTitle}>Hero Banner</div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
-          {bannersLoading ? <div style={{ color: "#aaa", fontSize: 13 }}>Loading...</div> : banners.length === 0 ? <div style={{ color: "#aaa", fontSize: 13 }}>No banners uploaded yet.</div> : (banners as MediaAsset[]).map((banner) => (
-            <div key={banner.id} onClick={() => setActiveMut.mutate({ id: banner.id, isActive: !banner.isActive, assetType: "banner" })}
-              style={{ width: 160, border: `2px solid ${banner.isActive ? "#F5569B" : "#e8e8e8"}`, borderRadius: 8, overflow: "hidden", cursor: "pointer", background: banner.isActive ? "#fff0f6" : "#fafafa", position: "relative", transition: "all 0.2s" }}>
-              <img src={banner.url} alt={banner.filename} style={{ width: "100%", height: 90, objectFit: "cover" }} />
-              {banner.isActive && <div style={{ position: "absolute", top: 4, right: 4, background: "#F5569B", color: "#fff", fontSize: 10, borderRadius: 4, padding: "1px 5px" }}>Active</div>}
-              <div style={{ fontSize: 10, color: "#888", padding: "4px 6px", textAlign: "center", borderTop: "1px solid #f0f0f0" }}>{banner.filename.length > 16 ? banner.filename.slice(0, 14) + "…" : banner.filename}</div>
-            </div>
-          ))}
-        </div>
-        <UploadZone onUpload={(f) => handleUpload(f, "banner")} loading={uploadMut.isPending} label="Upload new banner (drag & drop or click)" />
       </div>
 
       {/* Background Texture */}
@@ -240,16 +229,13 @@ function HomepageAssetsTab() {
 function AllImagesTab() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const utils = trpc.useUtils();
 
   const { data: assets = [], isLoading } = trpc.media.list.useQuery({ search: debouncedSearch });
   const uploadMut = trpc.media.upload.useMutation({ onSuccess: () => utils.media.list.invalidate() });
   const replaceMut = trpc.media.replace.useMutation({ onSuccess: () => utils.media.list.invalidate() });
-  const deleteMut = trpc.media.delete.useMutation({ onSuccess: () => { utils.media.list.invalidate(); setSelectedIds(new Set()); }, onError: (err) => alert(err.message) });
-  const batchDeleteMut = trpc.media.batchDelete.useMutation({ onSuccess: () => { utils.media.list.invalidate(); setSelectedIds(new Set()); setShowDeleteConfirm(false); }, onError: (err) => alert(err.message) });
+  const deleteMut = trpc.media.delete.useMutation({ onSuccess: () => utils.media.list.invalidate(), onError: (err) => alert(err.message) });
 
   const handleSearch = (val: string) => {
     setSearch(val);
@@ -265,29 +251,6 @@ function AllImagesTab() {
   const handleReplace = async (id: number, file: File) => {
     const base64 = await fileToBase64(file);
     await replaceMut.mutateAsync({ id, filename: file.name, base64, mimeType: file.type || "image/jpeg" });
-  };
-
-  const toggleSelect = (id: number) => {
-    const newSelected = new Set(selectedIds);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
-    setSelectedIds(newSelected);
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedIds.size === assets.length && assets.length > 0) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set((assets as MediaAsset[]).map(a => a.id)));
-    }
-  };
-
-  const handleBatchDelete = async () => {
-    if (selectedIds.size === 0) return;
-    await batchDeleteMut.mutateAsync({ ids: Array.from(selectedIds) });
   };
 
   return (
@@ -311,155 +274,15 @@ function AllImagesTab() {
       ) : assets.length === 0 ? (
         <div style={{ color: "#aaa", fontSize: 13, textAlign: "center", padding: 40 }}>{debouncedSearch ? "No images found." : "No images uploaded yet."}</div>
       ) : (
-        <div>
-          <div style={{ display: "flex", gap: 12, marginBottom: 16, alignItems: "center" }}>
-            <button
-              onClick={toggleSelectAll}
-              style={{
-                padding: "8px 16px",
-                borderRadius: 6,
-                border: "1px solid #ddd",
-                background: selectedIds.size === assets.length && assets.length > 0 ? "#F5569B" : "#fff",
-                color: selectedIds.size === assets.length && assets.length > 0 ? "#fff" : "#333",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-            >
-              {selectedIds.size === assets.length && assets.length > 0 ? "Deselect All" : "Select All"}
-            </button>
-            {selectedIds.size > 0 && (
-              <>
-                <span style={{ fontSize: 13, color: "#666" }}>已选 {selectedIds.size} 张</span>
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  style={{
-                    padding: "8px 16px",
-                    borderRadius: 6,
-                    border: "1px solid #ff4444",
-                    background: "#fff",
-                    color: "#ff4444",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  Delete Selected
-                </button>
-              </>
-            )}
-          </div>
-
-          {showDeleteConfirm && (
-            <div style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0,0,0,0.5)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1000,
-            }}>
-              <div style={{
-                background: "#fff",
-                borderRadius: 8,
-                padding: 24,
-                maxWidth: 400,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-              }}>
-                <h2 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 12px 0", color: "#1a1a1a" }}>确认删除</h2>
-                <p style={{ fontSize: 14, color: "#666", margin: "0 0 24px 0" }}>确定要删除这 {selectedIds.size} 张图片吗？此操作无法撤销。</p>
-                <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-                  <button
-                    onClick={() => setShowDeleteConfirm(false)}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: 6,
-                      border: "1px solid #ddd",
-                      background: "#fff",
-                      color: "#333",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                  >
-                    取消
-                  </button>
-                  <button
-                    onClick={handleBatchDelete}
-                    disabled={batchDeleteMut.isPending}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: 6,
-                      border: "none",
-                      background: "#ff4444",
-                      color: "#fff",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      cursor: batchDeleteMut.isPending ? "not-allowed" : "pointer",
-                      opacity: batchDeleteMut.isPending ? 0.6 : 1,
-                    }}
-                  >
-                    {batchDeleteMut.isPending ? "删除中..." : "确认删除"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16 }}>
-            {(assets as MediaAsset[]).map((asset) => (
-              <div
-                key={asset.id}
-                style={{
-                  position: "relative",
-                  border: selectedIds.has(asset.id) ? "3px solid #F5569B" : "1px solid #e8e8e8",
-                  borderRadius: 8,
-                  overflow: "hidden",
-                  background: selectedIds.has(asset.id) ? "#fff0f6" : "#fff",
-                  transition: "all 0.2s",
-                }}
-              >
-                {/* Checkbox */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 8,
-                    left: 8,
-                    width: 20,
-                    height: 20,
-                    background: selectedIds.has(asset.id) ? "#F5569B" : "#fff",
-                    border: selectedIds.has(asset.id) ? "2px solid #F5569B" : "2px solid #ddd",
-                    borderRadius: 4,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    zIndex: 10,
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleSelect(asset.id);
-                  }}
-                >
-                  {selectedIds.has(asset.id) && (
-                    <span style={{ color: "#fff", fontSize: 14, fontWeight: "bold" }}>✓</span>
-                  )}
-                </div>
-
-                {/* Image Card Content */}
-                <div onClick={() => toggleSelect(asset.id)} style={{ cursor: "pointer" }}>
-                  <ImageCard
-                    asset={asset as MediaAsset}
-                    onDelete={(id) => deleteMut.mutate({ id })}
-                    onReplace={handleReplace}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16 }}>
+          {(assets as MediaAsset[]).map((asset) => (
+            <ImageCard
+              key={asset.id}
+              asset={asset as MediaAsset}
+              onDelete={(id) => deleteMut.mutate({ id })}
+              onReplace={handleReplace}
+            />
+          ))}
         </div>
       )}
     </div>
