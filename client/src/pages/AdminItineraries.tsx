@@ -580,15 +580,16 @@ export default function AdminItineraries() {
                 howLong: itinDetail.howLong || "",
                 days: itinDetail.days,
                 sections: (() => {
-                  if (Array.isArray(itinDetail.sections)) return itinDetail.sections;
-                  if (typeof itinDetail.sections === 'string') {
+                  let sections = itinDetail.sections;
+                  // Handle double serialization
+                  while (typeof sections === 'string') {
                     try {
-                      return JSON.parse(itinDetail.sections);
+                      sections = JSON.parse(sections);
                     } catch (e) {
                       return [];
                     }
                   }
-                  return [];
+                  return Array.isArray(sections) ? sections : [];
                 })(),
                 isActive: itinDetail.isActive,
                 sortOrder: itinDetail.sortOrder ?? 0,
