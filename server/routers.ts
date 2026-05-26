@@ -1482,7 +1482,7 @@ export const appRouter = router({
     }),
     createSponsor: publicProcedure
       .input(z.object({
-        name: z.string().min(1),
+        name: z.string().min(1).optional().default(() => `Sponsor ${Date.now()}`),
         logoUrls: z.array(z.string()).min(1),
         websiteUrl: z.string().optional(),
         isVisible: z.boolean().default(true),
