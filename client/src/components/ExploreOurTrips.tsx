@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { trpc } from '../lib/trpc';
 
 interface Trip {
   id: string;
@@ -9,9 +10,10 @@ interface Trip {
   description: string;
   price: string;
   image: string;
+  slug?: string;
 }
 
-const trips: Trip[] = [
+const defaultTrips: Trip[] = [
   {
     id: '1',
     nights: 12,
@@ -72,17 +74,44 @@ export default function ExploreOurTrips() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const itemsPerView = 3;
+  
+  // Fetch itineraries from backend
+  const { data: itineraries, isLoading } = trpc.admin.listItineraries.useQuery();
+  
+  // Transform itineraries to Trip format
+  const trips: Trip[] = (itineraries || []).map(itin => ({
+    id: itin.id.toString(),
+    nights: itin.days || 1,
+    destination: itin.place || 'China',
+    title: itin.name,
+    description: itin.shortDescription || itin.description || '',
+    price: itin.price || 'Contact for pricing',
+    image: itin.coverImage || itin.bannerImage || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=600&fit=crop',
+    slug: itin.slug,
+  })).slice(0, 6); // Limit to 6 items
 
   const handlePrev = () => {
+    if (trips.length <= itemsPerView) return;
     setCurrentIndex((prev) => Math.max(0, prev - 1));
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => Math.min(trips.length - itemsPerView, prev + 1));
+    if (trips.length <= itemsPerView) return;
+    setCurrentIndex((prev) => Math.min(Math.max(0, trips.length - itemsPerView), prev + 1));
   };
 
   const canGoPrev = currentIndex > 0;
-  const canGoNext = currentIndex < trips.length - itemsPerView;
+  const canGoNext = currentIndex < Math.max(0, trips.length - itemsPerView);
+
+  if (isLoading) {
+    return (
+      <section className="w-full py-16 md:py-24 relative overflow-hidden" style={{ minHeight: '700px', backgroundColor: '#0a0a0a' }}>
+        <div className="w-full h-full relative flex items-center justify-center">
+          <div className="text-white">Loading trips...</div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -127,10 +156,10 @@ export default function ExploreOurTrips() {
               ref={containerRef}
               className="flex transition-transform duration-500 ease-out"
               style={{
-                transform: `translateX(-${currentIndex * 100}%)`,
+                transform: `translateX(-${currentIndex * (100 / Math.max(1, trips.length))}%)`,
               }}
             >
-              {trips.map((trip) => (
+              {trips.length > 0 ? trips.map((trip) => (
                 <div
                   key={trip.id}
                   className="flex-shrink-0 w-full px-4 md:px-8"
@@ -149,6 +178,7 @@ export default function ExploreOurTrips() {
                     </div>
 
                     {/* Right: Cards carousel - 2/3 width */}
+                    {trips.length > 0 && (
                     <div className="w-2/3 flex-shrink-0">
                       <div className="grid grid-cols-3 gap-6">
                         {trips.slice(currentIndex, currentIndex + itemsPerView).map((card) => (
@@ -188,18 +218,26 @@ export default function ExploreOurTrips() {
                                 <p className="text-sm font-semibold text-gray-900 mb-3">
                                   {card.price}
                                 </p>
-                                <button className="w-full px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded hover:bg-gray-800 transition-colors duration-200">
-                                  EXPLORE TRIP
-                                </button>
+                                <a 
+                                href={`/itinerary/${card.slug}`}
+                                className="w-full px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded hover:bg-gray-800 transition-colors duration-200 inline-block text-center"
+                              >
+                                EXPLORE TRIP
+                              </a>
                               </div>
                             </div>
                           </div>
                         ))}
                       </div>
                     </div>
+                    )}
                   </div>
                 </div>
-              ))}
+              ))) : (
+                <div className="w-full flex items-center justify-center text-white">
+                  <p>No trips available</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
