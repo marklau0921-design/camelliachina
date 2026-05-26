@@ -116,7 +116,7 @@ export default function Footer() {
         {/* Bottom Copyright */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-white/40 tracking-wide">
-            wayseekchina | COPYRIGHT 2026 | ALL RIGHTS RESERVED
+            WAYSEEKCHINA | COPYRIGHT 2026 | ALL RIGHTS RESERVED
           </p>
           <div className="flex gap-8 text-xs text-white/40">
             <a href="#" className="hover:text-white/70 transition-colors tracking-wide">TERMS & CONDITIONS</a>
