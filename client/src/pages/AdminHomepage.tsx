@@ -167,29 +167,14 @@ function SponsorModal({ initial, onSave, onClose }: { initial?: SponsorForm & { 
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ background: "#fff", borderRadius: 8, padding: 32, width: 480, maxWidth: "90vw", maxHeight: "80vh", overflowY: "auto" }}>
         <h3 style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 24, color: "#1a1a1a" }}>
-          {initial?.id ? "Edit Sponsor" : "Add Sponsor"}
+          {initial?.id ? "Edit Sponsor Logo" : "Add Sponsor Logo"}
         </h3>
-        <Field label="Sponsor Name">
-          <input style={inputStyle} value={form.name} onChange={e => set("name", e.target.value)} placeholder="e.g. Cathay Pacific" />
-        </Field>
         <Field label="Logo Image">
           <ImageUploader value={form.logoUrl} onChange={v => set("logoUrl", v ?? "")} category="homepage" />
         </Field>
-        <Field label="Website URL (optional)">
-          <input style={inputStyle} value={form.websiteUrl} onChange={e => set("websiteUrl", e.target.value)} placeholder="https://..." />
-        </Field>
-        <Field label="Sort Order">
-          <input style={inputStyle} type="number" value={form.sortOrder} onChange={e => set("sortOrder", Number(e.target.value))} />
-        </Field>
-        <Field label="Visible">
-          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-            <input type="checkbox" checked={form.isVisible} onChange={e => set("isVisible", e.target.checked)} />
-            <span style={{ fontFamily: "Lato, sans-serif", fontSize: 13 }}>Show on homepage</span>
-          </label>
-        </Field>
-        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 8 }}>
+        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 24 }}>
           <button style={btnSecondary} onClick={onClose}>Cancel</button>
-          <button style={btnPrimary} onClick={() => { if (!form.name || !form.logoUrl) return; onSave({ ...form, id: initial?.id }); }}>Save</button>
+          <button style={btnPrimary} onClick={() => { if (!form.logoUrl) return; onSave({ ...form, id: initial?.id }); }}>Save</button>
         </div>
       </div>
     </div>
