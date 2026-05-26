@@ -411,3 +411,30 @@ html {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+
+/* Ripple animation for trip buttons */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Scrollbar styling for similar-track */
+.similar-track::-webkit-scrollbar {
+  height: 6px;
+}
+
+.similar-track::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.similar-track::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.similar-track::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
