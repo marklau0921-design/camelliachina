@@ -12,7 +12,7 @@ interface ItineraryBlock {
   dayNumber: number;
   title: string;
   description: string;
-  images?: string[];
+  image?: string;
 }
 
 interface ItinerarySection {
@@ -22,179 +22,6 @@ interface ItinerarySection {
   daysRange: string;
   blocks: ItineraryBlock[];
   galleryImages: string[];
-}
-
-// ─── Image Carousel (for day cards with multiple images) ────────────────────
-
-const CURSOR_LEFT = 'url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22%3E%3Cpolyline points=%2215 18 9 12 15 6%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E") 12 12, auto';
-const CURSOR_RIGHT = 'url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22%3E%3Cpolyline points=%229 18 15 12 9 6%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E") 12 12, auto';
-
-function ImageCarousel({ images, alt }: { images: string[]; alt: string }) {
-  if (!images || images.length === 0) {
-    return <div style={{ width: '100%', height: '100%', background: '#ddd', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: '12px', color: '#aaa' }}>No Image</span></div>;
-  }
-
-  const [current, setCurrent] = React.useState(0);
-  const [mouseOnLeft, setMouseOnLeft] = React.useState(false);
-  const [mouseInside, setMouseInside] = React.useState(false);
-  const [animKey, setAnimKey] = React.useState(0);
-  const [direction, setDirection] = React.useState<'next' | 'prev'>('next');
-  const [animating, setAnimating] = React.useState(false);
-  const [prev, setPrev] = React.useState<number | null>(null);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const lastMousePos = React.useRef({ x: 0, y: 0 });
-  const touchStartX = React.useRef(0);
-  const touchStartY = React.useRef(0);
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      if (!mouseInside || !containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const { x, y } = lastMousePos.current;
-      const stillInside = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-      if (!stillInside) {
-        setMouseInside(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [mouseInside]);
-
-  const navigate = (dir: 'next' | 'prev') => {
-    if (animating) return;
-    const nextIdx = dir === 'next'
-      ? (current + 1) % images.length
-      : (current - 1 + images.length) % images.length;
-    setDirection(dir);
-    setPrev(current);
-    setCurrent(nextIdx);
-    setAnimKey(k => k + 1);
-    setAnimating(true);
-    setTimeout(() => {
-      setPrev(null);
-      setAnimating(false);
-    }, 460);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    lastMousePos.current = { x: e.clientX, y: e.clientY };
-    setMouseInside(true);
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    setMouseOnLeft(e.clientX - rect.left < rect.width / 2);
-  };
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(mouseOnLeft ? 'prev' : 'next');
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    const dy = e.changedTouches[0].clientY - touchStartY.current;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
-      e.stopPropagation();
-      navigate(dx < 0 ? 'next' : 'prev');
-    }
-  };
-
-  const exitTo = direction === 'next' ? '-100%' : '100%';
-  const enterFrom = direction === 'next' ? '100%' : '-100%';
-
-  return (
-    <div
-      ref={containerRef}
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-        overflow: 'hidden',
-        cursor: mouseInside ? (mouseOnLeft ? CURSOR_LEFT : CURSOR_RIGHT) : 'default',
-        background: '#000',
-      }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => setMouseInside(false)}
-      onClick={handleClick}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      <style>{`
-        @keyframes carousel-slide-in-${animKey} {
-          from { transform: translateX(${enterFrom}); }
-          to   { transform: translateX(0%); }
-        }
-        @keyframes carousel-slide-out-${animKey} {
-          from { transform: translateX(0%); }
-          to   { transform: translateX(${exitTo}); }
-        }
-      `}</style>
-      {images.map((src, idx) => {
-        const isCurrent = idx === current;
-        const isExiting = idx === prev;
-        let animStyle: React.CSSProperties = {};
-        if (isCurrent && prev !== null) {
-          animStyle = {
-            animation: `carousel-slide-in-${animKey} 0.45s cubic-bezier(0.4,0,0.2,1) forwards`,
-            zIndex: 2,
-          };
-        } else if (isExiting) {
-          animStyle = {
-            animation: `carousel-slide-out-${animKey} 0.45s cubic-bezier(0.4,0,0.2,1) forwards`,
-            zIndex: 1,
-          };
-        } else if (isCurrent) {
-          animStyle = { transform: 'translateX(0%)', zIndex: 2 };
-        } else {
-          animStyle = { transform: 'translateX(100%)', zIndex: 0 };
-        }
-        return (
-          <img
-            key={idx}
-            src={src}
-            alt={alt}
-            draggable={false}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block',
-              pointerEvents: 'none',
-              ...animStyle,
-            }}
-          />
-        );
-      })}
-      {images.length > 1 && (
-        <div style={{
-          position: 'absolute',
-          bottom: '12px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          gap: '6px',
-          zIndex: 10,
-          pointerEvents: 'none',
-        }}>
-          {images.map((_, idx) => (
-            <div key={idx} style={{
-              width: '7px',
-              height: '7px',
-              borderRadius: '50%',
-              background: idx === current ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.45)',
-              transition: 'background 0.3s',
-            }} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
 }
 
 // ─── Gallery Strip ────────────────────────────────────────────────────────────
@@ -309,9 +136,81 @@ function GalleryStrip({ images }: { images: string[] }) {
 
 // ─── Image Carousel ───────────────────────────────────────────────────────────
 
+const CURSOR_LEFT = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Ccircle cx='15' cy='15' r='14' fill='rgba(0%2C0%2C0%2C0.45)'/%3E%3Cpolyline points='17%2C10 12%2C15 17%2C20' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") 15 15, w-resize`;
+const CURSOR_RIGHT = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Ccircle cx='15' cy='15' r='14' fill='rgba(0%2C0%2C0%2C0.45)'/%3E%3Cpolyline points='13%2C10 18%2C15 13%2C20' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") 15 15, e-resize`;
 
+function ImageCarousel({ images, alt }: { images: string[]; alt: string }) {
+  const [current, setCurrent] = useState(0);
+  const [mouseOnLeft, setMouseOnLeft] = useState(false);
+  const [mouseInside, setMouseInside] = useState(false);
+  const [animKey, setAnimKey] = useState(0);
+  const [direction, setDirection] = useState<'next' | 'prev'>('next');
+  const [animating, setAnimating] = useState(false);
+  const [prev, setPrev] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lastMousePos = useRef({ x: 0, y: 0 });
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!mouseInside || !containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const { x, y } = lastMousePos.current;
+      if (!(x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom)) setMouseInside(false);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [mouseInside]);
 
+  const navigate = (dir: 'next' | 'prev') => {
+    if (animating || images.length <= 1) return;
+    const nextIdx = dir === 'next' ? (current + 1) % images.length : (current - 1 + images.length) % images.length;
+    setDirection(dir);
+    setPrev(current);
+    setCurrent(nextIdx);
+    setAnimKey(k => k + 1);
+    setAnimating(true);
+    setTimeout(() => { setPrev(null); setAnimating(false); }, 460);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    lastMousePos.current = { x: e.clientX, y: e.clientY };
+    setMouseInside(true);
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setMouseOnLeft(e.clientX - rect.left < rect.width / 2);
+  };
+
+  const handleClick = (e: React.MouseEvent) => { e.stopPropagation(); navigate(mouseOnLeft ? 'prev' : 'next'); };
+  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; touchStartY.current = e.touches[0].clientY; };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) { e.stopPropagation(); navigate(dx < 0 ? 'next' : 'prev'); }
+  };
+
+  const exitTo = direction === 'next' ? '-100%' : '100%';
+  const enterFrom = direction === 'next' ? '100%' : '-100%';
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', cursor: images.length > 1 ? (mouseInside ? (mouseOnLeft ? CURSOR_LEFT : CURSOR_RIGHT) : 'pointer') : 'default' }}
+      onClick={handleClick} onMouseMove={handleMouseMove} onMouseLeave={() => setMouseInside(false)}
+      onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      {prev !== null && (
+        <img key={`prev-${animKey}`} src={images[prev]} alt={alt} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: `slideOut 460ms cubic-bezier(0.23,1,0.32,1) forwards`, ['--exit-to' as any]: exitTo }} />
+      )}
+      <img key={`curr-${animKey}`} src={images[current]} alt={alt} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: prev !== null ? `slideIn 460ms cubic-bezier(0.23,1,0.32,1) forwards` : 'none', ['--enter-from' as any]: enterFrom }} />
+      {images.length > 1 && (
+        <div style={{ position: 'absolute', bottom: '12px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '6px', zIndex: 10, pointerEvents: 'none' }}>
+          {images.map((_, idx) => (
+            <div key={idx} style={{ width: '7px', height: '7px', borderRadius: '50%', background: idx === current ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.45)', transition: 'background 0.3s' }} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ─── Similar Trips ────────────────────────────────────────────────────────────
 
@@ -700,6 +599,11 @@ export default function ItineraryDetail() {
         )}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.38)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 24px' }}>
+          {itin.place && (
+            <p style={{ fontSize: '13px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', marginBottom: '16px', fontFamily: 'var(--font-sans)' }}>
+              {itin.place}
+            </p>
+          )}
           <h1 style={{ color: '#fff', fontSize: 'clamp(28px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.15, letterSpacing: '0.02em', maxWidth: '800px', marginBottom: '20px', fontFamily: 'var(--font-serif)' }}>
             {itin.name}
           </h1>
@@ -804,7 +708,7 @@ export default function ItineraryDetail() {
                     {section.blocks.map((block, i) => {
                       const imageLeft = i % 2 === 1;
                       const cardHeight = i % 2 === 0 ? '480px' : '510px';
-                      const images = block.images || [];
+                      const images = block.image ? [block.image] : [];
                       return (
                         <div key={block.id}>
                           <div style={{ display: 'flex', flexDirection: imageLeft ? 'row' : 'row-reverse', width: '100%', maxWidth: '964px', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '4px 4px 16px rgba(0,0,0,0.13)', height: cardHeight }}>

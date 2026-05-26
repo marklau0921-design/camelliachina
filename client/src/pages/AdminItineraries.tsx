@@ -15,7 +15,7 @@ export interface ItineraryBlock {
   dayNumber: number;
   title: string;
   description: string;
-  images?: string[];
+  image?: string;
 }
 
 export interface ItinerarySection {
@@ -150,33 +150,8 @@ function BlockEditor({ block, onChange, onDelete }: {
         <FocusTextarea value={block.description} onChange={v => set("description", v)} placeholder="What happens on this day..." rows={4} />
       </div>
       <div>
-        <label style={labelStyle}>Day Images (optional - multiple)</label>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {(block.images || []).map((img, idx) => (
-            <div key={idx} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <ImageUploader value={img} onChange={url => {
-                const newImages = [...(block.images || [])];
-                newImages[idx] = url;
-                set("images", newImages);
-              }} category="itinerary" label="" />
-              <button
-                onClick={() => {
-                  const newImages = (block.images || []).filter((_, i) => i !== idx);
-                  set("images", newImages);
-                }}
-                style={{ padding: '6px 12px', background: '#f5569b', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '12px' }}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-          <button
-            onClick={() => set("images", [...(block.images || []), ""])}
-            style={{ padding: '8px 12px', background: '#2d6a4f', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '12px', alignSelf: 'flex-start' }}
-          >
-            + Add Image
-          </button>
-        </div>
+        <label style={labelStyle}>Day Image (optional)</label>
+        <ImageUploader value={block.image || ""} onChange={url => set("image", url)} category="itinerary" label="" />
       </div>
     </div>
   );
@@ -197,7 +172,7 @@ function SectionEditor({ section, onChange, onDelete, index }: {
     const nextDay = section.blocks.length > 0
       ? Math.max(...section.blocks.map(b => b.dayNumber)) + 1
       : 1;
-    set("blocks", [...section.blocks, { id: genId(), dayNumber: nextDay, title: "", description: "", images: [] }]);
+    set("blocks", [...section.blocks, { id: genId(), dayNumber: nextDay, title: "", description: "", image: "" }]);
   };
 
   const updateBlock = (i: number, b: ItineraryBlock) => {
