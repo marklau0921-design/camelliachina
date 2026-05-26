@@ -274,13 +274,15 @@ export default function AdminCityEdit() {
                 label="Banner Background Image"
               />
             </div>
-            <Field label="Banner Title">
-              <TextInput
-                value={form.bannerTitle}
-                onChange={v => set("bannerTitle", v)}
-                placeholder="e.g. Luxury Holidays & Honeymoons in Chengdu"
-              />
-            </Field>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <Field label="Banner Title">
+                <TextInput
+                  value={form.bannerTitle}
+                  onChange={v => set("bannerTitle", v)}
+                  placeholder="e.g. Luxury Holidays & Honeymoons in Chengdu"
+                />
+              </Field>
+            </div>
             <div style={{ gridColumn: "1 / -1" }}>
               <ImageUploader
                 value={form.cityCardImage}
