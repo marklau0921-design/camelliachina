@@ -1,4 +1,5 @@
 import { Youtube, Facebook, Instagram } from 'lucide-react';
+import { trpc } from '@/lib/trpc';
 
 /**
  * Footer Component
@@ -6,6 +7,7 @@ import { Youtube, Facebook, Instagram } from 'lucide-react';
  * Reference: WildChina footer layout with brand logo on left
  */
 export default function Footer() {
+  const { data: homepageAssets } = trpc.cms.getHomepageAssets.useQuery();
   return (
     <footer className="bg-[#1a1a1a] text-white">
       <div className="w-full flex justify-center py-16">
@@ -15,12 +17,21 @@ export default function Footer() {
           
           {/* Brand Column */}
           <div className="flex items-center">
-            <img 
-              src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=800&fit=crop"
-              alt="MORA"
-              className="h-20 object-contain"
-              style={{ backgroundColor: 'transparent' }}
-            />
+            {homepageAssets?.logo ? (
+              <img 
+                src={homepageAssets.logo.url}
+                alt="Logo"
+                className="h-20 object-contain"
+                style={{ backgroundColor: 'transparent' }}
+              />
+            ) : (
+              <img 
+                src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=800&fit=crop"
+                alt="Logo"
+                className="h-20 object-contain"
+                style={{ backgroundColor: 'transparent' }}
+              />
+            )}
           </div>
 
           {/* Contact Column */}
@@ -39,8 +50,8 @@ export default function Footer() {
               {/* Email */}
               <div>
                 <p className="text-sm font-light mb-2 text-white/80">✉️ Email:</p>
-                <a href="mailto:info@intochina.com" className="text-sm text-white/70 hover:text-[#D4AF37] transition-colors">
-                  info@intochina.com
+                <a href="mailto:info@wayseekchina.com" className="text-sm text-white/70 hover:text-[#D4AF37] transition-colors">
+                  info@wayseekchina.com
                 </a>
               </div>
             </div>
@@ -105,7 +116,7 @@ export default function Footer() {
         {/* Bottom Copyright */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-white/40 tracking-wide">
-            INTO CHINA TRIP | COPYRIGHT 2026 | ALL RIGHTS RESERVED
+            wayseekchina | COPYRIGHT 2026 | ALL RIGHTS RESERVED
           </p>
           <div className="flex gap-8 text-xs text-white/40">
             <a href="#" className="hover:text-white/70 transition-colors tracking-wide">TERMS & CONDITIONS</a>
