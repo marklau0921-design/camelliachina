@@ -579,7 +579,17 @@ export default function AdminItineraries() {
                 price: itinDetail.price || "",
                 howLong: itinDetail.howLong || "",
                 days: itinDetail.days,
-                sections: Array.isArray(itinDetail.sections) ? itinDetail.sections : [],
+                sections: (() => {
+                  if (Array.isArray(itinDetail.sections)) return itinDetail.sections;
+                  if (typeof itinDetail.sections === 'string') {
+                    try {
+                      return JSON.parse(itinDetail.sections);
+                    } catch (e) {
+                      return [];
+                    }
+                  }
+                  return [];
+                })(),
                 isActive: itinDetail.isActive,
                 sortOrder: itinDetail.sortOrder ?? 0,
                 tagIds: itinDetail.tagIds || [],
