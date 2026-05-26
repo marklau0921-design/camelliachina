@@ -243,7 +243,7 @@ function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
       id: itin.id,
       nights: itin.days,
       title: itin.name,
-      buttonText: 'EXPLORE TRIP',
+      buttonText: 'Explore Trip',
       image: itin.coverImage || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
     }));
 
