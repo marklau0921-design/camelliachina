@@ -193,7 +193,7 @@ export default function WhyUs() {
 
     const imageBlock = slide.isCover ? (
       <div style={{ width: '100%', height: '100%', background: '#00a0a6', position: 'relative' }}>
-        {/* Texture overlay - empty for now */}
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: '', backgroundRepeat: 'repeat', backgroundSize: '300px 300px' }} />
       </div>
     ) : (
       <>
@@ -216,7 +216,7 @@ export default function WhyUs() {
               paddingLeft: 'clamp(40px,8vw,120px)', paddingRight: '40px',
               willChange: 'transform', animation: anim('left'),
             }}>
-              {/* Texture overlay - empty for now */}
+              <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: '', backgroundRepeat: 'repeat', backgroundSize: '300px 300px', pointerEvents: 'none' }} />
               {textBlock.props.children}
             </div>
           ) : (
@@ -239,7 +239,7 @@ export default function WhyUs() {
               paddingLeft: 'clamp(40px,5vw,80px)', paddingRight: '40px',
               willChange: 'transform', animation: anim('right'),
             }}>
-              {/* Texture overlay - empty for now */}
+              <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: '', backgroundRepeat: 'repeat', backgroundSize: '300px 300px', pointerEvents: 'none' }} />
               {textBlock.props.children}
             </div>
           ) : (

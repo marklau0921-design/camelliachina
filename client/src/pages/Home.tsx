@@ -12,7 +12,6 @@ import PlanYourTrip from '@/pages/PlanYourTrip';
 import ResponsiveImage from '@/components/ResponsiveImage';
 import { Link, useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
-import BackgroundImageContainer from '@/components/BackgroundImageContainer';
 
 
 /**
@@ -247,22 +246,16 @@ export default function Home() {
       <PlanYourTrip />
 
       {/* Explore Our Trips Section - native DOM scrollLeft, zero jank */}
-      <BackgroundImageContainer
-        imageUrl={activeCta || activeBanners[0]}
+      <div
         className="w-full relative flex flex-col lg:flex-row lg:items-center"
         style={{
           minHeight: '680px',
           paddingTop: '50px',
           paddingBottom: '50px',
+          backgroundImage: `url(${activeCta || activeBanners[0]})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'scroll',
-        }}
-        blankStyle={{
-          minHeight: '680px',
-          paddingTop: '50px',
-          paddingBottom: '50px',
-          backgroundColor: 'transparent',
         }}
       >
         {/* Dark frosted glass overlay */}
@@ -372,7 +365,7 @@ export default function Home() {
             <ChevronRight size={20} color="white" strokeWidth={2} />
           </button>
         )}
-      </BackgroundImageContainer>
+      </div>
 
       {/* Discover China Carousel Section */}
       <CarouselSection />

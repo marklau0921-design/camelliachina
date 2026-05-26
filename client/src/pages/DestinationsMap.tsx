@@ -32,8 +32,9 @@ export default function DestinationsMap() {
 
       {/* Map Section - Full Page with Background */}
       <section 
-        className="flex-1 w-full pb-16 relative bg-black"
+        className="flex-1 w-full pb-16 relative"
         style={{
+          backgroundImage: ', ',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed'

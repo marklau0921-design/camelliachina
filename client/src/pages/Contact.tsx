@@ -96,8 +96,7 @@ function ContactPartnerLogos() {
 
   return (
     <section style={{ position: 'relative', width: '100%', height: '260px', backgroundColor: '#315c00', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
-      {/* Texture overlay - empty for now */}
-      {/* Hidden image to detect if texture loads */}
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: '', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
       <div style={{ position: 'relative', zIndex: 1, width: '100%', overflow: 'hidden' }}>
         <div
           ref={trackRef}

@@ -83,9 +83,9 @@ export default function Experiences() {
       {/* Hero Section */}
       <section className="relative w-full h-96 mt-20 overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-gray-800"
+          className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: undefined
+            backgroundImage: `url(''), url('')`
           }}
         >
           <div className="absolute inset-0 bg-black/50"></div>
