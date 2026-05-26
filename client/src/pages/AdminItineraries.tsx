@@ -295,10 +295,11 @@ function ItineraryForm({ initial, onSave, onCancel, saving, title }: {
   const [form, setForm] = useState<typeof emptyForm>(initial);
   const set = <K extends keyof typeof emptyForm>(k: K, v: (typeof emptyForm)[K]) => setForm(f => ({ ...f, [k]: v }));
 
-  const totalDays = form.sections.reduce((acc, s) => acc + s.blocks.length, 0);
+  const totalDays = (Array.isArray(form.sections) ? form.sections : []).reduce((acc, s) => acc + s.blocks.length, 0);
 
   const addSection = () => {
-    set("sections", [...form.sections, { id: genId(), title: "", description: "", daysRange: "", blocks: [], galleryImages: [] }]);
+    const currentSections = Array.isArray(form.sections) ? form.sections : [];
+    set("sections", [...currentSections, { id: genId(), title: "", description: "", daysRange: "", blocks: [], galleryImages: [] }]);
   };
 
   const SaveBar = () => (
