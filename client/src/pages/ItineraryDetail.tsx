@@ -496,7 +496,7 @@ export default function ItineraryDetail() {
 
       {/* ── ENQUIRE CTA ── */}
       <section style={{ position: 'relative', width: '100%', height: 'clamp(260px, 30vw, 275px)', backgroundColor: '#a84900', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: '', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
+        {/* Texture overlay - empty for now */}
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '28px', textAlign: 'center', padding: '0 24px' }}>
           <h2 style={{ fontFamily: 'AlternateGotNo1D', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, color: '#ffffff', letterSpacing: '0.05em', textTransform: 'uppercase', margin: 0, lineHeight: 1.1 }}>
             So, ready to start?

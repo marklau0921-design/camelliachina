@@ -155,15 +155,25 @@ export default function OurTeam() {
       `}</style>
       <Navigation />
       <div style={{ height: '218px', background: '#3d9e8c', position: 'relative', overflow: 'hidden' }}>
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: `url(${ctaBg || ''})`,
-          backgroundSize: '400px 400px',
-          backgroundRepeat: 'repeat',
-          opacity: 0.65,
-          mixBlendMode: 'multiply',
-        }} />
+        {ctaBg && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${ctaBg})`,
+            backgroundSize: '400px 400px',
+            backgroundRepeat: 'repeat',
+            opacity: 0.65,
+            mixBlendMode: 'multiply',
+          }} />
+        )}
+        {/* Hidden image to detect if texture loads */}
+        {ctaBg && (
+          <img
+            src={ctaBg}
+            alt=""
+            style={{ display: 'none' }}
+          />
+        )}
       </div>
       {members.map((member, index) => <TeamMemberSection key={member.id} member={member} index={index} />)}
       <Footer />

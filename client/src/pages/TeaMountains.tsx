@@ -641,18 +641,7 @@ export default function TeaMountains() {
           justifyContent: 'center',
         }}
       >
-        {/* Texture overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: '',
-            backgroundSize: '400px 400px',
-            backgroundRepeat: 'repeat',
-            opacity: 0.65,
-            mixBlendMode: 'multiply',
-          }}
-        />
+        {/* Texture overlay - empty for now */}
         {/* Content */}
         <div
           style={{

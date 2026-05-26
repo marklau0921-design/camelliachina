@@ -765,18 +765,7 @@ export default function Sichuan() {
           paddingRight: '40px',
         }}
       >
-        {/* Texture overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: '',
-            backgroundSize: '400px 400px',
-            backgroundRepeat: 'repeat',
-            opacity: 0.65,
-            mixBlendMode: 'multiply',
-          }}
-        />
+        {/* Texture overlay - empty for now */}
 
         {/* Content - Text Left */}
         <div

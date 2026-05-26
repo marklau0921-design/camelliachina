@@ -189,9 +189,8 @@ export default function SichuanDetail() {
 
       {/* Hero Section */}
       <section 
-        className="relative h-[70vh] w-full"
+        className="relative h-[70vh] w-full bg-gray-800"
         style={{
-          backgroundImage: ', ',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
