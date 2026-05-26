@@ -96,6 +96,8 @@ const cityInput = z.object({
   slug: z.string().optional(),
   description: z.string().optional(),
   coverImage: z.string().optional(),
+  // Banner section
+  bannerTitle: z.string().optional(),
   // City card image for Other Popular Destinations
   cityCardImage: z.string().optional(),
   // Introduction section
