@@ -1,5 +1,6 @@
 import { Link } from 'wouter';
 import { trpc } from '@/lib/trpc';
+import BackgroundImageContainer from '@/components/BackgroundImageContainer';
 
 export default function ReadyToStart() {
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
@@ -19,17 +20,27 @@ export default function ReadyToStart() {
       }}
     >
       {/* Texture overlay */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: `url(${ctaBg || ''})`,
-          backgroundSize: '400px 400px',
-          backgroundRepeat: 'repeat',
-          opacity: 0.65,
-          mixBlendMode: 'multiply',
-        }}
-      />
+      {ctaBg && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${ctaBg})`,
+            backgroundSize: '400px 400px',
+            backgroundRepeat: 'repeat',
+            opacity: 0.65,
+            mixBlendMode: 'multiply',
+          }}
+        />
+      )}
+      {/* Hidden image to detect if texture loads */}
+      {ctaBg && (
+        <img
+          src={ctaBg}
+          alt=""
+          style={{ display: 'none' }}
+        />
+      )}
 
       {/* Content */}
       <div

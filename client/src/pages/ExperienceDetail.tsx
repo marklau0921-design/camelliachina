@@ -10,6 +10,7 @@ import { Link, useParams } from 'wouter';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { trpc } from '@/lib/trpc';
+import BackgroundImageContainer from '@/components/BackgroundImageContainer';
 
 // ── Helper to convert type name to slug ──────────────────────────────────────
 function toSlug(str: string): string {
@@ -261,8 +262,12 @@ function SimilarCarousel({ items, bgImage }: { items: any[]; bgImage: string }) 
   if (!items || items.length === 0) return null;
 
   return (
-    <div className="w-full relative flex flex-col lg:flex-row lg:items-center"
-      style={{ minHeight: '680px', paddingTop: '50px', paddingBottom: '50px', backgroundImage: `url(${bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+    <BackgroundImageContainer
+      imageUrl={bgImage}
+      className="w-full relative flex flex-col lg:flex-row lg:items-center"
+      style={{ minHeight: '680px', paddingTop: '50px', paddingBottom: '50px', backgroundSize: 'cover', backgroundPosition: 'center' }}
+      blankStyle={{ minHeight: '680px', paddingTop: '50px', paddingBottom: '50px', backgroundColor: 'transparent' }}
+    >
       <div className="absolute inset-0" style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', backgroundColor: 'rgba(10,10,10,0.85)', zIndex: 0 }} />
 
       <div className="lg:hidden w-full px-6 mb-6 relative z-10">
@@ -352,7 +357,7 @@ function SimilarCarousel({ items, bgImage }: { items: any[]; bgImage: string }) 
           <ChevronRight size={20} color="white" strokeWidth={2} />
         </button>
       )}
-    </div>
+    </BackgroundImageContainer>
   );
 }
 
