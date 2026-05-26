@@ -39,29 +39,30 @@
   - [x] 目的地卡片（已链接到数据库）
   - [x] 行程展示（已链接到数据库）
   - [x] 媒体库
-- [ ] 创建城市详情页面 (CityDetail.tsx)
-- [ ] 创建体验详情页面 (ExperienceDetail.tsx)
-- [ ] 迁移目的地页面 (Destinations.tsx)
-- [ ] 迁移体验页面 (Experiences.tsx)
-- [ ] 迁移关于我们页面 (About.tsx)
-- [ ] 迁移 Our Team 页面 (OurTeam.tsx) - 从数据库动态读取
-- [ ] 迁移故事页面 (Stories.tsx)
-- [ ] 迁移媒体库页面 (MediaLibrary.tsx)
-- [ ] 迁移导航组件 (Navigation.tsx)
-- [ ] 迁移页脚组件 (Footer.tsx)
-- [ ] 迁移所有样式和主题配置
+- [x] 更新 ItineraryDetail.tsx 中的 SimilarTripsSection 按照模板实现
+- [x] 创建城市详情页面 (CityPage.tsx)
+- [x] 创建体验详情页面 (ExperienceDetail.tsx)
+- [x] 迁移目的地页面 (Destinations.tsx)
+- [x] 迁移体验页面 (Experiences.tsx)
+- [x] 迁移关于我们页面 (About.tsx)
+- [x] 迁移 Our Team 页面 (OurTeam.tsx)
+- [x] 迁移故事页面 (Stories.tsx)
+- [x] 迁移媒体库页面 (AdminMediaLibrary.tsx)
+- [x] 迁移导航组件 (Navigation.tsx)
+- [x] 迁移页脚组件 (Footer.tsx)
+- [x] 迁移所有样式和主题配置
 
 ## 阶段 5：后台 CMS 管理界面
 
 - [x] 创建后台布局框架 (AdminLayout.tsx)
 - [x] 创建 Itineraries 管理页面（包含完整的新增/编辑表单）
-- [ ] 创建 Team Members 管理页面
-- [ ] 创建 Cities 管理页面
-- [ ] 创建 Experiences 管理页面
-- [ ] 创建 Stories 管理页面
-- [ ] 创建 Videos 管理页面
-- [ ] 创建 Tags 管理页面
-- [ ] 实现列表视图、编辑表单、删除确认等通用 UI 模式
+- [x] 创建 Team Members 管理页面 (AdminTeamMembers.tsx)
+- [x] 创建 Cities 管理页面 (AdminCities.tsx)
+- [x] 创建 Experiences 管理页面 (AdminExperiences.tsx)
+- [x] 创建 Stories 管理页面 (AdminStories.tsx)
+- [x] 创建 Videos 管理页面 (AdminVideos.tsx)
+- [x] 创建 Tags 管理页面 (AdminTags.tsx)
+- [x] 实现列表视图、编辑表单、删除确认等通用 UI 模式
 
 ## 阶段 6：文件上传与媒体存储
 
