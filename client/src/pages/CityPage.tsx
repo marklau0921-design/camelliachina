@@ -782,9 +782,9 @@ function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
             style={{ width: '220px', height: '320px' }}
             onClick={() => { if (!isDragging) navigate(`/destinations/${dest.slug}`); }}
           >
-            {dest.coverImage && (
+            {dest.cityCardImage && (
               <img
-                src={dest.coverImage}
+                src={dest.cityCardImage}
                 alt={dest.name}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 draggable={false}
