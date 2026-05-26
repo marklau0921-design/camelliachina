@@ -438,7 +438,7 @@ function ItineraryForm({ initial, onSave, onCancel, saving, title }: {
             </div>
           )}
 
-          {form.sections.map((section, i) => (
+          {(Array.isArray(form.sections) ? form.sections : []).map((section, i) => (
             <SectionEditor
               key={section.id}
               section={section}
@@ -579,7 +579,7 @@ export default function AdminItineraries() {
                 price: itinDetail.price || "",
                 howLong: itinDetail.howLong || "",
                 days: itinDetail.days,
-                sections: (itinDetail.sections as ItinerarySection[]) || [],
+                sections: Array.isArray(itinDetail.sections) ? itinDetail.sections : [],
                 isActive: itinDetail.isActive,
                 sortOrder: itinDetail.sortOrder ?? 0,
                 tagIds: itinDetail.tagIds || [],
