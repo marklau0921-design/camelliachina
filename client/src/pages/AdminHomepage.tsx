@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import ImageUploader from "@/components/ImageUploader";
+import MultiImageUploader from "@/components/MultiImageUploader";
 import AdminLayout from "@/components/AdminLayout";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -15,14 +16,14 @@ interface VideoStoryForm {
 
 interface SponsorForm {
   name: string;
-  logoUrl: string;
+  logoUrls: string[];
   websiteUrl: string;
   isVisible: boolean;
   sortOrder: number;
 }
 
 const emptyVideoStory: VideoStoryForm = { title: "", youtubeId: "", thumbnailUrl: "", isVisible: true, sortOrder: 0 };
-const emptySponsor: SponsorForm = { name: "", logoUrl: "", websiteUrl: "", isVisible: true, sortOrder: 0 };
+const emptySponsor: SponsorForm = { name: "", logoUrls: [], websiteUrl: "", isVisible: true, sortOrder: 0 };
 
 // ─── Section Header ───────────────────────────────────────────────────────────
 function SectionHeader({ title, visible, onToggle }: { title: string; visible: boolean; onToggle: () => void }) {
@@ -169,12 +170,12 @@ function SponsorModal({ initial, onSave, onClose }: { initial?: SponsorForm & { 
         <h3 style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 24, color: "#1a1a1a" }}>
           {initial?.id ? "Edit Sponsor Logo" : "Add Sponsor Logo"}
         </h3>
-        <Field label="Logo Image">
-          <ImageUploader value={form.logoUrl} onChange={v => set("logoUrl", v ?? "")} category="homepage" />
+        <Field label="Logo Images">
+          <MultiImageUploader value={form.logoUrls} onChange={v => set("logoUrls", v)} category="homepage" />
         </Field>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 24 }}>
           <button style={btnSecondary} onClick={onClose}>Cancel</button>
-          <button style={btnPrimary} onClick={() => { if (!form.logoUrl) return; onSave({ ...form, id: initial?.id }); }}>Save</button>
+          <button style={btnPrimary} onClick={() => { if (form.logoUrls.length === 0) return; onSave({ ...form, id: initial?.id }); }}>Save</button>
         </div>
       </div>
     </div>

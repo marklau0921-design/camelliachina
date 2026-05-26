@@ -1483,30 +1483,30 @@ export const appRouter = router({
     createSponsor: publicProcedure
       .input(z.object({
         name: z.string().min(1),
-        logoUrl: z.string().min(1),
+        logoUrls: z.array(z.string()).min(1),
         websiteUrl: z.string().optional(),
         isVisible: z.boolean().default(true),
         sortOrder: z.number().default(0),
       }))
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);
-        return createHomepageSponsor({ name: input.name, logo: input.logoUrl, url: input.websiteUrl, isVisible: input.isVisible, sortOrder: input.sortOrder });
+        return createHomepageSponsor({ name: input.name, logoUrls: JSON.stringify(input.logoUrls), websiteUrl: input.websiteUrl, isVisible: input.isVisible, sortOrder: input.sortOrder });
       }),
     updateSponsor: publicProcedure
       .input(z.object({
         id: z.number(),
         name: z.string().optional(),
-        logoUrl: z.string().optional(),
+        logoUrls: z.array(z.string()).optional(),
         websiteUrl: z.string().optional(),
         isVisible: z.boolean().optional(),
         sortOrder: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);
-        const { id, logoUrl, websiteUrl, ...rest } = input;
+        const { id, logoUrls, websiteUrl, ...rest } = input;
         const data: Record<string, any> = { ...rest };
-        if (logoUrl !== undefined) data.logo = logoUrl;
-        if (websiteUrl !== undefined) data.url = websiteUrl;
+        if (logoUrls !== undefined) data.logoUrls = JSON.stringify(logoUrls);
+        if (websiteUrl !== undefined) data.websiteUrl = websiteUrl;
         return updateHomepageSponsor(id, data);
       }),
     deleteSponsor: publicProcedure
