@@ -706,7 +706,18 @@ export async function getHomepageHero() {
   const db = await getDb();
   if (!db) return null;
   const rows = await db.select().from(homepageHero).limit(1);
-  return rows[0] ?? null;
+  if (rows.length > 0) return rows[0];
+  
+  // Auto-create default record if missing
+  const defaultData = {
+    isVisible: true,
+    backgroundImage: null,
+    title: "THE LUXURY TRAVEL EXPERTS",
+    subtitle: "TAILOR-MADE TRIPS, AWARD WINNING SERVICE. EST. 2005.",
+  };
+  await db.insert(homepageHero).values(defaultData);
+  const newRows = await db.select().from(homepageHero).limit(1);
+  return newRows[0] ?? null;
 }
 export async function upsertHomepageHero(data: Partial<HomepageHero>) {
   const db = await getDb();
@@ -731,7 +742,17 @@ export async function getHomepageIntro() {
   const db = await getDb();
   if (!db) return null;
   const rows = await db.select().from(homepageIntro).limit(1);
-  return rows[0] ?? null;
+  if (rows.length > 0) return rows[0];
+  
+  // Auto-create default record if missing
+  const defaultData = {
+    isVisible: true,
+    title: "THE LUXURY TRAVEL EXPERTS",
+    content: "",
+  };
+  await db.insert(homepageIntro).values(defaultData);
+  const newRows = await db.select().from(homepageIntro).limit(1);
+  return newRows[0] ?? null;
 }
 export async function upsertHomepageIntro(data: Partial<HomepageIntro>) {
   const db = await getDb();
@@ -805,7 +826,18 @@ export async function getHomepageStorySection(sectionType: "image" | "video"): P
   const db = await getDb();
   if (!db) return null;
   const rows = await db.select().from(homepageStorySections).where(eq(homepageStorySections.sectionType, sectionType)).limit(1);
-  return rows[0] ?? null;
+  if (rows.length > 0) return rows[0];
+  
+  // Auto-create default record if missing
+  const defaultData = {
+    sectionType,
+    title: "Stories From the Road",
+    subtitle: "Real stories. Meaningful journeys.",
+    isVisible: true,
+  };
+  await db.insert(homepageStorySections).values(defaultData);
+  const newRows = await db.select().from(homepageStorySections).where(eq(homepageStorySections.sectionType, sectionType)).limit(1);
+  return newRows[0] ?? null;
 }
 export async function upsertHomepageStorySection(sectionType: "image" | "video", data: Partial<InsertHomepageStorySection>) {
   const db = await getDb();
@@ -831,7 +863,22 @@ export async function listHomepageStoriesByType(type: "image" | "video") {
 export async function listAboutSections() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(aboutSections).orderBy(aboutSections.sortOrder);
+  const rows = await db.select().from(aboutSections).orderBy(aboutSections.sortOrder);
+  
+  // Auto-create default record if table is empty
+  if (rows.length === 0) {
+    const defaultData = {
+      name: "About Us",
+      slug: "about-us",
+      isVisible: true,
+      sortOrder: 0,
+    };
+    await db.insert(aboutSections).values(defaultData);
+    const newRows = await db.select().from(aboutSections).orderBy(aboutSections.sortOrder);
+    return newRows;
+  }
+  
+  return rows;
 }
 
 export async function createAboutSection(data: Omit<InsertAboutSection, "id" | "createdAt" | "updatedAt">) {
@@ -860,7 +907,22 @@ export async function deleteAboutSection(id: number) {
 export async function listWhyUsSections() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(whyUsSections).orderBy(whyUsSections.sortOrder);
+  const rows = await db.select().from(whyUsSections).orderBy(whyUsSections.sortOrder);
+  
+  // Auto-create default record if table is empty
+  if (rows.length === 0) {
+    const defaultData = {
+      title: "Why Choose Us",
+      content: "",
+      image: null,
+      sortOrder: 0,
+    };
+    await db.insert(whyUsSections).values(defaultData);
+    const newRows = await db.select().from(whyUsSections).orderBy(whyUsSections.sortOrder);
+    return newRows;
+  }
+  
+  return rows;
 }
 
 export async function createWhyUsSection(data: Omit<InsertWhyUsSection, "id" | "createdAt" | "updatedAt">) {
