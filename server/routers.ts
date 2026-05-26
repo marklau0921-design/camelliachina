@@ -17,7 +17,7 @@ import {
   createMediaAsset, listMediaAssets, listHomepageAssets, getActiveHomepageAsset, getActiveBanners,
   setAssetActive, updateAssetSortOrder, replaceMediaAsset, deleteMediaAsset, getMediaAsset,
 } from "./db-media";
-import { storagePut, UPLOADS_ROOT } from "./storage";
+import { storagePut, UPLOADS_ROOT, storageDelete } from "./storage";
 import { generateStaticPages, generateNavData, clearStaticCache, STATIC_CACHE_DIR } from "./staticGenerator";
 import {
   listTags, createTag, updateTag, deleteTag,
@@ -1137,10 +1137,10 @@ export const appRouter = router({
 
     // 列出所有媒体资产（支持搜索）
     list: publicProcedure
-      .input(z.object({ search: z.string().optional() }))
+      .input(z.object({ search: z.string().optional(), assetType: z.enum(["logo", "banner", "cta", "general"]).optional() }))
       .query(async ({ ctx, input }) => {
         await requireAdmin(ctx);
-        return listMediaAssets(input.search);
+        return listMediaAssets(input.search, input.assetType);
       }),
 
     // 列出 Homepage Assets（按类型）
@@ -1222,6 +1222,31 @@ export const appRouter = router({
         }
         await deleteMediaAsset(input.id);
         return { success: true };
+      }),
+
+    // 批量删除媒体资产
+    batchDelete: publicProcedure
+      .input(z.object({ ids: z.array(z.number()) }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        for (const id of input.ids) {
+          const asset = await getMediaAsset(id);
+          if (!asset) continue;
+          // 检查引用：sourceUrl 不为空说明被引用
+          if (asset.sourceUrl) {
+            throw new TRPCError({
+              code: "PRECONDITION_FAILED",
+              message: `Image "${asset.filename}" is currently in use.`,
+            });
+          }
+          // 删除本地文件
+          if (asset.storageKey) {
+            const { storageDelete } = await import("./storage");
+            storageDelete(asset.storageKey);
+          }
+          await deleteMediaAsset(id);
+        }
+        return { success: true, deletedCount: input.ids.length };
       }),
   }),
     // ─── Contact form ────────────────────────────────────────────────────────

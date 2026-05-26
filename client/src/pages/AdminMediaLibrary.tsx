@@ -229,6 +229,8 @@ function HomepageAssetsTab() {
 function AllImagesTab() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const utils = trpc.useUtils();
 
@@ -236,6 +238,7 @@ function AllImagesTab() {
   const uploadMut = trpc.media.upload.useMutation({ onSuccess: () => utils.media.list.invalidate() });
   const replaceMut = trpc.media.replace.useMutation({ onSuccess: () => utils.media.list.invalidate() });
   const deleteMut = trpc.media.delete.useMutation({ onSuccess: () => utils.media.list.invalidate(), onError: (err) => alert(err.message) });
+  const batchDeleteMut = trpc.media.batchDelete.useMutation({ onSuccess: () => { utils.media.list.invalidate(); setSelectedIds(new Set()); setShowDeleteConfirm(false); }, onError: (err) => alert(err.message) });
 
   const handleSearch = (val: string) => {
     setSearch(val);
@@ -251,6 +254,29 @@ function AllImagesTab() {
   const handleReplace = async (id: number, file: File) => {
     const base64 = await fileToBase64(file);
     await replaceMut.mutateAsync({ id, filename: file.name, base64, mimeType: file.type || "image/jpeg" });
+  };
+
+  const toggleSelect = (id: number) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === assets.length && assets.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set((assets as MediaAsset[]).map(a => a.id)));
+    }
+  };
+
+  const handleBatchDelete = async () => {
+    if (selectedIds.size === 0) return;
+    await batchDeleteMut.mutateAsync({ ids: Array.from(selectedIds) });
   };
 
   return (
@@ -274,15 +300,155 @@ function AllImagesTab() {
       ) : assets.length === 0 ? (
         <div style={{ color: "#aaa", fontSize: 13, textAlign: "center", padding: 40 }}>{debouncedSearch ? "No images found." : "No images uploaded yet."}</div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16 }}>
-          {(assets as MediaAsset[]).map((asset) => (
-            <ImageCard
-              key={asset.id}
-              asset={asset as MediaAsset}
-              onDelete={(id) => deleteMut.mutate({ id })}
-              onReplace={handleReplace}
-            />
-          ))}
+        <div>
+          <div style={{ display: "flex", gap: 12, marginBottom: 16, alignItems: "center" }}>
+            <button
+              onClick={toggleSelectAll}
+              style={{
+                padding: "8px 16px",
+                borderRadius: 6,
+                border: "1px solid #ddd",
+                background: selectedIds.size === assets.length && assets.length > 0 ? "#F5569B" : "#fff",
+                color: selectedIds.size === assets.length && assets.length > 0 ? "#fff" : "#333",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+            >
+              {selectedIds.size === assets.length && assets.length > 0 ? "Deselect All" : "Select All"}
+            </button>
+            {selectedIds.size > 0 && (
+              <>
+                <span style={{ fontSize: 13, color: "#666" }}>已选 {selectedIds.size} 张</span>
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: 6,
+                    border: "1px solid #ff4444",
+                    background: "#fff",
+                    color: "#ff4444",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  Delete Selected
+                </button>
+              </>
+            )}
+          </div>
+
+          {showDeleteConfirm && (
+            <div style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.5)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1000,
+            }}>
+              <div style={{
+                background: "#fff",
+                borderRadius: 8,
+                padding: 24,
+                maxWidth: 400,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              }}>
+                <h2 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 12px 0", color: "#1a1a1a" }}>确认删除</h2>
+                <p style={{ fontSize: 14, color: "#666", margin: "0 0 24px 0" }}>确定要删除这 {selectedIds.size} 张图片吗？此操作无法撤销。</p>
+                <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: 6,
+                      border: "1px solid #ddd",
+                      background: "#fff",
+                      color: "#333",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    取消
+                  </button>
+                  <button
+                    onClick={handleBatchDelete}
+                    disabled={batchDeleteMut.isPending}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: 6,
+                      border: "none",
+                      background: "#ff4444",
+                      color: "#fff",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: batchDeleteMut.isPending ? "not-allowed" : "pointer",
+                      opacity: batchDeleteMut.isPending ? 0.6 : 1,
+                    }}
+                  >
+                    {batchDeleteMut.isPending ? "删除中..." : "确认删除"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16 }}>
+            {(assets as MediaAsset[]).map((asset) => (
+              <div
+                key={asset.id}
+                style={{
+                  position: "relative",
+                  border: selectedIds.has(asset.id) ? "3px solid #F5569B" : "1px solid #e8e8e8",
+                  borderRadius: 8,
+                  overflow: "hidden",
+                  background: selectedIds.has(asset.id) ? "#fff0f6" : "#fff",
+                  transition: "all 0.2s",
+                }}
+              >
+                {/* Checkbox */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 8,
+                    left: 8,
+                    width: 20,
+                    height: 20,
+                    background: selectedIds.has(asset.id) ? "#F5569B" : "#fff",
+                    border: selectedIds.has(asset.id) ? "2px solid #F5569B" : "2px solid #ddd",
+                    borderRadius: 4,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    zIndex: 10,
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleSelect(asset.id);
+                  }}
+                >
+                  {selectedIds.has(asset.id) && (
+                    <span style={{ color: "#fff", fontSize: 14, fontWeight: "bold" }}>✓</span>
+                  )}
+                </div>
+
+                {/* Image Card Content */}
+                <div onClick={() => toggleSelect(asset.id)} style={{ cursor: "pointer" }}>
+                  <ImageCard
+                    asset={asset as MediaAsset}
+                    onDelete={(id) => deleteMut.mutate({ id })}
+                    onReplace={handleReplace}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
