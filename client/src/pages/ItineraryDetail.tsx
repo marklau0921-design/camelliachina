@@ -311,78 +311,7 @@ function GalleryStrip({ images }: { images: string[] }) {
 
 
 
-function ImageCarousel({ images, alt }: { images: string[]; alt: string }) {
-  const [current, setCurrent] = useState(0);
-  const [mouseOnLeft, setMouseOnLeft] = useState(false);
-  const [mouseInside, setMouseInside] = useState(false);
-  const [animKey, setAnimKey] = useState(0);
-  const [direction, setDirection] = useState<'next' | 'prev'>('next');
-  const [animating, setAnimating] = useState(false);
-  const [prev, setPrev] = useState<number | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const lastMousePos = useRef({ x: 0, y: 0 });
-  const touchStartX = useRef(0);
-  const touchStartY = useRef(0);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!mouseInside || !containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const { x, y } = lastMousePos.current;
-      if (!(x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom)) setMouseInside(false);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [mouseInside]);
-
-  const navigate = (dir: 'next' | 'prev') => {
-    if (animating || images.length <= 1) return;
-    const nextIdx = dir === 'next' ? (current + 1) % images.length : (current - 1 + images.length) % images.length;
-    setDirection(dir);
-    setPrev(current);
-    setCurrent(nextIdx);
-    setAnimKey(k => k + 1);
-    setAnimating(true);
-    setTimeout(() => { setPrev(null); setAnimating(false); }, 460);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    lastMousePos.current = { x: e.clientX, y: e.clientY };
-    setMouseInside(true);
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    setMouseOnLeft(e.clientX - rect.left < rect.width / 2);
-  };
-
-  const handleClick = (e: React.MouseEvent) => { e.stopPropagation(); navigate(mouseOnLeft ? 'prev' : 'next'); };
-  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; touchStartY.current = e.touches[0].clientY; };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    const dy = e.changedTouches[0].clientY - touchStartY.current;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) { e.stopPropagation(); navigate(dx < 0 ? 'next' : 'prev'); }
-  };
-
-  const exitTo = direction === 'next' ? '-100%' : '100%';
-  const enterFrom = direction === 'next' ? '100%' : '-100%';
-
-  return (
-    <div ref={containerRef} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', cursor: images.length > 1 ? (mouseInside ? (mouseOnLeft ? CURSOR_LEFT : CURSOR_RIGHT) : 'pointer') : 'default' }}
-      onClick={handleClick} onMouseMove={handleMouseMove} onMouseLeave={() => setMouseInside(false)}
-      onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-      {prev !== null && (
-        <img key={`prev-${animKey}`} src={images[prev]} alt={alt} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: `slideOut 460ms cubic-bezier(0.23,1,0.32,1) forwards`, ['--exit-to' as any]: exitTo }} />
-      )}
-      <img key={`curr-${animKey}`} src={images[current]} alt={alt} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: prev !== null ? `slideIn 460ms cubic-bezier(0.23,1,0.32,1) forwards` : 'none', ['--enter-from' as any]: enterFrom }} />
-      {images.length > 1 && (
-        <div style={{ position: 'absolute', bottom: '12px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '6px', zIndex: 10, pointerEvents: 'none' }}>
-          {images.map((_, idx) => (
-            <div key={idx} style={{ width: '7px', height: '7px', borderRadius: '50%', background: idx === current ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.45)', transition: 'background 0.3s' }} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ─── Similar Trips ────────────────────────────────────────────────────────────
 
