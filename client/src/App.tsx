@@ -20,6 +20,8 @@ import FontShowcase from "./pages/FontShowcase";
 import TeaMountains from "./pages/TeaMountains";
 import WhyUs from "./pages/WhyUs";
 import OurTeam from "./pages/OurTeam";
+import Stories from "./pages/Stories";
+import MediaLibrary from "./pages/MediaLibrary";
 import AdminEnquiries from "./pages/AdminEnquiries";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminCities from "./pages/AdminCities";
@@ -74,6 +76,8 @@ function Router() {
       <Route path="/itinerary/:slug" component={ItineraryDetail} />
       <Route path="/about/why-us" component={WhyUs} />
       <Route path="/about/our-team" component={OurTeam} />
+      <Route path="/stories" component={Stories} />
+      <Route path="/media" component={MediaLibrary} />
       <Route path="/experiences/:categorySlug/:id" component={ExperienceDetail} />
       <Route path="/experiences/:categorySlug" component={ExperienceCategoryPage} />
       <Route path="/experience-preview/:slug" component={ExperienceDetail} />

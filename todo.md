@@ -2,10 +2,10 @@
 
 ## 阶段 1：源仓库分析与迁移规划
 
-- [ ] 克隆并分析源仓库 wayseekchinatravel 的目录结构
-- [ ] 识别所有前台页面组件与资源
-- [ ] 列出源仓库中的所有设计资源（图片、字体、样式）
-- [ ] 规划组件迁移映射表
+- [x] 克隆并分析源仓库 wayseekchinatravel 的目录结构
+- [x] 识别所有前台页面组件与资源
+- [x] 列出源仓库中的所有设计资源（图片、字体、样式）
+- [x] 规划组件迁移映射表
 
 ## 阶段 2：数据库 Schema 设计与迁移
 
@@ -39,51 +39,51 @@
   - [x] 目的地卡片（已链接到数据库）
   - [x] 行程展示（已链接到数据库）
   - [x] 媒体库
-- [ ] 创建城市详情页面 (CityDetail.tsx)
-- [ ] 创建体验详情页面 (ExperienceDetail.tsx)
-- [ ] 迁移目的地页面 (Destinations.tsx)
-- [ ] 迁移体验页面 (Experiences.tsx)
-- [ ] 迁移关于我们页面 (About.tsx)
-- [ ] 迁移 Our Team 页面 (OurTeam.tsx) - 从数据库动态读取
+- [x] 创建城市详情页面 (CityDetail.tsx) - 已实现为 CityPage.tsx
+- [x] 创建体验详情页面 (ExperienceDetail.tsx)
+- [x] 迁移目的地页面 (Destinations.tsx)
+- [x] 迁移体验页面 (Experiences.tsx)
+- [x] 迁移关于我们页面 (About.tsx)
+- [x] 迁移 Our Team 页面 (OurTeam.tsx) - 从数据库动态读取
 - [ ] 迁移故事页面 (Stories.tsx)
 - [ ] 迁移媒体库页面 (MediaLibrary.tsx)
-- [ ] 迁移导航组件 (Navigation.tsx)
-- [ ] 迁移页脚组件 (Footer.tsx)
-- [ ] 迁移所有样式和主题配置
+- [x] 迁移导航组件 (Navigation.tsx)
+- [x] 迁移页脚组件 (Footer.tsx)
+- [x] 迁移所有样式和主题配置
 
 ## 阶段 5：后台 CMS 管理界面
 
 - [x] 创建后台布局框架 (AdminLayout.tsx)
 - [x] 创建 Itineraries 管理页面（包含完整的新增/编辑表单）
-- [ ] 创建 Team Members 管理页面
-- [ ] 创建 Cities 管理页面
-- [ ] 创建 Experiences 管理页面
-- [ ] 创建 Stories 管理页面
-- [ ] 创建 Videos 管理页面
-- [ ] 创建 Tags 管理页面
+- [x] 创建 Team Members 管理页面 - 已实现为 AdminAboutOurTeam.tsx
+- [x] 创建 Cities 管理页面 - 已实现为 AdminCities.tsx 和 AdminCityEdit.tsx
+- [x] 创建 Experiences 管理页面 - 已实现为 AdminExperiences.tsx 和 AdminExperienceEdit.tsx
+- [x] 创建 Stories 管理页面 - 已实现为 AdminStories.tsx
+- [x] 创建 Videos 管理页面 - 已实现为 AdminVideos.tsx
+- [x] 创建 Tags 管理页面 - 已实现为 AdminTags.tsx
 - [ ] 实现列表视图、编辑表单、删除确认等通用 UI 模式
 
 ## 阶段 6：文件上传与媒体存储
 
-- [ ] 配置 Manus Storage 集成
-- [ ] 实现头像上传功能
-- [ ] 实现图片上传功能
-- [ ] 实现视频上传功能
-- [ ] 创建文件上传组件
-- [ ] 集成上传进度显示
+- [x] 配置 Manus Storage 集成 - 已在 server/storage.ts 中配置
+- [x] 实现头像上传功能 - 已在 AdminAboutOurTeam.tsx 中实现
+- [x] 实现图片上传功能 - 已在多个 Admin 页面中实现
+- [x] 实现视频上传功能 - 已在 AdminVideos.tsx 中实现
+- [x] 创建文件上传组件 - 已实现为 ImageUploader 和相关组件
+- [x] 集成上传进度显示 - 已集成
 
 ## 阶段 7：认证与权限控制
 
-- [ ] 配置管理员身份验证
-- [ ] 实现后台登录页面
-- [ ] 实现权限检查中间件
-- [ ] 为所有后台路由添加权限保护
-- [ ] 实现会话管理
+- [x] 配置管理员身份验证 - 已通过 Manus OAuth 实现
+- [x] 实现后台登录页面 - 已通过 OAuth 流程实现
+- [x] 实现权限检查中间件 - 已在 server/_core/trpc.ts 中实现
+- [x] 为所有后台路由添加权限保护 - 已在 routers.ts 中实现
+- [x] 实现会话管理 - 已通过 Manus OAuth 实现
 
 ## 阶段 8：测试、优化与首次部署
 
 - [ ] 运行类型检查 (pnpm check)
-- [ ] 运行单元测试 (pnpm test)
+- [x] 运行单元测试 (pnpm test) - 8/8 测试通过
 - [ ] 运行生产构建 (pnpm build)
 - [ ] 验证前台页面正常显示
 - [ ] 验证后台 CMS 功能正常
@@ -127,3 +127,4 @@
 - [x] 前台：主页简介板块从数据库读取（LuxuryTravelExperts.tsx）
 - [x] 前台：CarouselSection Stories 从数据库读取
 - [x] 前台：PartnerLogos 赞助商从数据库读取
+- [x] 前台：所有页面 backgroundImage 处理优化 - 防止加载失败时显示破碎图片
