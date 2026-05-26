@@ -7,7 +7,7 @@ import { trpc } from '@/lib/trpc';
  * Reference: WildChina footer layout with brand logo on left
  */
 export default function Footer() {
-  const { data: homepageAssets } = trpc.cms.getHomepageAssets.useQuery();
+  const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
   return (
     <footer className="bg-[#1a1a1a] text-white">
       <div className="w-full flex justify-center py-16">
