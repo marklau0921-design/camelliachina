@@ -295,9 +295,9 @@ export default function AdminHomepage() {
 
   const handleSponsorSave = (data: SponsorForm & { id?: number }) => {
     if (data.id) {
-      updateSponsor.mutate({ id: data.id, name: data.name, logoUrl: data.logoUrl, websiteUrl: data.websiteUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
+      updateSponsor.mutate({ id: data.id, name: data.name, logoUrls: data.logoUrls, websiteUrl: data.websiteUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
     } else {
-      createSponsor.mutate({ name: data.name, logoUrl: data.logoUrl, websiteUrl: data.websiteUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
+      createSponsor.mutate({ name: data.name, logoUrls: data.logoUrls, websiteUrl: data.websiteUrl || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
     }
   };
 
