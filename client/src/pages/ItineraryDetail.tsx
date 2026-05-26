@@ -361,10 +361,10 @@ function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
       {/* Mobile: Title above carousel */}
       <div className="lg:hidden w-full px-6 mb-6 relative z-10">
         <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: 400, fontSize: '28px', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: '12px', lineHeight: 1.1 }}>
-          Similar Itineraries
+          Explore Our Trips
         </h2>
         <p style={{ fontSize: '13px', color: 'rgba(0,0,0,0.6)', fontStyle: 'italic', lineHeight: 1.6 }}>
-          Explore similar journeys to continue your adventure.
+          Explore our sample trips or get in touch to begin your bespoke adventure.
         </p>
       </div>
 
@@ -392,26 +392,26 @@ function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
         style={{ position: 'relative', zIndex: 1, width: '100%', overflowX: 'scroll', overflowY: 'hidden', cursor: 'grab', userSelect: 'none', paddingLeft: isDesktop ? '60px' : '24px', paddingRight: isDesktop ? '60px' : '24px' } as React.CSSProperties}
       >
         <div style={{ display: 'flex', flexDirection: 'row', gap: '25px', alignItems: 'flex-start', minWidth: 'max-content', paddingBottom: '8px' }}>
-          {/* Desktop left spacing */}
+          {/* 大屏左边 20vw 空白占位，竖屏不显示 */}
           {isDesktop && <div style={{ width: '20vw', flexShrink: 0 }} />}
-          {/* Title block - Desktop only */}
+          {/* Title block - Desktop only (JS controlled) */}
           {isDesktop && (
             <div style={{ width: '260px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingTop: '8px' }}>
               <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: '700', fontSize: '32px', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: '16px', lineHeight: 1.1 }}>
-                Similar Itineraries
+                Explore Our Trips
               </h2>
               <p style={{ fontSize: '14px', color: 'rgba(0,0,0,0.6)', fontStyle: 'italic', lineHeight: 1.6 }}>
-                Explore similar journeys to continue your adventure.
+                Explore our sample trips or get in touch to begin your bespoke adventure.
               </p>
             </div>
           )}
           {/* Trip Cards */}
-          {itineraries.map((trip) => (
+          {(itineraries && itineraries.length > 0 ? itineraries : []).map((trip) => (
             <div key={trip.id} className="relative group overflow-hidden flex-shrink-0" style={{ width: '310px', height: '550px', userSelect: 'none' }}>
               <img src={trip.image} alt={trip.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" draggable={false} />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />
               <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
-                {trip.nights && <div className="text-xs font-bold uppercase tracking-wider text-right" style={{color: '#ffffff', fontWeight: '500'}}>{trip.nights} NIGHTS</div>}
+                {trip.nights && <div className="text-xs font-bold uppercase tracking-wider text-yellow-300 text-right" style={{color: '#ffffff', fontWeight: '500'}}>{trip.nights} NIGHTS</div>}
                 <div>
                   <h3 className="text-base font-bold uppercase tracking-wider mb-4 leading-tight opacity-85" style={{fontWeight: '300'}}>{trip.title}</h3>
                   <button
@@ -421,11 +421,13 @@ function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
                     onMouseLeave={e => { e.currentTarget.style.background = 'rgba(20,20,20,0.55)'; e.currentTarget.style.color = '#fff'; }}
                     onMouseDown={(e) => {
                       e.stopPropagation();
+                      // ripple effect
                       const btn = e.currentTarget;
                       const circle = document.createElement('span');
                       const diameter = Math.max(btn.clientWidth, btn.clientHeight);
                       const radius = diameter / 2;
-                      circle.style.cssText = `position:absolute;width:${diameter}px;height:${diameter}px;left:${e.clientX - btn.getBoundingClientRect().left - radius}px;top:${e.clientY - btn.getBoundingClientRect().top - radius}px;background:rgba(255,255,255,0.35);border-radius:50%;transform:scale(0);animation:ripple 0.5s linear;pointer-events:none;`;
+                      const rect = btn.getBoundingClientRect();
+                      circle.style.cssText = `position:absolute;width:${diameter}px;height:${diameter}px;left:${e.clientX - rect.left - radius}px;top:${e.clientY - rect.top - radius}px;background:rgba(255,255,255,0.35);border-radius:50%;transform:scale(0);animation:ripple 0.5s linear;pointer-events:none;`;
                       btn.appendChild(circle);
                       setTimeout(() => circle.remove(), 600);
                     }}
@@ -437,6 +439,36 @@ function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
               </div>
             </div>
           ))}
+          {/* View More */}
+          <div className="flex-shrink-0" style={{ width: '155px', height: '550px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <button
+              style={{
+                backgroundColor: '#111111',
+                color: '#ffffff',
+                fontFamily: 'Lato, sans-serif',
+                fontSize: '13px',
+                fontWeight: 700,
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                padding: '14px 36px',
+                border: '2px solid #111111',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s, color 0.2s, transform 0.1s',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.backgroundColor = '#ffffff';
+                e.currentTarget.style.color = '#111111';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.backgroundColor = '#111111';
+                e.currentTarget.style.color = '#ffffff';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+              onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.95)')}
+              onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
+            >View More</button>
+          </div>
         </div>
       </div>
 
