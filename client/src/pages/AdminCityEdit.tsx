@@ -135,6 +135,7 @@ export default function AdminCityEdit() {
     name: "",
     slug: "",
     coverImage: "",
+    bannerTitle: "",
     cityCardImage: "",
     introductionTitle: "",
     introductionDescription: "",
@@ -159,6 +160,7 @@ export default function AdminCityEdit() {
         name: city.name || "",
         slug: city.slug || "",
         coverImage: city.coverImage || "",
+        bannerTitle: (city as any).bannerTitle || "",
         cityCardImage: (city as any).cityCardImage || "",
         introductionTitle: (city as any).introductionTitle || "",
         introductionDescription: (city as any).introductionDescription || "",
@@ -272,6 +274,13 @@ export default function AdminCityEdit() {
                 label="Banner Background Image"
               />
             </div>
+            <Field label="Banner Title">
+              <TextInput
+                value={form.bannerTitle}
+                onChange={v => set("bannerTitle", v)}
+                placeholder="e.g. Luxury Holidays & Honeymoons in Chengdu"
+              />
+            </Field>
             <div style={{ gridColumn: "1 / -1" }}>
               <ImageUploader
                 value={form.cityCardImage}

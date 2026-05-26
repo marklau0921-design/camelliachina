@@ -54,6 +54,8 @@ export const cities = mysqlTable("cities", {
   slug: varchar("slug", { length: 100 }).notNull().unique(),
   description: text("description"),
   coverImage: varchar("coverImage", { length: 512 }),
+  // Banner section
+  bannerTitle: varchar("bannerTitle", { length: 300 }),
   // Introduction section
   introductionTitle: varchar("introductionTitle", { length: 200 }),
   introductionDescription: text("introductionDescription"),

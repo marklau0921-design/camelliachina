@@ -116,7 +116,35 @@ export async function getCityById(id: number) {
   const db = await getDb();
   if (!db) return null;
   const rows = await db.select().from(cities).where(eq(cities.id, id)).limit(1);
-  return rows[0] ?? null;
+  
+  if (rows.length === 0) return null;
+  
+  const city = rows[0];
+  
+  // Ensure required fields have default values if missing
+  const hasChanges = !city.bannerTitle || !city.introductionTitle || !city.introductionDescription;
+  
+  if (hasChanges) {
+    const updates: Partial<InsertCity> = {};
+    if (!city.bannerTitle) {
+      updates.bannerTitle = `Luxury Holidays & Honeymoons in ${city.name}`;
+    }
+    if (!city.introductionTitle) {
+      updates.introductionTitle = `Why Should You Travel to ${city.name} With Us?`;
+    }
+    if (!city.introductionDescription) {
+      updates.introductionDescription = "";
+    }
+    
+    // Update with defaults
+    await db.update(cities).set({ ...updates, updatedAt: new Date() }).where(eq(cities.id, id));
+    
+    // Return updated record
+    const updatedRows = await db.select().from(cities).where(eq(cities.id, id)).limit(1);
+    return updatedRows[0] ?? null;
+  }
+  
+  return city;
 }
 
 export async function createCity(data: Omit<InsertCity, "slug"> & { slug?: string }) {
