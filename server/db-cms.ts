@@ -579,9 +579,13 @@ export async function updateItinerary(id: number, data: Partial<InsertItinerary>
   const updateData = { ...data, updatedAt: new Date() };
   // Ensure sections is properly serialized as JSON
   if (updateData.sections !== undefined) {
+    console.log('[updateItinerary] sections before stringify:', updateData.sections);
     updateData.sections = JSON.stringify(updateData.sections);
+    console.log('[updateItinerary] sections after stringify:', updateData.sections);
   }
+  console.log('[updateItinerary] updateData keys:', Object.keys(updateData));
   await db.update(itineraries).set(updateData).where(eq(itineraries.id, id));
+  console.log('[updateItinerary] update completed for id:', id);
   if (tagIds !== undefined) {
     await db.delete(itineraryTags).where(eq(itineraryTags.itineraryId, id));
     if (tagIds.length > 0) {

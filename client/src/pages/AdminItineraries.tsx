@@ -510,7 +510,7 @@ export default function AdminItineraries() {
     onSuccess: () => { utils.admin.listItineraries.invalidate(); setShowForm(false); },
   });
   const updateItin = trpc.admin.updateItinerary.useMutation({
-    onSuccess: () => { utils.admin.listItineraries.invalidate(); setEditId(null); },
+    onSuccess: () => { utils.admin.listItineraries.invalidate(); /* Keep form open */ },
   });
   const deleteItin = trpc.admin.deleteItinerary.useMutation({
     onSuccess: () => utils.admin.listItineraries.invalidate(),
