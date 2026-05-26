@@ -290,14 +290,27 @@ export default function CityPage() {
       <Navigation />
 
       {/* Hero Section */}
-      <div className="relative w-full bg-cover bg-center" style={{
-        backgroundImage: bannerImageLoaded ? `url(${(city as any).coverImage || ''})` : 'none',
-        backgroundColor: '#1a1a1a',
-        backgroundAttachment: 'scroll',
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-        height: '400px',
-      }}>
+      {bannerImageLoaded && (
+        <div className="relative w-full bg-cover bg-center" style={{
+          backgroundImage: `url(${(city as any).coverImage || ''})`,
+          backgroundAttachment: 'scroll',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          height: '400px',
+        }}>
+          <div className="absolute inset-0 bg-black/20"></div>
+          <div className="relative h-full flex items-center justify-center">
+            <h1 className="text-lg md:text-xl lg:text-2xl font-semibold text-white uppercase text-center px-6" style={{
+              letterSpacing: '0.12em',
+              textShadow: '2px 2px 8px rgba(0, 0, 0, 0.5)',
+              fontWeight: '600',
+              lineHeight: '1.8'
+            }}>
+              {(city as any).bannerTitle}
+            </h1>
+          </div>
+        </div>
+      )}
       {/* Hidden image to detect if banner image loads successfully */}
       {(city as any).coverImage && (
         <img
@@ -308,18 +321,10 @@ export default function CityPage() {
           onError={() => setBannerImageLoaded(false)}
         />
       )}
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative h-full flex items-center justify-center">
-          <h1 className="text-lg md:text-xl lg:text-2xl font-semibold text-white uppercase text-center px-6" style={{
-            letterSpacing: '0.12em',
-            textShadow: '2px 2px 8px rgba(0, 0, 0, 0.5)',
-            fontWeight: '600',
-            lineHeight: '1.8'
-          }}>
-            {(city as any).bannerTitle}
-          </h1>
-        </div>
-      </div>
+      {/* Blank space while loading */}
+      {!bannerImageLoaded && (
+        <div style={{ height: '400px', backgroundColor: 'transparent' }}></div>
+      )}
 
       {/* Navigation Tabs */}
       <div className="w-full" style={{ height: '48px', backgroundColor: '#F3F3F3' }}>
