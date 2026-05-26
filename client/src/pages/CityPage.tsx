@@ -304,7 +304,7 @@ export default function CityPage() {
             fontWeight: '600',
             lineHeight: '1.8'
           }}>
-            {(city as any).bannerTitle || `Luxury Holidays & Honeymoons in ${cityName}`}
+            {(city as any).bannerTitle}
           </h1>
         </div>
       </div>
