@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Link, useLocation } from 'wouter';
 import { X, ChevronLeft } from 'lucide-react';
@@ -6,6 +6,7 @@ import { X, ChevronLeft } from 'lucide-react';
 /**
  * Navigation Component — Detached overlay architecture
  * Nav bar is always exactly 55px. Dropdown menus are independent fixed layers.
+ * Logo: Only shows when fully loaded, blank otherwise.
  */
 
 // ── Destinations data ──────────────────────────────────────────────────────
@@ -51,6 +52,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
   const [navVisible, setNavVisible] = useState(true);
   const lastScrollY = useRef(0);
   const [location, setLocation] = useLocation();
+  const [logoLoaded, setLogoLoaded] = useState(false);
 
   // 动态加载 Brand Assets logo
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
@@ -308,12 +310,26 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
               className="flex-shrink-0 group absolute"
               style={{ left: 'clamp(28px, calc(-645px + 49.82vw), 305px)' }}
             >
-              <img
-                src={logoUrl}
-                alt="Wayseek 未远"
-                className="group-hover:opacity-70 transition-opacity"
-                style={{ height: '40px', width: 'auto', objectFit: 'contain' }}
-              />
+              {logoLoaded && (
+                <img
+                  src={logoUrl}
+                  alt="Wayseek 未远"
+                  className="group-hover:opacity-70 transition-opacity"
+                  style={{ height: '40px', width: 'auto', objectFit: 'contain' }}
+                  onLoad={() => setLogoLoaded(true)}
+                  onError={() => setLogoLoaded(false)}
+                />
+              )}
+              {!logoLoaded && logoUrl && (
+                <img
+                  src={logoUrl}
+                  alt="Wayseek 未远"
+                  className="group-hover:opacity-70 transition-opacity"
+                  style={{ height: '40px', width: 'auto', objectFit: 'contain', display: 'none' }}
+                  onLoad={() => setLogoLoaded(true)}
+                  onError={() => setLogoLoaded(false)}
+                />
+              )}
             </Link>
 
             {/* Center nav — desktop */}

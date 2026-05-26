@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import Navigation from '@/components/Navigation';
@@ -54,6 +54,11 @@ export default function Home() {
   // The userAuth hooks provides authentication state
   // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
   let { user, loading, error, isAuthenticated, logout } = useAuth();
+
+  // Image loading states
+  const [heroBannerLoaded, setHeroBannerLoaded] = useState(false);
+  const [heroLogoLoaded, setHeroLogoLoaded] = useState(false);
+  const [tripImagesLoaded, setTripImagesLoaded] = useState<Record<string | number, boolean>>({});
 
   // 动态首页资产
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
@@ -215,11 +220,25 @@ export default function Home() {
         {/* Image Background */}
         <div className="relative w-full h-full">
           <div className="w-full h-full">
-            <img
-              src={activeBanners[currentSlide % activeBanners.length]}
-              alt="China countryside landscape"
-              className="w-full h-full object-cover object-center"
-            />
+            {heroBannerLoaded && (
+              <img
+                src={activeBanners[currentSlide % activeBanners.length]}
+                alt="China countryside landscape"
+                className="w-full h-full object-cover object-center"
+                onLoad={() => setHeroBannerLoaded(true)}
+                onError={() => setHeroBannerLoaded(false)}
+              />
+            )}
+            {!heroBannerLoaded && (
+              <img
+                src={activeBanners[currentSlide % activeBanners.length]}
+                alt="China countryside landscape"
+                className="w-full h-full object-cover object-center"
+                style={{ display: 'none' }}
+                onLoad={() => setHeroBannerLoaded(true)}
+                onError={() => setHeroBannerLoaded(false)}
+              />
+            )}
           </div>
           <div className="absolute inset-0 bg-black/30"></div>
         </div>
@@ -227,12 +246,25 @@ export default function Home() {
         {/* Hero Logo - Center */}
         <div className="absolute inset-0 flex items-center justify-center z-20">
           <div className="flex flex-col items-center gap-4">
-            <img
-              src={activeLogo || ''}
-              alt="Wayseek 未远"
-              style={{ height: 'clamp(60px, 12vw, 160px)', width: 'auto', maxWidth: '60vw', objectFit: 'contain' }}
-            />
-            <div className="w-32 h-px bg-[#F5F3EF]"></div>
+            {heroLogoLoaded && (
+              <img
+                src={activeLogo || ''}
+                alt="Wayseek 未远"
+                style={{ height: 'clamp(60px, 12vw, 160px)', width: 'auto', maxWidth: '60vw', objectFit: 'contain' }}
+                onLoad={() => setHeroLogoLoaded(true)}
+                onError={() => setHeroLogoLoaded(false)}
+              />
+            )}
+            {!heroLogoLoaded && activeLogo && (
+              <img
+                src={activeLogo}
+                alt="Wayseek 未远"
+                style={{ height: 'clamp(60px, 12vw, 160px)', width: 'auto', maxWidth: '60vw', objectFit: 'contain', display: 'none' }}
+                onLoad={() => setHeroLogoLoaded(true)}
+                onError={() => setHeroLogoLoaded(false)}
+              />
+            )}
+            {heroLogoLoaded && <div className="w-32 h-px bg-[#F5F3EF]"></div>}
           </div>
         </div>
       </section>
@@ -311,7 +343,27 @@ export default function Home() {
             {/* Trip Cards */}
             {itineraries.map((trip) => (
               <div key={trip.id} className="relative group overflow-hidden flex-shrink-0" style={{ width: '310px', height: '550px', userSelect: 'none' }}>
-                <img src={trip.image} alt={trip.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" draggable={false} />
+                {tripImagesLoaded[trip.id] && (
+                  <img
+                    src={trip.image}
+                    alt={trip.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    draggable={false}
+                    onLoad={() => setTripImagesLoaded(prev => ({ ...prev, [trip.id]: true }))}
+                    onError={() => setTripImagesLoaded(prev => ({ ...prev, [trip.id]: false }))}
+                  />
+                )}
+                {!tripImagesLoaded[trip.id] && trip.image && (
+                  <img
+                    src={trip.image}
+                    alt={trip.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    draggable={false}
+                    style={{ display: 'none' }}
+                    onLoad={() => setTripImagesLoaded(prev => ({ ...prev, [trip.id]: true }))}
+                    onError={() => setTripImagesLoaded(prev => ({ ...prev, [trip.id]: false }))}
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />
                 <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
                   {trip.nights && <div className="text-xs font-bold uppercase tracking-wider text-yellow-300 text-right" style={{color: '#ffffff', fontWeight: '500'}}>{trip.nights} NIGHTS</div>}
