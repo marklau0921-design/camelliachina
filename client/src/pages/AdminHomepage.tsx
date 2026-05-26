@@ -220,6 +220,12 @@ export default function AdminHomepage() {
   const [imageDragOver, setImageDragOver] = useState(false);
   const imageFileRef = useRef<HTMLInputElement>(null);
 
+  // Sponsor upload state
+  const [sponsorUploading, setSponsorUploading] = useState(false);
+  const [sponsorUploadProgress, setSponsorUploadProgress] = useState<{ current: number; total: number } | null>(null);
+  const [sponsorDragOver, setSponsorDragOver] = useState(false);
+  const sponsorFileRef = useRef<HTMLInputElement>(null);
+
   const handleImageFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     const imageFiles = Array.from(files).filter(f => f.type.startsWith("image/"));
@@ -257,6 +263,51 @@ export default function AdminHomepage() {
     setImageUploadProgress(null);
     if (imageFileRef.current) imageFileRef.current.value = "";
     if (addedCount > 0) toast.success(`${addedCount} image${addedCount > 1 ? "s" : ""} added`);
+  };
+
+  const handleSponsorFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const imageFiles = Array.from(files).filter(f => f.type.startsWith("image/"));
+    if (imageFiles.length === 0) return;
+    setSponsorUploading(true);
+    setSponsorUploadProgress({ current: 0, total: imageFiles.length });
+    const logoUrls: string[] = [];
+    for (let i = 0; i < imageFiles.length; i++) {
+      const file = imageFiles[i];
+      setSponsorUploadProgress({ current: i + 1, total: imageFiles.length });
+      try {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve((reader.result as string).split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        const result = await uploadImageMutation.mutateAsync({
+          filename: file.name, base64, mimeType: file.type, fileSize: file.size,
+          source: "homepage", assetType: "sponsor",
+        });
+        logoUrls.push(result.url);
+      } catch (e: any) {
+        toast.error(e.message || "Upload failed");
+      }
+    }
+    if (logoUrls.length > 0) {
+      try {
+        await createSponsor.mutateAsync({
+          name: `Sponsor ${Date.now()}`,
+          logoUrls,
+          websiteUrl: "",
+          isVisible: true,
+          sortOrder: 0,
+        });
+        toast.success(`${logoUrls.length} logo${logoUrls.length > 1 ? "s" : ""} added`);
+      } catch (e: any) {
+        toast.error(e.message || "Failed to save sponsor");
+      }
+    }
+    setSponsorUploading(false);
+    setSponsorUploadProgress(null);
+    if (sponsorFileRef.current) sponsorFileRef.current.value = "";
   };
 
   // ── Video Stories Section ─────────────────────────────────────────────────
@@ -527,24 +578,93 @@ export default function AdminHomepage() {
       {/* ── Sponsors ────────────────────────────────────────────────────────── */}
       <div style={{ ...cardStyle, marginBottom: 32 }}>
         <SectionHeader title="Sponsor Logos" visible={true} onToggle={() => {}} />
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
-          {sponsors.length === 0 && (
-            <div style={{ color: "#aaa", fontFamily: "Lato, sans-serif", fontSize: 13, padding: "20px 0", width: "100%", textAlign: "center" }}>
-              No sponsors yet. Add one below.
-            </div>
+        <p style={{ fontFamily: "Lato, sans-serif", fontSize: 12, color: "#888", margin: "-12px 0 20px 0" }}>
+          Upload sponsor logos. Drag & drop or click to upload.
+        </p>
+
+        {/* Sponsor logos grid */}
+        {sponsors.length === 0 && !sponsorUploading && (
+          <div style={{ color: "#aaa", fontFamily: "Lato, sans-serif", fontSize: 13, padding: "12px 0", textAlign: "center" }}>
+            No logos yet. Upload below.
+          </div>
+        )}
+        {sponsors.length > 0 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
+            {sponsors.map(sp => {
+              const logoUrls = typeof sp.logoUrls === 'string' ? JSON.parse(sp.logoUrls) : (Array.isArray(sp.logoUrls) ? sp.logoUrls : []);
+              return (
+                <div key={sp.id} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  {logoUrls.map((logo: string, idx: number) => (
+                    <div key={idx} style={{ position: "relative", width: 100, height: 60, borderRadius: 4, overflow: "hidden", border: "1px solid #eee", background: "#f5f5f5", flexShrink: 0 }}>
+                      <img src={logo} alt={`Logo ${idx}`} style={{ width: "100%", height: "100%", objectFit: "contain", padding: 4 }} />
+                      <button
+                        onClick={() => {
+                          if (confirm("Delete this logo?")) {
+                            const updatedLogos = logoUrls.filter((_: string, i: number) => i !== idx);
+                            if (updatedLogos.length === 0) {
+                              deleteSponsor.mutate({ id: sp.id });
+                            } else {
+                              updateSponsor.mutate({ id: sp.id, name: sp.name, logoUrls: updatedLogos, websiteUrl: sp.websiteUrl, isVisible: sp.isVisible, sortOrder: sp.sortOrder });
+                            }
+                          }
+                        }}
+                        style={{ position: "absolute", top: 3, right: 3, width: 20, height: 20, borderRadius: "50%", background: "rgba(0,0,0,0.55)", border: "none", cursor: "pointer", color: "#fff", fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Direct upload area */}
+        <div
+          onDrop={e => { e.preventDefault(); setSponsorDragOver(false); handleSponsorFiles(e.dataTransfer.files); }}
+          onDragOver={e => { e.preventDefault(); setSponsorDragOver(true); }}
+          onDragLeave={() => setSponsorDragOver(false)}
+          onClick={() => !sponsorUploading && sponsorFileRef.current?.click()}
+          style={{
+            border: `1px dashed ${sponsorDragOver ? "#F5569B" : "#ccc"}`,
+            borderRadius: 4,
+            padding: "14px 16px",
+            cursor: sponsorUploading ? "default" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            color: sponsorDragOver ? "#F5569B" : "#888",
+            fontSize: 12,
+            letterSpacing: "0.05em",
+            background: sponsorDragOver ? "#fff0f6" : "#fafafa",
+            transition: "all 0.18s",
+            userSelect: "none",
+          }}
+        >
+          {sponsorUploading ? (
+            <span style={{ fontFamily: "Lato, sans-serif", display: "flex", alignItems: "center", gap: 8 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              Uploading
+              {sponsorUploadProgress && sponsorUploadProgress.total > 1 && (
+                <span style={{ fontWeight: 700, color: "#F5569B" }}>{sponsorUploadProgress.current}/{sponsorUploadProgress.total}</span>
+              )}
+            </span>
+          ) : (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span style={{ fontFamily: "Lato, sans-serif" }}>Upload logos (drag & drop or click) — multiple files supported</span>
+            </>
           )}
-          {sponsors.map(sp => (
-            <div key={sp.id} style={{ border: "1px solid #f0f0f0", borderRadius: 8, padding: 12, background: "#fafafa", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, width: 140 }}>
-              {sp.logo && <img src={sp.logo} alt={sp.name} style={{ width: 80, height: 48, objectFit: "contain" }} />}
-              <div style={{ fontFamily: "Lato, sans-serif", fontSize: 12, color: "#1a1a1a", fontWeight: 600, textAlign: "center" }}>{sp.name}</div>
-              <div style={{ display: "flex", gap: 4 }}>
-                <button style={{ ...btnSecondary, padding: "5px 10px", fontSize: 11 }} onClick={() => setSponsorModal({ id: sp.id, name: sp.name, logoUrl: sp.logo ?? "", websiteUrl: sp.url ?? "", isVisible: sp.isVisible ?? true, sortOrder: sp.sortOrder ?? 0 })}>Edit</button>
-                <button style={{ ...btnDanger, padding: "5px 10px", fontSize: 11 }} onClick={() => { if (confirm("Delete this sponsor?")) deleteSponsor.mutate({ id: sp.id }); }}>Del</button>
-              </div>
-            </div>
-          ))}
         </div>
-        <button style={btnPrimary} onClick={() => setSponsorModal(emptySponsor)}>+ Add Sponsor</button>
+        <input
+          ref={sponsorFileRef}
+          type="file"
+          accept="image/*"
+          multiple
+          style={{ display: "none" }}
+          onChange={e => handleSponsorFiles(e.target.files)}
+        />
       </div>
 
       {/* ── Modals ────────────────────────────────────────────────────────────── */}
