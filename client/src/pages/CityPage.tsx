@@ -130,6 +130,7 @@ export default function CityPage() {
   const [tripsShowLeftBtn, setTripsShowLeftBtn] = useState(false);
   const [tripsShowRightBtn, setTripsShowRightBtn] = useState(true);
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024);
+  const [bannerImageLoaded, setBannerImageLoaded] = useState(false);
 
   // Fetch city data by slug
   const { data: city, isLoading: cityLoading, error: cityError } = trpc.cms.getCityBySlug.useQuery(
@@ -290,12 +291,23 @@ export default function CityPage() {
 
       {/* Hero Section */}
       <div className="relative w-full bg-cover bg-center" style={{
-        backgroundImage: `url(${(city as any).coverImage || ''})`,
+        backgroundImage: bannerImageLoaded ? `url(${(city as any).coverImage || ''})` : 'none',
+        backgroundColor: '#1a1a1a',
         backgroundAttachment: 'scroll',
         backgroundPosition: 'center',
         backgroundSize: 'cover',
         height: '400px',
       }}>
+      {/* Hidden image to detect if banner image loads successfully */}
+      {(city as any).coverImage && (
+        <img
+          src={(city as any).coverImage}
+          alt=""
+          style={{ display: 'none' }}
+          onLoad={() => setBannerImageLoaded(true)}
+          onError={() => setBannerImageLoaded(false)}
+        />
+      )}
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative h-full flex items-center justify-center">
           <h1 className="text-lg md:text-xl lg:text-2xl font-semibold text-white uppercase text-center px-6" style={{
