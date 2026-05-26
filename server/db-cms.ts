@@ -576,7 +576,12 @@ export async function createItinerary(data: Omit<InsertItinerary, "slug"> & { sl
 export async function updateItinerary(id: number, data: Partial<InsertItinerary>, tagIds?: number[]) {
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");
-  await db.update(itineraries).set({ ...data, updatedAt: new Date() }).where(eq(itineraries.id, id));
+  const updateData = { ...data, updatedAt: new Date() };
+  // Ensure sections is properly serialized as JSON
+  if (updateData.sections !== undefined) {
+    updateData.sections = JSON.stringify(updateData.sections);
+  }
+  await db.update(itineraries).set(updateData).where(eq(itineraries.id, id));
   if (tagIds !== undefined) {
     await db.delete(itineraryTags).where(eq(itineraryTags.itineraryId, id));
     if (tagIds.length > 0) {

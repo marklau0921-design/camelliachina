@@ -584,7 +584,7 @@ export default function AdminItineraries() {
                 sortOrder: itinDetail.sortOrder ?? 0,
                 tagIds: itinDetail.tagIds || [],
               }}
-              onSave={data => updateItin.mutate({ id: editId, ...data })}
+              onSave={data => updateItin.mutate({ id: editId, ...data }, { onSuccess: () => { /* Keep form open after save */ } })}
               onCancel={() => setEditId(null)}
               saving={updateItin.isPending}
             />
