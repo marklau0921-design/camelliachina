@@ -678,10 +678,8 @@ function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
   // Filter out current city
   const otherCities = allCities.filter((c: any) => c.slug !== currentSlug);
 
-  // Duplicate for infinite scroll
-  const destinations = otherCities.length > 0
-    ? [...otherCities, ...otherCities, ...otherCities]
-    : [];
+  // Show each city once
+  const destinations = otherCities;
   const cardWidth = 220 + 16;
   const totalWidth = otherCities.length * cardWidth;
 
