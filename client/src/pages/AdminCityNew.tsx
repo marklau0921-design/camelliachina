@@ -119,6 +119,7 @@ export default function AdminCityNew() {
     name: "",
     slug: "",
     coverImage: "",
+    bannerTitle: "",
     cityCardImage: "",
     introductionTitle: "",
     introductionDescription: "",
@@ -216,6 +217,13 @@ export default function AdminCityNew() {
                 label="Banner Background Image"
               />
             </div>
+            <Field label="Banner Title">
+              <TextInput
+                value={form.bannerTitle}
+                onChange={v => set("bannerTitle", v)}
+                placeholder="e.g. Luxury Holidays & Honeymoons in Chengdu"
+              />
+            </Field>
             <div style={{ gridColumn: "1 / -1" }}>
               <ImageUploader
                 value={form.cityCardImage}
