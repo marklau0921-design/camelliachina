@@ -89,10 +89,13 @@ describe("CMS Auto-Create Functionality", () => {
     // Call listAboutSections - should auto-create
     const sections = await listAboutSections();
 
-    expect(sections.length).toBeGreaterThan(0);
-    expect(sections[0].name).toBe("About Us");
-    expect(sections[0].slug).toBe("about-us");
+    expect(sections.length).toBe(2);
+    expect(sections[0].name).toBe("WHY US");
+    expect(sections[0].slug).toBe("why-us");
     expect(sections[0].isVisible).toBe(true);
+    expect(sections[1].name).toBe("Our Team");
+    expect(sections[1].slug).toBe("our-team");
+    expect(sections[1].isVisible).toBe(true);
   });
 
   it("should auto-create why us section if table is empty", async () => {

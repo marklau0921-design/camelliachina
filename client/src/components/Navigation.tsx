@@ -41,6 +41,16 @@ interface ExperienceCategory {
   items: ExperienceItem[];
 }
 
+interface AboutMenuItem {
+  label: string;
+  route: string;
+}
+
+const DEFAULT_ABOUT_ITEMS: AboutMenuItem[] = [
+  { label: 'WHY US', route: '/about/why-us' },
+  { label: 'Our Team', route: '/about/our-team' },
+];
+
 // ── Component ──────────────────────────────────────────────────────────────
 interface NavigationProps {
   forceHide?: boolean;
@@ -60,6 +70,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
 
   // 动态加载体验类型及其子项
   const { data: navData } = trpc.cms.listExperienceTypesWithNav.useQuery();
+  const { data: aboutSections } = trpc.about.listPublicSections.useQuery();
   const categories: ExperienceCategory[] = useMemo(() => {
     if (!navData || navData.length === 0) return [];
     return navData.map(type => ({
@@ -72,6 +83,13 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
       })),
     }));
   }, [navData]);
+  const aboutItems: AboutMenuItem[] = useMemo(() => {
+    if (!aboutSections) return DEFAULT_ABOUT_ITEMS;
+    return aboutSections.map(section => ({
+      label: section.name,
+      route: `/about/${section.slug || toSlug(section.name)}`,
+    }));
+  }, [aboutSections]);
 
   // 动态加载城市列表及其体验（不使用静态 fallback，避免闪现）
   const { data: citiesData } = trpc.cms.listCitiesWithExperiences.useQuery();
@@ -568,10 +586,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
               {/* Landscape — no preview image, just the two links */}
               <div className="bt-landscape-layout" style={{ flex: 1, overflow: 'hidden' }}>
                 <div style={{ flexShrink: 0, overflowY: 'hidden', paddingTop: '60px', paddingBottom: '40px', paddingRight: '20px', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', minWidth: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
-                  {[
-                    { label: 'Why Us?', route: '/about/why-us' },
-                    { label: 'Our Team', route: '/about/our-team' },
-                  ].map((item, i) => (
+                  {aboutItems.map((item, i) => (
                     <a
                       key={i}
                       href={item.route}
@@ -589,10 +604,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
               {/* Portrait — same two links, single column */}
               <div className="exp-portrait-layout" style={{ flex: 1, flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
                 <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', paddingTop: '60px', paddingBottom: '40px', paddingLeft: '32px', paddingRight: '64px', display: 'flex', flexDirection: 'column' }}>
-                  {[
-                    { label: 'Why Us?', route: '/about/why-us' },
-                    { label: 'Our Team', route: '/about/our-team' },
-                  ].map((item, i) => (
+                  {aboutItems.map((item, i) => (
                     <a
                       key={i}
                       href={item.route}

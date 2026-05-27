@@ -1014,21 +1014,37 @@ export async function listHomepageStoriesByType(type: "image" | "video") {
 export async function listAboutSections() {
   const db = await getDb();
   if (!db) return [];
-  const rows = await db.select().from(aboutSections).orderBy(aboutSections.sortOrder);
-  
-  // Auto-create default record if table is empty
-  if (rows.length === 0) {
-    const defaultData = {
-      name: "About Us",
-      slug: "about-us",
+  let rows = await db.select().from(aboutSections).orderBy(aboutSections.sortOrder);
+
+  const legacyAboutUs = rows.find(row => row.slug === "about-us" && row.name === "About Us");
+  const hasWhyUs = rows.some(row => row.slug === "why-us");
+  if (legacyAboutUs && hasWhyUs) {
+    await db.delete(aboutSections).where(eq(aboutSections.id, legacyAboutUs.id));
+    rows = await db.select().from(aboutSections).orderBy(aboutSections.sortOrder);
+  } else if (legacyAboutUs) {
+    await db.update(aboutSections).set({
+      name: "WHY US",
+      slug: "why-us",
       isVisible: true,
       sortOrder: 0,
-    };
-    await db.insert(aboutSections).values(defaultData);
-    const newRows = await db.select().from(aboutSections).orderBy(aboutSections.sortOrder);
-    return newRows;
+      updatedAt: new Date(),
+    }).where(eq(aboutSections.id, legacyAboutUs.id));
+    rows = await db.select().from(aboutSections).orderBy(aboutSections.sortOrder);
   }
-  
+
+  const requiredSections = [
+    { name: "WHY US", slug: "why-us", isVisible: true, sortOrder: 0 },
+    { name: "Our Team", slug: "our-team", isVisible: true, sortOrder: 1 },
+  ];
+  const existingSlugs = new Set(rows.map(row => row.slug));
+
+  for (const section of requiredSections) {
+    if (!existingSlugs.has(section.slug)) {
+      await db.insert(aboutSections).values(section);
+    }
+  }
+
+  rows = await db.select().from(aboutSections).orderBy(aboutSections.sortOrder);
   return rows;
 }
 
