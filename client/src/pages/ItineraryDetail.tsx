@@ -13,6 +13,7 @@ interface ItineraryBlock {
   title: string;
   description: string;
   image?: string;
+  images?: string[];
 }
 
 interface ItinerarySection {
@@ -703,7 +704,7 @@ export default function ItineraryDetail() {
                     {section.blocks.map((block, i) => {
                       const imageLeft = i % 2 === 1;
                       const cardHeight = i % 2 === 0 ? '480px' : '510px';
-                      const images = block.image ? [block.image] : [];
+                      const images = block.images?.length ? block.images : block.image ? [block.image] : [];
                       return (
                         <div key={block.id}>
                           <div style={{ display: 'flex', flexDirection: imageLeft ? 'row' : 'row-reverse', width: '100%', maxWidth: '964px', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '4px 4px 16px rgba(0,0,0,0.13)', height: cardHeight }}>

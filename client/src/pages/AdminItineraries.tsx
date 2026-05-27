@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import AdminLayout from "@/components/AdminLayout";
@@ -16,6 +16,7 @@ export interface ItineraryBlock {
   title: string;
   description: string;
   image?: string;
+  images?: string[];
 }
 
 export interface ItinerarySection {
@@ -75,6 +76,17 @@ function genId() {
   return Math.random().toString(36).slice(2, 9);
 }
 
+function normalizeSections(sections: ItinerarySection[]): ItinerarySection[] {
+  return (Array.isArray(sections) ? sections : []).map(section => ({
+    ...section,
+    blocks: (Array.isArray(section.blocks) ? section.blocks : []).map(block => {
+      const images = block.images?.length ? block.images : block.image ? [block.image] : [];
+      return { ...block, images, image: images[0] ?? "" };
+    }),
+    galleryImages: Array.isArray(section.galleryImages) ? section.galleryImages : [],
+  }));
+}
+
 function FocusInput({ value, onChange, placeholder, style }: {
   value: string; onChange: (v: string) => void; placeholder?: string; style?: React.CSSProperties;
 }) {
@@ -114,6 +126,70 @@ function BlockEditor({ block, onChange, onDelete }: {
   onDelete: () => void;
 }) {
   const set = <K extends keyof ItineraryBlock>(k: K, v: ItineraryBlock[K]) => onChange({ ...block, [k]: v });
+  const upload = trpc.media.upload.useMutation();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [urlInput, setUrlInput] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
+  const [uploadError, setUploadError] = useState("");
+  const images = block.images?.length ? block.images : block.image ? [block.image] : [];
+
+  const updateImages = (nextImages: string[]) => {
+    onChange({ ...block, images: nextImages, image: nextImages[0] ?? "" });
+  };
+
+  const fileToBase64 = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve((reader.result as string).split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const imageFiles = Array.from(files).filter(file => file.type.startsWith("image/"));
+    if (imageFiles.length === 0) {
+      setUploadError("Please select image files.");
+      return;
+    }
+    setUploading(true);
+    setUploadError("");
+    setUploadProgress({ current: 0, total: imageFiles.length });
+    const uploaded: string[] = [];
+    for (let i = 0; i < imageFiles.length; i++) {
+      const file = imageFiles[i];
+      setUploadProgress({ current: i + 1, total: imageFiles.length });
+      try {
+        if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} is over 10MB.`);
+        const base64 = await fileToBase64(file);
+        const result = await upload.mutateAsync({
+          filename: file.name,
+          base64,
+          mimeType: file.type,
+          fileSize: file.size,
+          source: "itinerary",
+          sourceLabel: block.title || `Day ${block.dayNumber}`,
+          sourceUrl: "",
+          assetType: "general",
+        });
+        uploaded.push(result.url);
+      } catch (e: any) {
+        setUploadError(e.message || "Upload failed");
+      }
+    }
+    if (uploaded.length > 0) updateImages([...images, ...uploaded]);
+    setUploading(false);
+    setUploadProgress(null);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const addUrl = () => {
+    const value = urlInput.trim();
+    if (!value) return;
+    updateImages([...images, value]);
+    setUrlInput("");
+  };
 
   return (
     <div style={{ border: "1px solid #e8e8e8", background: "#fafafa", marginBottom: "10px", padding: "14px" }}>
@@ -150,8 +226,60 @@ function BlockEditor({ block, onChange, onDelete }: {
         <FocusTextarea value={block.description} onChange={v => set("description", v)} placeholder="What happens on this day..." rows={4} />
       </div>
       <div>
-        <label style={labelStyle}>Day Image (optional)</label>
-        <ImageUploader value={block.image || ""} onChange={url => set("image", url)} category="itinerary" label="" />
+        <label style={labelStyle}>Day Images (optional)</label>
+        {images.length > 0 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "10px" }}>
+            {images.map((image, i) => (
+              <div key={`${image}-${i}`} style={{ position: "relative", width: "92px", height: "68px", background: "#e8e8e8", overflow: "hidden" }}>
+                <img src={image} alt={`Day ${block.dayNumber} image ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                <button
+                  type="button"
+                  onClick={() => updateImages(images.filter((_, index) => index !== i))}
+                  style={{ position: "absolute", top: "4px", right: "4px", width: "20px", height: "20px", border: "none", background: "rgba(0,0,0,0.65)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                  title="Remove image"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+          <FocusInput value={urlInput} onChange={setUrlInput} placeholder="Paste image URL" style={{ flex: 1 }} />
+          <button
+            type="button"
+            onClick={addUrl}
+            disabled={!urlInput.trim()}
+            style={{ padding: "0 14px", border: "1px solid #ddd", background: urlInput.trim() ? "#fff" : "#f0f0f0", color: urlInput.trim() ? "#444" : "#aaa", cursor: urlInput.trim() ? "pointer" : "not-allowed", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase" }}
+          >
+            Add
+          </button>
+        </div>
+        <div
+          onClick={() => !uploading && fileRef.current?.click()}
+          onDrop={e => { e.preventDefault(); if (!uploading) handleFiles(e.dataTransfer.files); }}
+          onDragOver={e => e.preventDefault()}
+          style={{ border: "1px dashed #ccc", padding: "12px 16px", cursor: uploading ? "default" : "pointer", display: "flex", alignItems: "center", gap: "8px", color: uploading ? "#aaa" : "#888", fontSize: "12px", letterSpacing: "0.05em", background: "#fff" }}
+        >
+          <ImageIcon size={14} />
+          {uploading ? (
+            <span>
+              Uploading {uploadProgress ? `${uploadProgress.current}/${uploadProgress.total}` : ""}...
+            </span>
+          ) : (
+            <span>Upload images (drag & drop or click) - multiple files supported</span>
+          )}
+        </div>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          multiple
+          style={{ display: "none" }}
+          onChange={e => handleFiles(e.target.files)}
+        />
+        {uploadError && <p style={{ fontSize: "12px", color: "#b00020", marginTop: "6px", marginBottom: 0 }}>{uploadError}</p>}
+        <p style={{ fontSize: "11px", color: "#aaa", marginTop: "6px", marginBottom: 0 }}>{images.length} image{images.length !== 1 ? "s" : ""} in day carousel</p>
       </div>
     </div>
   );
@@ -172,7 +300,7 @@ function SectionEditor({ section, onChange, onDelete, index }: {
     const nextDay = section.blocks.length > 0
       ? Math.max(...section.blocks.map(b => b.dayNumber)) + 1
       : 1;
-    set("blocks", [...section.blocks, { id: genId(), dayNumber: nextDay, title: "", description: "", image: "" }]);
+    set("blocks", [...section.blocks, { id: genId(), dayNumber: nextDay, title: "", description: "", image: "", images: [] }]);
   };
 
   const updateBlock = (i: number, b: ItineraryBlock) => {
@@ -240,9 +368,17 @@ function SectionEditor({ section, onChange, onDelete, index }: {
                 No days yet — click "Add Day" to start.
               </div>
             )}
-            {section.blocks.map((block, i) => (
-              <BlockEditor key={block.id} block={block} onChange={b => updateBlock(i, b)} onDelete={() => deleteBlock(i)} />
-            ))}
+            {section.blocks.map((block, i) => {
+              const images = block.images?.length ? block.images : block.image ? [block.image] : [];
+              return (
+                <BlockEditor
+                  key={block.id}
+                  block={{ ...block, images, image: images[0] ?? "" }}
+                  onChange={b => updateBlock(i, b)}
+                  onDelete={() => deleteBlock(i)}
+                />
+              );
+            })}
           </div>
 
           {/* Gallery */}
@@ -301,6 +437,7 @@ function ItineraryForm({ initial, onSave, onCancel, saving, title }: {
     const currentSections = Array.isArray(form.sections) ? form.sections : [];
     set("sections", [...currentSections, { id: genId(), title: "", description: "", daysRange: "", blocks: [], galleryImages: [] }]);
   };
+  const normalizedForm = { ...form, sections: normalizeSections(form.sections) };
 
   const SaveBar = () => (
     <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
@@ -314,7 +451,7 @@ function ItineraryForm({ initial, onSave, onCancel, saving, title }: {
         Preview
       </a>
       <button
-        onClick={() => onSave(form)}
+        onClick={() => onSave(normalizedForm)}
         disabled={saving || !form.name.trim()}
         style={{ padding: "9px 24px", fontSize: "12px", letterSpacing: "0.1em", textTransform: "uppercase", background: ACCENT, color: "#fff", border: "none", cursor: saving || !form.name.trim() ? "not-allowed" : "pointer", opacity: saving || !form.name.trim() ? 0.5 : 1 }}
       >
