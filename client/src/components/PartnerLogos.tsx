@@ -174,8 +174,8 @@ export default function PartnerLogos() {
                     width: 'auto',
                     maxWidth: '320px',
                       objectFit: 'contain',
-                      filter: logo.invert ? 'invert(1) grayscale(100%)' : 'grayscale(100%)',
-                      opacity: 0.7,
+                      filter: 'brightness(0)',
+                      opacity: 1,
                       transition: 'opacity 0.2s',
                     }}
                   />
@@ -190,8 +190,8 @@ export default function PartnerLogos() {
                   width: 'auto',
                   maxWidth: '320px',
                     objectFit: 'contain',
-                    filter: logo.invert ? 'invert(1) grayscale(100%)' : 'grayscale(100%)',
-                    opacity: 0.7,
+                    filter: 'brightness(0)',
+                    opacity: 1,
                     transition: 'opacity 0.2s',
                     pointerEvents: 'none',
                   }}
