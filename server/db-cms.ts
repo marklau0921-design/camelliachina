@@ -879,6 +879,10 @@ function quoteColumn(column: string) {
   return `\`${column}\``;
 }
 
+function serializeSponsorLogoValue(logoUrl: string, logoColumn: string) {
+  return logoColumn === "logoUrls" ? JSON.stringify([logoUrl]) : logoUrl;
+}
+
 export async function listHomepageSponsors() {
   const pool = await getPool();
   if (!pool) {
@@ -908,7 +912,7 @@ export async function createHomepageSponsor(data: InsertHomepageSponsor) {
   const values: any[] = [
     data.isVisible !== false ? 1 : 0,
     data.name,
-    data.logoUrls,
+    serializeSponsorLogoValue(data.logoUrls, columns.logoColumn),
     data.sortOrder ?? 0,
   ];
 
@@ -936,7 +940,7 @@ export async function updateHomepageSponsor(id: number, data: Partial<InsertHome
   }
   if (data.logoUrls !== undefined) {
     updates.push(`${quoteColumn(columns.logoColumn)} = ?`);
-    values.push(data.logoUrls);
+    values.push(serializeSponsorLogoValue(data.logoUrls, columns.logoColumn));
   }
   if (data.websiteUrl !== undefined && columns.websiteColumn) {
     updates.push(`${quoteColumn(columns.websiteColumn)} = ?`);
