@@ -1,5 +1,5 @@
 import { eq, desc, and, sql } from "drizzle-orm";
-import { getDb } from "./db";
+import { getDb, getPool } from "./db";
 import {
   cities, tags, experiences, experienceTags, experienceTypes, experienceDetails, experienceLabels,
   teamMembers, itineraries, itineraryTags, stories, storyTags,
@@ -835,9 +835,24 @@ export async function deleteHomepageStory(id: number) {
 
 // Sponsors
 export async function listHomepageSponsors() {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(homepageSponsors).orderBy(homepageSponsors.sortOrder);
+  const pool = await getPool();
+  if (!pool) {
+    console.warn('[listHomepageSponsors] Database not available');
+    return [];
+  }
+  try {
+    const [rows] = await pool.query(
+      'SELECT `id`, `isVisible`, `name`, `logo` as `logoUrls`, `url` as `websiteUrl`, `sortOrder`, `createdAt`, `updatedAt` FROM `homepage_sponsors` ORDER BY `sortOrder`'
+    );
+    console.log('[listHomepageSponsors] Success, returned', (rows as any[]).length, 'sponsors');
+    return (rows as any[]).map(row => ({
+      ...row,
+      logoUrls: typeof row.logoUrls === 'string' ? JSON.parse(row.logoUrls) : row.logoUrls
+    }));
+  } catch (error) {
+    console.error('[listHomepageSponsors] Query error:', error);
+    return [];
+  }
 }
 export async function createHomepageSponsor(data: InsertHomepageSponsor) {
   const db = await getDb();

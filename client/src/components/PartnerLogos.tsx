@@ -18,7 +18,16 @@ export default function PartnerLogos() {
 
   // 使用 DB sponsors，若无数据则 fallback
   const logos = (homepageData?.sponsors && homepageData.sponsors.length > 0)
-    ? homepageData.sponsors.map(sp => ({ src: sp.logo || '', alt: sp.name, invert: false, url: sp.url || undefined }))
+    ? homepageData.sponsors.flatMap(sp => {
+        // logoUrls 是 JSON 数组字符串，需要解析
+        const urls = typeof sp.logoUrls === 'string' ? JSON.parse(sp.logoUrls) : sp.logoUrls || [];
+        return urls.map((logoUrl: string) => ({
+          src: logoUrl,
+          alt: sp.name,
+          invert: false,
+          url: sp.websiteUrl || undefined
+        }));
+      })
     : fallbackLogos;
 
   const trackRef = useRef<HTMLDivElement>(null);

@@ -604,7 +604,7 @@ export default function ItineraryDetail() {
               {itin.place}
             </p>
           )}
-          <h1 style={{ color: '#fff', fontSize: 'clamp(28px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.15, letterSpacing: '0.02em', maxWidth: '800px', marginBottom: '20px', fontFamily: 'var(--font-serif)' }}>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(28px, 5vw, 56px)', fontWeight: 600, lineHeight: 1.8, letterSpacing: '0.12em', maxWidth: '800px', marginBottom: '20px', fontFamily: 'var(--font-serif)', textShadow: '2px 2px 8px rgba(0, 0, 0, 0.5)' }}>
             {itin.name}
           </h1>
           {itin.shortDescription && (
@@ -631,7 +631,7 @@ export default function ItineraryDetail() {
 
       {/* ── OVERVIEW ── */}
       <div id="overview" style={{ maxWidth: '720px', margin: '0 auto', padding: '64px 24px', textAlign: 'center', scrollMarginTop: '60px' }}>
-        <h2 style={{ fontSize: 'clamp(26px, 4vw, 44px)', fontWeight: 300, lineHeight: 1.2, marginBottom: '32px', color: '#1a1a1a', fontFamily: 'var(--font-serif)' }}>
+        <h2 style={{ fontSize: 'clamp(26px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.8, marginBottom: '32px', color: '#1a1a1a', fontFamily: 'var(--font-serif)', letterSpacing: '0.05em' }}>
           {itin.overviewTitle || itin.name}
         </h2>
         {itin.description && (
@@ -687,7 +687,7 @@ export default function ItineraryDetail() {
               <div style={{ flex: 1, minWidth: 0, maxWidth: '964px' }}>
                 {/* Section header */}
                 <div style={{ paddingTop: '64px', paddingBottom: '32px' }}>
-                  <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)', marginBottom: '16px', color: '#1a1a1a' }}>
+                  <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', fontFamily: 'var(--font-sans)', marginBottom: '16px', color: '#1a1a1a' }}>
                     {section.title}
                   </h2>
                   {section.description && (
