@@ -42,18 +42,23 @@ export async function createMediaAsset(data: {
 }
 
 // ─── 查询所有媒体资产（支持搜索）──────────────────────────────────────────────
-export async function listMediaAssets(search?: string) {
+export async function listMediaAssets(search?: string, assetType?: "logo" | "banner" | "cta" | "general") {
   const db = await getDb();
   if (!db) return [];
+  const filters = [];
   if (search && search.trim()) {
     const q = `%${search.trim()}%`;
-    return db
-      .select()
-      .from(mediaAssets)
-      .where(or(like(mediaAssets.filename, q), like(mediaAssets.url, q)))
-      .orderBy(desc(mediaAssets.createdAt));
+    filters.push(or(like(mediaAssets.filename, q), like(mediaAssets.url, q)));
   }
-  return db.select().from(mediaAssets).orderBy(desc(mediaAssets.createdAt));
+  if (assetType) {
+    filters.push(eq(mediaAssets.assetType, assetType));
+  }
+
+  return db
+    .select()
+    .from(mediaAssets)
+    .where(filters.length > 0 ? and(...filters) : undefined)
+    .orderBy(desc(mediaAssets.createdAt));
 }
 
 // ─── 查询 Homepage Assets（按类型）──────────────────────────────────────────

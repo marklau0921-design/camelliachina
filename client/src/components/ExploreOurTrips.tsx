@@ -233,7 +233,7 @@ export default function ExploreOurTrips() {
                     )}
                   </div>
                 </div>
-              ))) : (
+              )) : (
                 <div className="w-full flex items-center justify-center text-white">
                   <p>No trips available</p>
                 </div>

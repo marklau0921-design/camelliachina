@@ -604,7 +604,7 @@ export default function AdminHomepage() {
                             if (updatedLogos.length === 0) {
                               deleteSponsor.mutate({ id: sp.id });
                             } else {
-                              updateSponsor.mutate({ id: sp.id, name: sp.name, logoUrls: updatedLogos, websiteUrl: sp.websiteUrl, isVisible: sp.isVisible, sortOrder: sp.sortOrder });
+                              updateSponsor.mutate({ id: sp.id, name: sp.name, logoUrls: updatedLogos, websiteUrl: sp.websiteUrl ?? undefined, isVisible: sp.isVisible, sortOrder: sp.sortOrder });
                             }
                           }
                         }}

@@ -834,6 +834,29 @@ export async function deleteHomepageStory(id: number) {
 }
 
 // Sponsors
+function parseSponsorLogoUrls(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((url): url is string => typeof url === "string" && url.length > 0);
+  if (typeof value !== "string" || value.length === 0) return [];
+
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((url): url is string => typeof url === "string" && url.length > 0);
+    }
+  } catch {
+    // Existing databases may contain a single URL instead of a JSON array.
+  }
+
+  return [value];
+}
+
+function normalizeHomepageSponsor(row: any): HomepageSponsor {
+  return {
+    ...row,
+    logoUrls: parseSponsorLogoUrls(row.logoUrls),
+  };
+}
+
 export async function listHomepageSponsors() {
   const pool = await getPool();
   if (!pool) {
@@ -845,10 +868,7 @@ export async function listHomepageSponsors() {
       'SELECT `id`, `isVisible`, `name`, `logo` as `logoUrls`, `url` as `websiteUrl`, `sortOrder`, `createdAt`, `updatedAt` FROM `homepage_sponsors` ORDER BY `sortOrder`'
     );
     console.log('[listHomepageSponsors] Success, returned', (rows as any[]).length, 'sponsors');
-    return (rows as any[]).map(row => ({
-      ...row,
-      logoUrls: typeof row.logoUrls === 'string' ? JSON.parse(row.logoUrls) : row.logoUrls
-    }));
+    return (rows as any[]).map(normalizeHomepageSponsor);
   } catch (error) {
     console.error('[listHomepageSponsors] Query error:', error);
     return [];
@@ -860,12 +880,12 @@ export async function createHomepageSponsor(data: InsertHomepageSponsor) {
   const [result] = await db.insert(homepageSponsors).values(data);
   return { id: (result as any).insertId };
 }
-export async function updateHomepageSponsor(id: number, data: Partial<HomepageSponsor>) {
+export async function updateHomepageSponsor(id: number, data: Partial<InsertHomepageSponsor>) {
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");
   await db.update(homepageSponsors).set(data).where(eq(homepageSponsors.id, id));
   const rows = await db.select().from(homepageSponsors).where(eq(homepageSponsors.id, id)).limit(1);
-  return rows[0] ?? null;
+  return rows[0] ? normalizeHomepageSponsor(rows[0]) : null;
 }
 export async function deleteHomepageSponsor(id: number) {
   const db = await getDb();

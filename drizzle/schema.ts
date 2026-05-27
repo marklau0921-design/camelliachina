@@ -380,15 +380,15 @@ export const homepageSponsors = mysqlTable("homepage_sponsors", {
   id: int("id").autoincrement().primaryKey(),
   isVisible: boolean("isVisible").default(true).notNull(),
   name: varchar("name", { length: 200 }).notNull(),
-  logoUrls: text("logoUrls").notNull(), // JSON array of logo URLs
-  websiteUrl: varchar("websiteUrl", { length: 512 }),
+  logoUrls: text("logo").notNull(), // Stored as a JSON array string in the existing logo column
+  websiteUrl: varchar("url", { length: 512 }),
   sortOrder: int("sortOrder").default(0).notNull(),
   backgroundTexture: varchar("backgroundTexture", { length: 512 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
-export type HomepageSponsor = typeof homepageSponsors.$inferSelect & { logoUrls: string[] };
-export type InsertHomepageSponsor = typeof homepageSponsors.$inferInsert & { logoUrls: string[] };
+export type HomepageSponsor = Omit<typeof homepageSponsors.$inferSelect, "logoUrls"> & { logoUrls: string[] };
+export type InsertHomepageSponsor = typeof homepageSponsors.$inferInsert;
 
 // ─── About Page Management ────────────────────────────────────────────────────
 // About 子板块目录（可增删，控制显示/隐藏）
