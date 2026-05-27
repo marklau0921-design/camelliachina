@@ -597,18 +597,13 @@ export default function ItineraryDetail() {
         ) : (
           <div style={{ width: '100%', height: '100%', background: '#1a1a1a' }} />
         )}
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.38)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 24px' }}>
-          {itin.place && (
-            <p style={{ fontSize: '13px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', marginBottom: '16px', fontFamily: 'var(--font-sans)' }}>
-              {itin.place}
-            </p>
-          )}
-          <h1 style={{ color: '#fff', fontSize: 'clamp(28px, 5vw, 56px)', fontWeight: 600, lineHeight: 1.8, letterSpacing: '0.12em', maxWidth: '800px', marginBottom: '20px', fontFamily: 'var(--font-serif)', textShadow: '2px 2px 8px rgba(0, 0, 0, 0.5)' }}>
+          <h1 style={{ color: '#fff', fontSize: '40px', letterSpacing: '-0.01em', fontFamily: 'Lato', fontWeight: 500, lineHeight: 1.25, margin: '0 0 24px', maxWidth: '900px' }}>
             {itin.name}
           </h1>
           {itin.shortDescription && (
-            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'clamp(14px, 2vw, 18px)', fontStyle: 'italic', maxWidth: '560px', lineHeight: 1.6, fontFamily: 'var(--font-serif)' }}>
+            <p style={{ color: '#fff', fontSize: '30px', fontFamily: 'Lato', fontWeight: 500, letterSpacing: '0.02em', margin: 0, maxWidth: '900px', lineHeight: 1.3 }}>
               {itin.shortDescription}
             </p>
           )}
