@@ -284,7 +284,7 @@ export default function AdminHomepage() {
         });
         const result = await uploadImageMutation.mutateAsync({
           filename: file.name, base64, mimeType: file.type, fileSize: file.size,
-          source: "homepage", assetType: "sponsor",
+          source: "homepage", assetType: "logo",
         });
         logoUrls.push(result.url);
       } catch (e: any) {
