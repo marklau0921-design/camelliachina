@@ -16,6 +16,10 @@ const fallbackLogos = [
 export default function PartnerLogos() {
   const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
 
+  if (homepageData && (!homepageData.sponsors || homepageData.sponsors.length === 0)) {
+    return null;
+  }
+
   // 使用 DB sponsors，若无数据则 fallback
   const logos = (homepageData?.sponsors && homepageData.sponsors.length > 0)
     ? homepageData.sponsors.flatMap(sp => {
