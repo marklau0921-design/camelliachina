@@ -380,7 +380,7 @@ export const homepageSponsors = mysqlTable("homepage_sponsors", {
   id: int("id").autoincrement().primaryKey(),
   isVisible: boolean("isVisible").default(true).notNull(),
   name: varchar("name", { length: 200 }).notNull(),
-  logoUrls: text("logo").notNull(), // Stored as a JSON array string in the existing logo column
+  logoUrls: text("logo").notNull(), // Existing database column; API exposes it as logoUrls.
   websiteUrl: varchar("url", { length: 512 }),
   sortOrder: int("sortOrder").default(0).notNull(),
   backgroundTexture: varchar("backgroundTexture", { length: 512 }),

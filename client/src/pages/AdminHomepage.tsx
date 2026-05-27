@@ -25,6 +25,24 @@ interface SponsorForm {
 const emptyVideoStory: VideoStoryForm = { title: "", youtubeId: "", thumbnailUrl: "", isVisible: true, sortOrder: 0 };
 const emptySponsor: SponsorForm = { name: "", logoUrls: [], websiteUrl: "", isVisible: true, sortOrder: 0 };
 
+function normalizeLogoUrls(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((url): url is string => typeof url === "string" && url.length > 0);
+  }
+  if (typeof value !== "string" || value.length === 0) return [];
+
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((url): url is string => typeof url === "string" && url.length > 0);
+    }
+  } catch {
+    return [value];
+  }
+
+  return [];
+}
+
 // ─── Section Header ───────────────────────────────────────────────────────────
 function SectionHeader({ title, visible, onToggle }: { title: string; visible: boolean; onToggle: () => void }) {
   return (
@@ -591,7 +609,7 @@ export default function AdminHomepage() {
         {sponsors.length > 0 && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
             {sponsors.map(sp => {
-              const logoUrls = typeof sp.logoUrls === 'string' ? JSON.parse(sp.logoUrls) : (Array.isArray(sp.logoUrls) ? sp.logoUrls : []);
+              const logoUrls = normalizeLogoUrls(sp.logoUrls);
               return (
                 <div key={sp.id} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                   {logoUrls.map((logo: string, idx: number) => (

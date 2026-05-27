@@ -1490,7 +1490,18 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);
-        return createHomepageSponsor({ name: input.name, logoUrls: JSON.stringify(input.logoUrls), websiteUrl: input.websiteUrl, isVisible: input.isVisible, sortOrder: input.sortOrder });
+        const created = [];
+        for (let index = 0; index < input.logoUrls.length; index++) {
+          const logoUrl = input.logoUrls[index];
+          created.push(await createHomepageSponsor({
+            name: input.logoUrls.length > 1 ? `${input.name} ${index + 1}` : input.name,
+            logoUrls: logoUrl,
+            websiteUrl: input.websiteUrl,
+            isVisible: input.isVisible,
+            sortOrder: input.sortOrder + index,
+          }));
+        }
+        return created.length === 1 ? created[0] : created;
       }),
     updateSponsor: publicProcedure
       .input(z.object({
@@ -1505,7 +1516,7 @@ export const appRouter = router({
         await requireAdmin(ctx);
         const { id, logoUrls, websiteUrl, ...rest } = input;
         const data: Record<string, any> = { ...rest };
-        if (logoUrls !== undefined) data.logoUrls = JSON.stringify(logoUrls);
+        if (logoUrls !== undefined) data.logoUrls = logoUrls[0] ?? "";
         if (websiteUrl !== undefined) data.websiteUrl = websiteUrl;
         return updateHomepageSponsor(id, data);
       }),

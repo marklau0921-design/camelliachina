@@ -845,6 +845,7 @@ function parseSponsorLogoUrls(value: unknown): string[] {
     }
   } catch {
     // Existing databases may contain a single URL instead of a JSON array.
+    if (value.trim().startsWith("[")) return [];
   }
 
   return [value];
