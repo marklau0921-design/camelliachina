@@ -858,6 +858,27 @@ function normalizeHomepageSponsor(row: any): HomepageSponsor {
   };
 }
 
+async function getHomepageSponsorColumns(pool: any) {
+  const [columns] = await pool.query("SHOW COLUMNS FROM `homepage_sponsors`");
+  const names = new Set((columns as any[]).map((column) => column.Field));
+  const logoColumn = names.has("logoUrls") ? "logoUrls" : names.has("logo") ? "logo" : null;
+  const websiteColumn = names.has("websiteUrl") ? "websiteUrl" : names.has("url") ? "url" : null;
+
+  if (!logoColumn) {
+    throw new Error("homepage_sponsors table is missing logo/logoUrls column");
+  }
+
+  return {
+    names,
+    logoColumn,
+    websiteColumn,
+  };
+}
+
+function quoteColumn(column: string) {
+  return `\`${column}\``;
+}
+
 export async function listHomepageSponsors() {
   const pool = await getPool();
   if (!pool) {
@@ -865,8 +886,12 @@ export async function listHomepageSponsors() {
     return [];
   }
   try {
+    const columns = await getHomepageSponsorColumns(pool);
+    const websiteSelect = columns.websiteColumn
+      ? `${quoteColumn(columns.websiteColumn)} as \`websiteUrl\``
+      : "NULL as `websiteUrl`";
     const [rows] = await pool.query(
-      'SELECT `id`, `isVisible`, `name`, `logo` as `logoUrls`, `url` as `websiteUrl`, `sortOrder`, `createdAt`, `updatedAt` FROM `homepage_sponsors` ORDER BY `sortOrder`'
+      `SELECT \`id\`, \`isVisible\`, \`name\`, ${quoteColumn(columns.logoColumn)} as \`logoUrls\`, ${websiteSelect}, \`sortOrder\`, \`createdAt\`, \`updatedAt\` FROM \`homepage_sponsors\` ORDER BY \`sortOrder\``
     );
     console.log('[listHomepageSponsors] Success, returned', (rows as any[]).length, 'sponsors');
     return (rows as any[]).map(normalizeHomepageSponsor);
@@ -878,21 +903,30 @@ export async function listHomepageSponsors() {
 export async function createHomepageSponsor(data: InsertHomepageSponsor) {
   const pool = await getPool();
   if (!pool) throw new Error("DB unavailable");
+  const columns = await getHomepageSponsorColumns(pool);
+  const insertColumns = ["isVisible", "name", columns.logoColumn, "sortOrder"];
+  const values: any[] = [
+    data.isVisible !== false ? 1 : 0,
+    data.name,
+    data.logoUrls,
+    data.sortOrder ?? 0,
+  ];
+
+  if (columns.websiteColumn) {
+    insertColumns.splice(3, 0, columns.websiteColumn);
+    values.splice(3, 0, data.websiteUrl ?? null);
+  }
+
   const [result] = await pool.execute(
-    'INSERT INTO `homepage_sponsors` (`isVisible`, `name`, `logo`, `url`, `sortOrder`) VALUES (?, ?, ?, ?, ?)',
-    [
-      data.isVisible !== false ? 1 : 0,
-      data.name,
-      data.logoUrls,
-      data.websiteUrl ?? null,
-      data.sortOrder ?? 0,
-    ]
+    `INSERT INTO \`homepage_sponsors\` (${insertColumns.map(quoteColumn).join(", ")}) VALUES (${insertColumns.map(() => "?").join(", ")})`,
+    values
   ) as any;
   return { id: (result as any).insertId };
 }
 export async function updateHomepageSponsor(id: number, data: Partial<InsertHomepageSponsor>) {
   const pool = await getPool();
   if (!pool) throw new Error("DB unavailable");
+  const columns = await getHomepageSponsorColumns(pool);
 
   const updates: string[] = [];
   const values: any[] = [];
@@ -901,11 +935,11 @@ export async function updateHomepageSponsor(id: number, data: Partial<InsertHome
     values.push(data.name);
   }
   if (data.logoUrls !== undefined) {
-    updates.push('`logo` = ?');
+    updates.push(`${quoteColumn(columns.logoColumn)} = ?`);
     values.push(data.logoUrls);
   }
-  if (data.websiteUrl !== undefined) {
-    updates.push('`url` = ?');
+  if (data.websiteUrl !== undefined && columns.websiteColumn) {
+    updates.push(`${quoteColumn(columns.websiteColumn)} = ?`);
     values.push(data.websiteUrl ?? null);
   }
   if (data.isVisible !== undefined) {
@@ -923,7 +957,7 @@ export async function updateHomepageSponsor(id: number, data: Partial<InsertHome
   }
 
   const [rows] = await pool.query(
-    'SELECT `id`, `isVisible`, `name`, `logo` as `logoUrls`, `url` as `websiteUrl`, `sortOrder`, `createdAt`, `updatedAt` FROM `homepage_sponsors` WHERE `id` = ? LIMIT 1',
+    `SELECT \`id\`, \`isVisible\`, \`name\`, ${quoteColumn(columns.logoColumn)} as \`logoUrls\`, ${columns.websiteColumn ? `${quoteColumn(columns.websiteColumn)} as \`websiteUrl\`` : "NULL as `websiteUrl`"}, \`sortOrder\`, \`createdAt\`, \`updatedAt\` FROM \`homepage_sponsors\` WHERE \`id\` = ? LIMIT 1`,
     [id]
   );
   return (rows as any[])[0] ? normalizeHomepageSponsor((rows as any[])[0]) : null;
