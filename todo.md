@@ -127,3 +127,12 @@
 - [x] 前台：主页简介板块从数据库读取（LuxuryTravelExperts.tsx）
 - [x] 前台：CarouselSection Stories 从数据库读取
 - [x] 前台：PartnerLogos 赞助商从数据库读取
+
+
+## 当前会话任务
+
+- [ ] 验证 Sponsor Logos 上传功能是否正常（已改用 assetType: "general"）
+- [ ] 对齐 ItineraryDetail.tsx 排版与 CityPage.tsx 样式（字体粗细、字间距、响应式尺寸）
+- [ ] 完成 AdminItineraries.tsx 多图片上传功能测试
+- [ ] 完成 AdminHomepage.tsx Sponsor Logos 管理功能测试
+- [ ] 完成权限检查与文件上传权限验证
