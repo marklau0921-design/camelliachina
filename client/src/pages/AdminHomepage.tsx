@@ -353,6 +353,20 @@ export default function AdminHomepage() {
   const imageStories = imageStoriesQuery.data ?? [];
   const videoStories = videoStoriesQuery.data ?? [];
   const sponsors = sponsorsQuery.data ?? [];
+  const sponsorsVisible = sponsors.length > 0 ? sponsors.some(sp => sp.isVisible) : true;
+  const toggleSponsorsVisibility = () => {
+    const nextVisible = !sponsorsVisible;
+    sponsors.forEach(sp => {
+      updateSponsor.mutate({
+        id: sp.id,
+        name: sp.name,
+        logoUrls: normalizeLogoUrls(sp.logoUrls),
+        websiteUrl: sp.websiteUrl ?? undefined,
+        isVisible: nextVisible,
+        sortOrder: sp.sortOrder,
+      });
+    });
+  };
 
   const handleVideoStorySave = (data: VideoStoryForm & { id?: number }) => {
     if (data.id) {
@@ -595,7 +609,7 @@ export default function AdminHomepage() {
 
       {/* ── Sponsors ────────────────────────────────────────────────────────── */}
       <div style={{ ...cardStyle, marginBottom: 32 }}>
-        <SectionHeader title="Sponsor Logos" visible={true} onToggle={() => {}} />
+        <SectionHeader title="Sponsor Logos" visible={sponsorsVisible} onToggle={toggleSponsorsVisibility} />
         <p style={{ fontFamily: "Lato, sans-serif", fontSize: 12, color: "#888", margin: "-12px 0 20px 0" }}>
           Upload sponsor logos. Drag & drop or click to upload.
         </p>
