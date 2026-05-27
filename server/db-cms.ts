@@ -876,17 +876,57 @@ export async function listHomepageSponsors() {
   }
 }
 export async function createHomepageSponsor(data: InsertHomepageSponsor) {
-  const db = await getDb();
-  if (!db) throw new Error("DB unavailable");
-  const [result] = await db.insert(homepageSponsors).values(data);
+  const pool = await getPool();
+  if (!pool) throw new Error("DB unavailable");
+  const [result] = await pool.execute(
+    'INSERT INTO `homepage_sponsors` (`isVisible`, `name`, `logo`, `url`, `sortOrder`) VALUES (?, ?, ?, ?, ?)',
+    [
+      data.isVisible !== false ? 1 : 0,
+      data.name,
+      data.logoUrls,
+      data.websiteUrl ?? null,
+      data.sortOrder ?? 0,
+    ]
+  ) as any;
   return { id: (result as any).insertId };
 }
 export async function updateHomepageSponsor(id: number, data: Partial<InsertHomepageSponsor>) {
-  const db = await getDb();
-  if (!db) throw new Error("DB unavailable");
-  await db.update(homepageSponsors).set(data).where(eq(homepageSponsors.id, id));
-  const rows = await db.select().from(homepageSponsors).where(eq(homepageSponsors.id, id)).limit(1);
-  return rows[0] ? normalizeHomepageSponsor(rows[0]) : null;
+  const pool = await getPool();
+  if (!pool) throw new Error("DB unavailable");
+
+  const updates: string[] = [];
+  const values: any[] = [];
+  if (data.name !== undefined) {
+    updates.push('`name` = ?');
+    values.push(data.name);
+  }
+  if (data.logoUrls !== undefined) {
+    updates.push('`logo` = ?');
+    values.push(data.logoUrls);
+  }
+  if (data.websiteUrl !== undefined) {
+    updates.push('`url` = ?');
+    values.push(data.websiteUrl ?? null);
+  }
+  if (data.isVisible !== undefined) {
+    updates.push('`isVisible` = ?');
+    values.push(data.isVisible ? 1 : 0);
+  }
+  if (data.sortOrder !== undefined) {
+    updates.push('`sortOrder` = ?');
+    values.push(data.sortOrder);
+  }
+
+  if (updates.length > 0) {
+    values.push(id);
+    await pool.execute(`UPDATE \`homepage_sponsors\` SET ${updates.join(", ")} WHERE \`id\` = ?`, values);
+  }
+
+  const [rows] = await pool.query(
+    'SELECT `id`, `isVisible`, `name`, `logo` as `logoUrls`, `url` as `websiteUrl`, `sortOrder`, `createdAt`, `updatedAt` FROM `homepage_sponsors` WHERE `id` = ? LIMIT 1',
+    [id]
+  );
+  return (rows as any[])[0] ? normalizeHomepageSponsor((rows as any[])[0]) : null;
 }
 export async function deleteHomepageSponsor(id: number) {
   const db = await getDb();
