@@ -2,6 +2,13 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { trpc } from '@/lib/trpc';
 
+const TEAM_DISPLAY = "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)";
+const TEAM_SANS = "var(--font-travel-sans, 'Cabin', 'Josefin Sans', 'Helvetica Neue', Arial, sans-serif)";
+const TEAM_TEXT = '#52575c';
+const TEAM_DARK = '#000';
+const TEAM_MUTED = '#888';
+const TEAM_GREEN = '#379c8a';
+
 interface TeamMember {
   id: number;
   name: string;
@@ -20,20 +27,23 @@ interface TeamMember {
 
 
 const bioStyle: React.CSSProperties = {
-  color: '#333',
-  fontSize: 'clamp(14px, 1.3vw, 16px)',
-  lineHeight: 1.8,
-  fontWeight: 300,
+  fontFamily: TEAM_SANS,
+  color: TEAM_TEXT,
+  fontSize: '17px',
+  lineHeight: 1.5,
+  letterSpacing: '0.85px',
+  fontWeight: 400,
 };
 
 const quoteTextStyle: React.CSSProperties = {
-  fontFamily: 'Georgia, "Times New Roman", serif',
-  fontSize: 'clamp(14px, 1.4vw, 17px)',
-  fontWeight: 700,
-  color: '#2a7a6a',
-  lineHeight: 1.55,
+  fontFamily: TEAM_DISPLAY,
+  fontSize: 'clamp(32px, 3.5vw, 45px)',
+  fontWeight: 400,
+  color: TEAM_GREEN,
+  lineHeight: 1,
+  letterSpacing: '2.25px',
   margin: 0,
-  fontStyle: 'normal',
+  textTransform: 'uppercase',
 };
 
 function slugify(value: string) {
@@ -53,11 +63,10 @@ function TeamMemberSection({ member, index }: { member: TeamMember; index: numbe
 
   const text = (
     <div className="ot-text-col" style={{ flex: '1 1 0', paddingTop: '40px', minWidth: 0 }}>
-      <h1 style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 'clamp(32px, 4vw, 52px)', fontWeight: 400, color: '#1a1a1a', lineHeight: 1.05, letterSpacing: '-0.01em', margin: '0 0 10px' }}>{member.name}</h1>
-      <p style={{ color: '#555', fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 28px', fontWeight: 400 }}>{member.role}</p>
+      <h1 style={{ fontFamily: TEAM_DISPLAY, fontSize: 'clamp(38px, 5vw, 45px)', fontWeight: 400, color: TEAM_DARK, lineHeight: 1, letterSpacing: '2.25px', margin: '0 0 8px', textTransform: 'uppercase' }}>{member.name}</h1>
+      <p style={{ fontFamily: TEAM_SANS, color: TEAM_DARK, fontSize: '18px', letterSpacing: '1.8px', lineHeight: 1.28, textTransform: 'uppercase', margin: '0 0 26px', fontWeight: 700 }}>{member.role}</p>
       {member.bio1 && <p style={{ ...bioStyle, margin: '0 0 18px' }}>{member.bio1}</p>}
       {member.bio2 && <p style={{ ...bioStyle, margin: 0 }}>{member.bio2}</p>}
-      {member.specialty && <p style={{ color: '#2a7a6a', fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', margin: '26px 0 0' }}>{member.specialty}</p>}
     </div>
   );
 
@@ -92,18 +101,18 @@ function TeamMemberSection({ member, index }: { member: TeamMember; index: numbe
 function StoryText({ member }: { member: TeamMember }) {
   return (
     <div className="ot-story-text" style={{ flex: '0 0 auto', width: 'clamp(260px, 35vw, 420px)' }}>
-      {member.storyTitle && <h2 style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 'clamp(22px, 2.5vw, 32px)', fontWeight: 400, color: '#1a1a1a', lineHeight: 1.2, margin: '0 0 8px', letterSpacing: '-0.01em' }}>{member.storyTitle}</h2>}
-      {member.storySubtitle && <p style={{ color: '#888', fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0 0 24px' }}>{member.storySubtitle}</p>}
-      {member.storyText && <p style={{ ...bioStyle, color: '#444', margin: 0 }}>{member.storyText}</p>}
+      {member.storyTitle && <h2 style={{ fontFamily: TEAM_DISPLAY, fontSize: 'clamp(34px, 4vw, 45px)', fontWeight: 400, color: TEAM_DARK, lineHeight: 1, margin: '0 0 8px', letterSpacing: '2.25px', textTransform: 'uppercase' }}>{member.storyTitle}</h2>}
+      {member.storySubtitle && <p style={{ fontFamily: TEAM_SANS, color: TEAM_MUTED, fontSize: '13px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.5, textTransform: 'uppercase', margin: '0 0 24px' }}>{member.storySubtitle}</p>}
+      {member.storyText && <p style={{ ...bioStyle, margin: 0 }}>{member.storyText}</p>}
     </div>
   );
 }
 
 function StoryImages({ member, mirrored = false }: { member: TeamMember; mirrored?: boolean }) {
   return (
-    <div className="ot-story-images" style={{ flex: 1, minWidth: 0, position: 'relative', height: 'clamp(280px, 32vw, 420px)' }}>
-      {member.storyImage && <img src={member.storyImage} alt={member.storySubtitle || member.name} style={{ position: 'absolute', top: 0, [mirrored ? 'left' : 'right']: 0, width: '72%', height: '78%', objectFit: 'cover', display: 'block', zIndex: 1, boxShadow: '0 4px 20px rgba(0,0,0,0.10)' }} />}
-      {member.storyImage2 && <img src={member.storyImage2} alt={member.name} style={{ position: 'absolute', bottom: 0, [mirrored ? 'right' : 'left']: 0, width: '55%', height: '82%', objectFit: 'cover', objectPosition: 'top center', display: 'block', zIndex: 2, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }} />}
+    <div className="ot-story-images" style={{ flex: 1, minWidth: 0, position: 'relative', height: 'clamp(320px, 36vw, 480px)' }}>
+      {member.storyImage && <img src={member.storyImage} alt={member.storySubtitle || member.name} style={{ position: 'absolute', top: 0, [mirrored ? 'left' : 'right']: 0, width: '84%', height: '70%', objectFit: 'cover', objectPosition: 'center center', display: 'block', zIndex: 1, boxShadow: '0 4px 20px rgba(0,0,0,0.10)' }} />}
+      {member.storyImage2 && <img src={member.storyImage2} alt={member.name} style={{ position: 'absolute', bottom: 0, [mirrored ? 'right' : 'left']: 0, width: '46%', height: '86%', objectFit: 'cover', objectPosition: 'top center', display: 'block', zIndex: 2, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }} />}
     </div>
   );
 }
@@ -115,7 +124,7 @@ export default function OurTeam() {
   const members = data ?? [];
 
   return (
-    <div style={{ fontFamily: 'sans-serif', background: '#f5f2ee', minHeight: '100vh' }}>
+    <div style={{ fontFamily: TEAM_SANS, background: '#f5f2ee', minHeight: '100vh' }}>
       <style>{`
         .ot-three-col { padding-left: clamp(28px, calc(-645px + 49.82vw), 305px); padding-right: clamp(24px, 5vw, 60px); flex-wrap: nowrap; align-items: flex-start; }
         .ot-three-col.layout-normal .ot-photo-col { order: 1; }
@@ -141,7 +150,7 @@ export default function OurTeam() {
           .ot-text-col { flex: unset !important; padding-top: 40px !important; min-width: 0 !important; align-self: start !important; }
           .ot-story-row { flex-direction: row !important; gap: clamp(24px, 4vw, 48px) !important; align-items: center !important; }
           .ot-story-text { flex: 0 0 auto !important; width: clamp(220px, 38vw, 380px) !important; }
-          .ot-story-images { flex: 1 !important; min-width: 0 !important; height: clamp(220px, 28vw, 340px) !important; }
+          .ot-story-images { flex: 1 !important; min-width: 0 !important; height: clamp(260px, 32vw, 380px) !important; }
         }
         @media (max-width: 767px) {
           .ot-three-col { flex-direction: column !important; flex-wrap: nowrap !important; align-items: center !important; padding-left: 20px !important; padding-right: 20px !important; }
@@ -150,7 +159,7 @@ export default function OurTeam() {
           .ot-quote-col { order: 3 !important; flex: unset !important; width: 100% !important; max-width: 100% !important; padding-top: 0 !important; padding-bottom: 24px !important; }
           .ot-story-row { flex-direction: column !important; gap: 32px !important; }
           .ot-story-text { order: 1 !important; width: 100% !important; }
-          .ot-story-images { order: 2 !important; width: 100% !important; flex: unset !important; min-width: 0 !important; height: clamp(220px, 55vw, 320px) !important; }
+          .ot-story-images { order: 2 !important; width: 100% !important; flex: unset !important; min-width: 0 !important; height: clamp(260px, 70vw, 380px) !important; }
         }
       `}</style>
       <Navigation />
