@@ -35,7 +35,6 @@ const DURATION = 900;
 const EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 const DISPLAY_FONT = "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)";
 const BODY_FONT = "var(--font-travel-sans, 'Cabin', 'Helvetica Neue', Arial, sans-serif)";
-const SERIF_FONT = "var(--font-travel-serif, 'Cormorant Garamond', Georgia, serif)";
 
 type Direction = 'forward' | 'backward';
 type AnimRole = 'entering' | 'exiting';
@@ -241,7 +240,7 @@ export default function WhyUs() {
             <p style={{ fontFamily: BODY_FONT, fontSize: 'clamp(10px,1vw,13px)', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#c8b89a', margin: '0 0 20px 0' }}>
               {slide.num} / {String(SLIDES.length - 1).padStart(2, '0')}
             </p>
-            <h2 style={{ fontFamily: SERIF_FONT, fontSize: 'clamp(34px,4vw,62px)', fontWeight: 500, color: '#fff', lineHeight: 1.08, letterSpacing: '0.015em', margin: '0 0 28px 0' }}>
+            <h2 style={{ fontFamily: DISPLAY_FONT, fontSize: 'clamp(48px,5vw,86px)', fontWeight: 400, color: '#fff', lineHeight: 0.95, letterSpacing: '0.07em', margin: '0 0 28px 0', textTransform: 'uppercase' }}>
               {slide.title}
             </h2>
             <p style={{ fontFamily: BODY_FONT, fontSize: 'clamp(14px,1.15vw,17px)', color: 'rgba(255,255,255,0.7)', lineHeight: 1.75, letterSpacing: '0.03em', maxWidth: '430px', margin: 0 }}>
