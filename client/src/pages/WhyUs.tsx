@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Navigation from '@/components/Navigation';
 import { trpc } from '@/lib/trpc';
 
@@ -60,27 +60,30 @@ function preloadImages(slides: Slide[]) {
 export default function WhyUs() {
   const { data: dbSections } = trpc.about.listWhyUsSections.useQuery();
 
-  // Build slides: cover slide + DB sections only (no static fallback)
-  const dbSlides = dbSections && dbSections.length > 0
-    ? dbSections
-      .filter(s => s.title || s.content || s.image)
-      .map((s, i) => ({
-        num: String(i + 1).padStart(2, '0'),
-        title: s.title,
-        description: s.content,
-        image: s.image ?? undefined,
-      }))
-    : [];
-  const SLIDES: Slide[] = [
-    { isCover: true, title: 'WHY US?', subtitle: 'What sets us apart', description: `${dbSlides.length} reasons to travel with Wayseek` },
-    ...dbSlides,
-  ];
+  // Build slides from CMS data once per data update so navigation callbacks use the latest count.
+  const SLIDES = useMemo<Slide[]>(() => {
+    const dbSlides = dbSections && dbSections.length > 0
+      ? dbSections
+        .filter(s => s.title || s.content || s.image)
+        .map((s, i) => ({
+          num: String(i + 1).padStart(2, '0'),
+          title: s.title,
+          description: s.content,
+          image: s.image ?? undefined,
+        }))
+      : [];
+
+    return [
+      { isCover: true, title: 'WHY US?', subtitle: 'What sets us apart', description: `${dbSlides.length} reasons to travel with Wayseek` },
+      ...dbSlides,
+    ];
+  }, [dbSections]);
 
   const [current, setCurrent] = useState<SlideState>({ index: 0, role: 'idle', direction: 'forward' });
   const [prev, setPrev] = useState<SlideState | null>(null);
 
   // Preload all images on mount
-  useEffect(() => { preloadImages(SLIDES); }, [SLIDES.length]);
+  useEffect(() => { preloadImages(SLIDES); }, [SLIDES]);
   const lockRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -101,7 +104,14 @@ export default function WhyUs() {
       setCurrent(s => ({ ...s, role: 'idle' }));
       lockRef.current = false;
     }, DURATION + 60);
-  }, [current.index]);
+  }, [current.index, SLIDES.length]);
+
+  useEffect(() => {
+    if (current.index < SLIDES.length) return;
+    setCurrent({ index: Math.max(0, SLIDES.length - 1), role: 'idle', direction: 'forward' });
+    setPrev(null);
+    lockRef.current = false;
+  }, [current.index, SLIDES.length]);
 
   // Keyboard
   useEffect(() => {
