@@ -37,7 +37,7 @@ const bioStyle: React.CSSProperties = {
 
 const quoteTextStyle: React.CSSProperties = {
   fontFamily: TEAM_DISPLAY,
-  fontSize: 'clamp(32px, 3.5vw, 45px)',
+  fontSize: 'clamp(30px, 2.7vw, 38px)',
   fontWeight: 400,
   color: TEAM_GREEN,
   lineHeight: 1,
@@ -62,7 +62,7 @@ function TeamMemberSection({ member, index }: { member: TeamMember; index: numbe
   );
 
   const text = (
-    <div className="ot-text-col" style={{ flex: '0 1 527px', maxWidth: '527px', paddingTop: '40px', minWidth: 0 }}>
+    <div className="ot-text-col" style={{ flex: '0 1 790px', maxWidth: '790px', paddingTop: '40px', minWidth: 0 }}>
       <h1 style={{ fontFamily: TEAM_DISPLAY, fontSize: 'clamp(38px, 5vw, 45px)', fontWeight: 400, color: TEAM_DARK, lineHeight: 1, letterSpacing: '2.25px', margin: '0 0 8px', textTransform: 'uppercase' }}>{member.name}</h1>
       <p style={{ fontFamily: TEAM_SANS, color: TEAM_DARK, fontSize: '18px', letterSpacing: '1.8px', lineHeight: 1.28, textTransform: 'uppercase', margin: '0 0 26px', fontWeight: 700 }}>{member.role}</p>
       {member.bio1 && <p style={{ ...bioStyle, margin: '0 0 18px' }}>{member.bio1}</p>}
@@ -84,7 +84,7 @@ function TeamMemberSection({ member, index }: { member: TeamMember; index: numbe
         </div>
       )}
       <div id={`member-${slugify(member.name)}`} style={{ background: '#f5f2ee', position: 'relative', paddingBottom: '80px', paddingTop: index > 0 ? '0' : undefined }}>
-        <div className={`ot-three-col ${layoutClass}`} style={{ display: 'flex', maxWidth: '1340px', margin: '0 auto', gap: 'clamp(32px, 4vw, 64px)' }}>
+        <div className={`ot-three-col ${layoutClass}`} style={{ display: 'flex', maxWidth: '1600px', margin: '0 auto', gap: 'clamp(32px, 4vw, 64px)' }}>
           {mirrored ? <>{quote}{text}{photo}</> : <>{photo}{text}{quote}</>}
         </div>
 
