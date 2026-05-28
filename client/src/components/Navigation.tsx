@@ -508,7 +508,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
               {/* Landscape */}
               <div className="bt-landscape-layout" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
                 {/* Col 1 */}
-                <div style={{ flexShrink: 0, overflowY: 'hidden', paddingTop: '60px', paddingBottom: '40px', paddingRight: '20px', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', minWidth: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+                <div style={{ flexShrink: 0, overflowY: 'hidden', paddingTop: '60px', paddingBottom: '40px', paddingRight: '20px', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', width: '320px', boxSizing: 'content-box', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                   {activeDestinations.map(dest => (
                     <div
                       key={dest.id}
@@ -634,7 +634,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
               {/* Landscape */}
               <div className="exp-landscape-layout" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
                 {/* Col 1 */}
-                <div style={{ flexShrink: 0, overflowY: 'hidden', paddingTop: '60px', paddingBottom: '40px', paddingRight: '20px', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', minWidth: '320px', boxSizing: 'content-box', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+                <div style={{ flexShrink: 0, overflowY: 'hidden', paddingTop: '60px', paddingBottom: '40px', paddingRight: '20px', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', width: '320px', boxSizing: 'content-box', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                   {categories.length === 0 ? (
                     <div style={{ color: '#aaa', fontFamily: NAV_SANS, fontSize: '13px', paddingTop: '8px' }}>Loading...</div>
                   ) : categories.map(cat => (
