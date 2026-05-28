@@ -62,7 +62,7 @@ function TeamMemberSection({ member, index }: { member: TeamMember; index: numbe
   );
 
   const text = (
-    <div className="ot-text-col" style={{ flex: '1 1 0', paddingTop: '40px', minWidth: 0 }}>
+    <div className="ot-text-col" style={{ flex: '0 1 527px', maxWidth: '527px', paddingTop: '40px', minWidth: 0 }}>
       <h1 style={{ fontFamily: TEAM_DISPLAY, fontSize: 'clamp(38px, 5vw, 45px)', fontWeight: 400, color: TEAM_DARK, lineHeight: 1, letterSpacing: '2.25px', margin: '0 0 8px', textTransform: 'uppercase' }}>{member.name}</h1>
       <p style={{ fontFamily: TEAM_SANS, color: TEAM_DARK, fontSize: '18px', letterSpacing: '1.8px', lineHeight: 1.28, textTransform: 'uppercase', margin: '0 0 26px', fontWeight: 700 }}>{member.role}</p>
       {member.bio1 && <p style={{ ...bioStyle, margin: '0 0 18px' }}>{member.bio1}</p>}
@@ -71,7 +71,7 @@ function TeamMemberSection({ member, index }: { member: TeamMember; index: numbe
   );
 
   const quote = (
-    <div className="ot-quote-col" style={{ flexShrink: 0, width: 'clamp(160px, 18vw, 220px)', paddingTop: '151px' }}>
+    <div className="ot-quote-col" style={{ flexShrink: 0, width: 'clamp(280px, 22vw, 360px)', paddingTop: '151px' }}>
       {member.quote && <p style={quoteTextStyle}>{member.quote}</p>}
     </div>
   );
@@ -84,7 +84,7 @@ function TeamMemberSection({ member, index }: { member: TeamMember; index: numbe
         </div>
       )}
       <div id={`member-${slugify(member.name)}`} style={{ background: '#f5f2ee', position: 'relative', paddingBottom: '80px', paddingTop: index > 0 ? '0' : undefined }}>
-        <div className={`ot-three-col ${layoutClass}`} style={{ display: 'flex', maxWidth: '100%', margin: '0', gap: 'clamp(24px, 4vw, 56px)' }}>
+        <div className={`ot-three-col ${layoutClass}`} style={{ display: 'flex', maxWidth: '1340px', margin: '0 auto', gap: 'clamp(32px, 4vw, 64px)' }}>
           {mirrored ? <>{quote}{text}{photo}</> : <>{photo}{text}{quote}</>}
         </div>
 
@@ -126,7 +126,7 @@ export default function OurTeam() {
   return (
     <div style={{ fontFamily: TEAM_SANS, background: '#f5f2ee', minHeight: '100vh' }}>
       <style>{`
-        .ot-three-col { padding-left: clamp(28px, calc(-645px + 49.82vw), 305px); padding-right: clamp(24px, 5vw, 60px); flex-wrap: nowrap; align-items: flex-start; }
+        .ot-three-col { padding-left: clamp(28px, 4vw, 60px); padding-right: clamp(24px, 4vw, 60px); flex-wrap: nowrap; align-items: flex-start; justify-content: center; }
         .ot-three-col.layout-normal .ot-photo-col { order: 1; }
         .ot-three-col.layout-normal .ot-text-col { order: 2; }
         .ot-three-col.layout-normal .ot-quote-col { order: 3; }
