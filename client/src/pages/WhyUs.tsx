@@ -62,7 +62,9 @@ export default function WhyUs() {
 
   // Build slides: cover slide + DB sections only (no static fallback)
   const dbSlides = dbSections && dbSections.length > 0
-    ? dbSections.map((s, i) => ({
+    ? dbSections
+      .filter(s => s.title || s.content || s.image)
+      .map((s, i) => ({
         num: String(i + 1).padStart(2, '0'),
         title: s.title,
         description: s.content,
@@ -196,9 +198,11 @@ export default function WhyUs() {
         <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: '', backgroundRepeat: 'repeat', backgroundSize: '300px 300px' }} />
       </div>
     ) : (
-      <>
+      slide.image ? (
         <img src={slide.image} alt={slide.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-      </>
+      ) : (
+        <div style={{ width: '100%', height: '100%', background: '#00a0a6' }} />
+      )
     );
 
     return (

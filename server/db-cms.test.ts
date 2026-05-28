@@ -98,16 +98,14 @@ describe("CMS Auto-Create Functionality", () => {
     expect(sections[1].isVisible).toBe(true);
   });
 
-  it("should auto-create why us section if table is empty", async () => {
+  it("should return no why us sections if table is empty", async () => {
     // Clear existing records
     await db.delete(whyUsSections);
 
-    // Call listWhyUsSections - should auto-create
+    // Call listWhyUsSections - should not create placeholder content
     const sections = await listWhyUsSections();
 
-    expect(sections.length).toBeGreaterThan(0);
-    expect(sections[0].title).toBe("Why Choose Us");
-    expect(sections[0].content).toBe("");
+    expect(sections).toEqual([]);
   });
 
   it("should not create duplicate records on multiple calls", async () => {

@@ -1074,21 +1074,18 @@ export async function deleteAboutSection(id: number) {
 export async function listWhyUsSections() {
   const db = await getDb();
   if (!db) return [];
-  const rows = await db.select().from(whyUsSections).orderBy(whyUsSections.sortOrder);
-  
-  // Auto-create default record if table is empty
-  if (rows.length === 0) {
-    const defaultData = {
-      title: "Why Choose Us",
-      content: "",
-      image: null,
-      sortOrder: 0,
-    };
-    await db.insert(whyUsSections).values(defaultData);
-    const newRows = await db.select().from(whyUsSections).orderBy(whyUsSections.sortOrder);
-    return newRows;
+  let rows = await db.select().from(whyUsSections).orderBy(whyUsSections.sortOrder);
+
+  const legacyDefault = rows.find(row =>
+    row.title === "Why Choose Us" &&
+    !row.content &&
+    !row.image
+  );
+  if (legacyDefault) {
+    await db.delete(whyUsSections).where(eq(whyUsSections.id, legacyDefault.id));
+    rows = await db.select().from(whyUsSections).orderBy(whyUsSections.sortOrder);
   }
-  
+
   return rows;
 }
 
