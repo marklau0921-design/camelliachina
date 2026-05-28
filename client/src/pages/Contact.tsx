@@ -7,19 +7,25 @@ import Footer from '@/components/Footer';
 import CustomSelect from '@/components/CustomSelect';
 
 // ── Contact Partner Logos with drag scroll ──
-const CONTACT_LOGOS = [
-  { src: '', alt: 'Virtuoso', height: undefined as number | undefined },
-  { src: '', alt: 'Fan Club', height: undefined as number | undefined },
-  { src: '', alt: 'Pen Club', height: undefined as number | undefined },
-  { src: '', alt: 'Forbes', height: undefined as number | undefined },
-  { src: '', alt: 'Ensemble', height: undefined as number | undefined },
-  { src: '', alt: 'EF Education First', height: 80 as number | undefined },
-  { src: '', alt: 'Coveteur', height: undefined as number | undefined },
-  { src: '', alt: 'CNBC', height: undefined as number | undefined },
-  { src: '', alt: 'Travel + Leisure A-List 2026', height: undefined as number | undefined },
-];
-
 function ContactPartnerLogos() {
+  const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
+  const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const ctaTexture = homepageAssets?.cta?.url || '';
+  const textureOpacity = Math.max(0, Math.min(1, Number((homepageAssets?.cta as any)?.opacity ?? 28) / 100));
+  const logos = (homepageData?.sponsors || []).flatMap((sponsor: any) => {
+    let urls: string[] = [];
+    try {
+      urls = typeof sponsor.logoUrls === 'string' ? JSON.parse(sponsor.logoUrls) : sponsor.logoUrls || [];
+    } catch {
+      urls = [];
+    }
+    return urls.filter(Boolean).map((logoUrl: string) => ({
+      src: logoUrl,
+      alt: sponsor.name || 'Sponsor',
+      url: sponsor.websiteUrl || undefined,
+    }));
+  });
+
   const trackRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const startXRef = useRef(0);
@@ -43,6 +49,8 @@ function ContactPartnerLogos() {
     rafRef.current = requestAnimationFrame(step);
   };
   useEffect(() => () => cancelInertia(), []);
+
+  if (logos.length === 0) return null;
 
   const onMouseDown = (e: React.MouseEvent) => {
     cancelInertia();
@@ -96,7 +104,7 @@ function ContactPartnerLogos() {
 
   return (
     <section style={{ position: 'relative', width: '100%', height: '260px', backgroundColor: '#315c00', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: '', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: ctaTexture ? `url(${ctaTexture})` : '', backgroundSize: '420px 420px', backgroundRepeat: 'repeat', opacity: textureOpacity, mixBlendMode: 'normal', filter: 'contrast(1.45) brightness(1.08)' }} />
       <div style={{ position: 'relative', zIndex: 1, width: '100%', overflow: 'hidden' }}>
         <div
           ref={trackRef}
@@ -109,9 +117,15 @@ function ContactPartnerLogos() {
           onTouchEnd={onTouchEnd}
           style={{ display: 'flex', flexDirection: 'row', overflowX: 'scroll', msOverflowStyle: 'none', scrollbarWidth: 'none', cursor: 'grab', userSelect: 'none', WebkitOverflowScrolling: 'touch', paddingLeft: '24px', paddingRight: '24px', gap: '56px', alignItems: 'center' }}
         >
-          {CONTACT_LOGOS.map((logo, i) => (
+          {logos.map((logo, i) => (
             <div key={i} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100px', minWidth: '160px' }}>
-              <img src={logo.src} alt={logo.alt} draggable={false} style={{ height: logo.height ? `${logo.height}px` : '100%', width: 'auto', maxWidth: '280px', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.85, pointerEvents: 'none' }} />
+              {logo.url ? (
+                <a href={logo.url} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img src={logo.src} alt={logo.alt} draggable={false} style={{ height: '100%', width: 'auto', maxWidth: '280px', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.85, pointerEvents: 'none' }} />
+                </a>
+              ) : (
+                <img src={logo.src} alt={logo.alt} draggable={false} style={{ height: '100%', width: 'auto', maxWidth: '280px', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.85, pointerEvents: 'none' }} />
+              )}
             </div>
           ))}
         </div>
