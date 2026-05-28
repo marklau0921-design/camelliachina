@@ -26,6 +26,7 @@ interface Slide {
   subtitle?: string;
   description?: string;
   image?: string;
+  backgroundColor?: string;
   isCover?: boolean;
 }
 
@@ -59,6 +60,9 @@ function preloadImages(slides: Slide[]) {
 
 export default function WhyUs() {
   const { data: dbSections } = trpc.about.listWhyUsSections.useQuery();
+  const { data: homeSettings } = trpc.about.getWhyUsHomeSettings.useQuery();
+  const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const backgroundTexture = homepageAssets?.cta?.url;
 
   // Build slides from CMS data once per data update so navigation callbacks use the latest count.
   const SLIDES = useMemo<Slide[]>(() => {
@@ -70,14 +74,15 @@ export default function WhyUs() {
           title: s.title,
           description: s.content,
           image: s.image ?? undefined,
+          backgroundColor: (s as any).backgroundColor || '#12334c',
         }))
       : [];
 
     return [
-      { isCover: true, title: 'WHY US?', subtitle: 'What sets us apart', description: `${dbSlides.length} reasons to travel with Wayseek` },
+      { isCover: true, title: 'WHY US?', subtitle: 'What sets us apart', description: `${dbSlides.length} reasons to book\nwith WaySeekChina`, backgroundColor: homeSettings?.backgroundColor || '#12334c' },
       ...dbSlides,
     ];
-  }, [dbSections]);
+  }, [dbSections, homeSettings?.backgroundColor]);
 
   const [current, setCurrent] = useState<SlideState>({ index: 0, role: 'idle', direction: 'forward' });
   const [prev, setPrev] = useState<SlideState | null>(null);
@@ -151,6 +156,19 @@ export default function WhyUs() {
   const renderSlide = (state: SlideState) => {
     const slide = SLIDES[state.index] ?? SLIDES[0];
     const { role, direction } = state;
+    const slideBg = slide.backgroundColor || '#12334c';
+    const textureLayer = backgroundTexture
+      ? {
+          backgroundImage: `url(${backgroundTexture})`,
+          backgroundRepeat: 'repeat',
+          backgroundSize: '420px 420px',
+          opacity: 0.28,
+          mixBlendMode: 'screen' as const,
+        }
+      : {
+          backgroundImage: 'radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08), transparent 30%)',
+          opacity: 0.2,
+        };
 
     // Odd slide index (1,3,5) = text left / image right
     // Even slide index (2,4) = image left / text right
@@ -161,6 +179,32 @@ export default function WhyUs() {
       role === 'idle'
         ? 'none'
         : `${animName(panel, role as AnimRole, direction)} ${DURATION}ms ${EASE} both`;
+
+    if (slide.isCover) {
+      return (
+        <>
+          <div style={{ position: 'absolute', inset: 0, backgroundColor: slideBg, zIndex: 0 }} />
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, ...textureLayer }} />
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '50%', height: '100%', overflow: 'hidden', zIndex: 1 }}>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', paddingLeft: 'clamp(48px,12vw,240px)', willChange: 'transform', animation: anim('left') }}>
+              <h1 style={{ fontFamily: 'Impact, Haettenschweiler, Arial Narrow, sans-serif', fontSize: 'clamp(72px,12vw,172px)', fontWeight: 900, color: '#42b8a8', lineHeight: 0.9, letterSpacing: '0.06em', margin: 0 }}>
+                WHY US?
+              </h1>
+            </div>
+          </div>
+          <div style={{ position: 'absolute', top: 0, left: '50%', width: '50%', height: '100%', overflow: 'hidden', zIndex: 1 }}>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingLeft: 'clamp(40px,8vw,140px)', paddingRight: 'clamp(56px,8vw,150px)', willChange: 'transform', animation: anim('right') }}>
+              <p style={{ fontFamily: 'Lato, sans-serif', fontSize: 'clamp(12px,1vw,16px)', fontWeight: 800, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#42b8a8', margin: '0 0 24px 0' }}>
+                What sets us apart
+              </p>
+              <h2 style={{ fontFamily: 'Impact, Haettenschweiler, Arial Narrow, sans-serif', fontSize: 'clamp(30px,3.2vw,54px)', fontWeight: 900, color: '#ffffff', lineHeight: 1.35, letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'pre-line', margin: 0 }}>
+                {slide.description}
+              </h2>
+            </div>
+          </div>
+        </>
+      );
+    }
 
     const leftContent = textOnLeft ? 'text' : 'image';
     const rightContent = textOnLeft ? 'image' : 'text';
@@ -203,15 +247,13 @@ export default function WhyUs() {
       </div>
     );
 
-    const imageBlock = slide.isCover ? (
-      <div style={{ width: '100%', height: '100%', background: '#00a0a6', position: 'relative' }}>
-        <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: '', backgroundRepeat: 'repeat', backgroundSize: '300px 300px' }} />
-      </div>
-    ) : (
+    const imageBlock = (
       slide.image ? (
         <img src={slide.image} alt={slide.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
       ) : (
-        <div style={{ width: '100%', height: '100%', background: '#00a0a6' }} />
+        <div style={{ width: '100%', height: '100%', background: slideBg, position: 'relative' }}>
+          <div style={{ position: 'absolute', inset: 0, ...textureLayer }} />
+        </div>
       )
     );
 
@@ -225,12 +267,12 @@ export default function WhyUs() {
           {leftContent === 'text' ? (
             <div style={{
               position: 'absolute', inset: 0,
-              background: '#00a0a6',
+              background: slideBg,
               display: 'flex', flexDirection: 'column', justifyContent: 'center',
               paddingLeft: 'clamp(40px,8vw,120px)', paddingRight: '40px',
               willChange: 'transform', animation: anim('left'),
             }}>
-              <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: '', backgroundRepeat: 'repeat', backgroundSize: '300px 300px', pointerEvents: 'none' }} />
+              <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', ...textureLayer }} />
               {textBlock.props.children}
             </div>
           ) : (
@@ -248,12 +290,12 @@ export default function WhyUs() {
           {rightContent === 'text' ? (
             <div style={{
               position: 'absolute', inset: 0,
-              background: '#00a0a6',
+              background: slideBg,
               display: 'flex', flexDirection: 'column', justifyContent: 'center',
               paddingLeft: 'clamp(40px,5vw,80px)', paddingRight: '40px',
               willChange: 'transform', animation: anim('right'),
             }}>
-              <div style={{ position: 'absolute', inset: 0, opacity: 0.55, backgroundImage: '', backgroundRepeat: 'repeat', backgroundSize: '300px 300px', pointerEvents: 'none' }} />
+              <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', ...textureLayer }} />
               {textBlock.props.children}
             </div>
           ) : (
@@ -268,7 +310,7 @@ export default function WhyUs() {
 
   return (
     <div
-      style={{ position: 'fixed', inset: 0, overflow: 'hidden', background: '#00a0a6' }}
+      style={{ position: 'fixed', inset: 0, overflow: 'hidden', background: '#12334c' }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >

@@ -46,6 +46,7 @@ import {
   getHomepageStorySection, upsertHomepageStorySection,
   listAboutSections, createAboutSection, updateAboutSection, deleteAboutSection,
   listWhyUsSections, createWhyUsSection, updateWhyUsSection, deleteWhyUsSection,
+  getWhyUsHomeSettings, updateWhyUsHomeSettings,
 } from "./db-cms";
 
 // ── Admin session store (in-memory, no persistence) ──────────────────────────
@@ -1583,11 +1584,25 @@ export const appRouter = router({
       return listWhyUsSections();
     }),
 
+    getWhyUsHomeSettings: publicProcedure.query(async () => {
+      return getWhyUsHomeSettings();
+    }),
+
+    updateWhyUsHomeSettings: publicProcedure
+      .input(z.object({
+        backgroundColor: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        return updateWhyUsHomeSettings(input);
+      }),
+
     createWhyUsSection: publicProcedure
       .input(z.object({
         title: z.string().min(1),
         content: z.string().min(1),
         image: z.string().optional(),
+        backgroundColor: z.string().optional(),
         sortOrder: z.number().default(0),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -1601,6 +1616,7 @@ export const appRouter = router({
         title: z.string().optional(),
         content: z.string().optional(),
         image: z.string().optional(),
+        backgroundColor: z.string().optional(),
         sortOrder: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {

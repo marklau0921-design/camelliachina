@@ -1072,9 +1072,14 @@ export async function deleteAboutSection(id: number) {
 
 // ─── Why Us Sections ─────────────────────────────────────────────────────────
 export async function listWhyUsSections() {
-  const db = await getDb();
-  if (!db) return [];
-  let rows = await db.select().from(whyUsSections).orderBy(whyUsSections.sortOrder);
+  const pool = await getPool();
+  if (!pool) return [];
+  const columns = await getTableColumns(pool, "why_us_sections");
+  const backgroundSelect = columns.has("backgroundColor") ? "`backgroundColor`" : "'#12334c' as `backgroundColor`";
+  const [initialRows] = await pool.query(
+    `SELECT \`id\`, \`title\`, \`content\`, \`image\`, \`sortOrder\`, ${backgroundSelect}, \`createdAt\`, \`updatedAt\` FROM \`why_us_sections\` ORDER BY \`sortOrder\``
+  );
+  let rows = initialRows as any[];
 
   const legacyDefault = rows.find(row =>
     row.title === "Why Choose Us" &&
@@ -1082,30 +1087,90 @@ export async function listWhyUsSections() {
     !row.image
   );
   if (legacyDefault) {
-    await db.delete(whyUsSections).where(eq(whyUsSections.id, legacyDefault.id));
-    rows = await db.select().from(whyUsSections).orderBy(whyUsSections.sortOrder);
+    await pool.execute("DELETE FROM `why_us_sections` WHERE `id` = ?", [legacyDefault.id]);
+    const [freshRows] = await pool.query(
+      `SELECT \`id\`, \`title\`, \`content\`, \`image\`, \`sortOrder\`, ${backgroundSelect}, \`createdAt\`, \`updatedAt\` FROM \`why_us_sections\` ORDER BY \`sortOrder\``
+    );
+    rows = freshRows as any[];
   }
 
   return rows;
 }
 
 export async function createWhyUsSection(data: Omit<InsertWhyUsSection, "id" | "createdAt" | "updatedAt">) {
-  const db = await getDb();
-  if (!db) throw new Error("DB unavailable");
-  const [result] = await db.insert(whyUsSections).values(data);
+  const pool = await getPool();
+  if (!pool) throw new Error("DB unavailable");
+  const columns = await getTableColumns(pool, "why_us_sections");
+  const insertColumns = ["title", "content", "image", "sortOrder"];
+  const values: any[] = [data.title, data.content, data.image ?? null, data.sortOrder ?? 0];
+  if (columns.has("backgroundColor")) {
+    insertColumns.push("backgroundColor");
+    values.push((data as any).backgroundColor ?? "#12334c");
+  }
+  const [result] = await pool.execute(
+    `INSERT INTO \`why_us_sections\` (${insertColumns.map(quoteColumn).join(", ")}) VALUES (${insertColumns.map(() => "?").join(", ")})`,
+    values
+  ) as any;
   return { id: (result as any).insertId };
 }
 
 export async function updateWhyUsSection(id: number, data: Partial<InsertWhyUsSection>) {
-  const db = await getDb();
-  if (!db) throw new Error("DB unavailable");
-  await db.update(whyUsSections).set({ ...data, updatedAt: new Date() }).where(eq(whyUsSections.id, id));
-  const rows = await db.select().from(whyUsSections).where(eq(whyUsSections.id, id)).limit(1);
-  return rows[0] ?? null;
+  const pool = await getPool();
+  if (!pool) throw new Error("DB unavailable");
+  const columns = await getTableColumns(pool, "why_us_sections");
+  const updates: string[] = [];
+  const values: any[] = [];
+  const allowed = ["title", "content", "image", "sortOrder", "backgroundColor"] as const;
+  for (const key of allowed) {
+    if ((data as any)[key] !== undefined && (key !== "backgroundColor" || columns.has("backgroundColor"))) {
+      updates.push(`${quoteColumn(key)} = ?`);
+      values.push((data as any)[key]);
+    }
+  }
+  if (columns.has("updatedAt")) updates.push("`updatedAt` = CURRENT_TIMESTAMP");
+  if (updates.length > 0) {
+    values.push(id);
+    await pool.execute(`UPDATE \`why_us_sections\` SET ${updates.join(", ")} WHERE \`id\` = ?`, values);
+  }
+  const backgroundSelect = columns.has("backgroundColor") ? "`backgroundColor`" : "'#12334c' as `backgroundColor`";
+  const [rows] = await pool.query(
+    `SELECT \`id\`, \`title\`, \`content\`, \`image\`, \`sortOrder\`, ${backgroundSelect}, \`createdAt\`, \`updatedAt\` FROM \`why_us_sections\` WHERE \`id\` = ? LIMIT 1`,
+    [id]
+  );
+  return (rows as any[])[0] ?? null;
 }
 
 export async function deleteWhyUsSection(id: number) {
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");
   await db.delete(whyUsSections).where(eq(whyUsSections.id, id));
+}
+
+async function getTableColumns(pool: any, tableName: string) {
+  const [columns] = await pool.query(`SHOW COLUMNS FROM \`${tableName}\``);
+  return new Set((columns as any[]).map((column) => column.Field));
+}
+
+export async function getWhyUsHomeSettings() {
+  const pool = await getPool();
+  if (!pool) return { backgroundColor: "#12334c" };
+  const columns = await getTableColumns(pool, "about_sections");
+  const backgroundSelect = columns.has("backgroundColor") ? "`backgroundColor`" : "'#12334c' as `backgroundColor`";
+  const [rows] = await pool.query(
+    `SELECT ${backgroundSelect} FROM \`about_sections\` WHERE \`slug\` = 'why-us' LIMIT 1`
+  );
+  return { backgroundColor: (rows as any[])[0]?.backgroundColor ?? "#12334c" };
+}
+
+export async function updateWhyUsHomeSettings(data: { backgroundColor?: string }) {
+  const pool = await getPool();
+  if (!pool) throw new Error("DB unavailable");
+  const columns = await getTableColumns(pool, "about_sections");
+  if (data.backgroundColor !== undefined && columns.has("backgroundColor")) {
+    await pool.execute(
+      "UPDATE `about_sections` SET `backgroundColor` = ? WHERE `slug` = 'why-us'",
+      [data.backgroundColor]
+    );
+  }
+  return getWhyUsHomeSettings();
 }

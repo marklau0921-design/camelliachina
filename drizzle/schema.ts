@@ -410,6 +410,7 @@ export const whyUsSections = mysqlTable("why_us_sections", {
   title: varchar("title", { length: 300 }).notNull(),
   content: text("content").notNull(),
   image: varchar("image", { length: 512 }),
+  backgroundColor: varchar("backgroundColor", { length: 32 }).default("#12334c"),
   sortOrder: int("sortOrder").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

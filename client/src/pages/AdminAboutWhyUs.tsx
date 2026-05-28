@@ -89,10 +89,11 @@ interface SectionForm {
   title: string;
   content: string;
   image: string;
+  backgroundColor: string;
   sortOrder: number;
 }
 
-const emptySection: SectionForm = { title: '', content: '', image: '', sortOrder: 0 };
+const emptySection: SectionForm = { title: '', content: '', image: '', backgroundColor: '#12334c', sortOrder: 0 };
 
 function WhyUsSectionForm({
   initial,
@@ -128,6 +129,19 @@ function WhyUsSectionForm({
               onFocus={e => { e.target.style.borderColor = ACCENT; }}
               onBlur={e => { e.target.style.borderColor = '#ddd'; }}
             />
+          </Field>
+        </div>
+        <div style={{ marginBottom: '20px' }}>
+          <Field label="Background Color">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <input
+                type="color"
+                value={form.backgroundColor || '#12334c'}
+                onChange={e => update('backgroundColor', e.target.value)}
+                style={{ width: 44, height: 34, padding: 0, border: '1px solid #ddd', background: 'transparent', cursor: 'pointer' }}
+              />
+              <TextInput value={form.backgroundColor || '#12334c'} onChange={v => update('backgroundColor', v)} placeholder="#12334c" />
+            </div>
           </Field>
         </div>
         <div style={{ marginBottom: '20px' }}>
@@ -179,10 +193,18 @@ export default function AdminAboutWhyUs() {
   const [, navigate] = useLocation();
   const utils = trpc.useUtils();
   const { data: sections = [], isLoading } = trpc.about.listWhyUsSections.useQuery();
+  const { data: homeSettings } = trpc.about.getWhyUsHomeSettings.useQuery();
   const [editingId, setEditingId] = React.useState<number | null>(null);
   const [showCreate, setShowCreate] = React.useState(false);
+  const [homeBackgroundColor, setHomeBackgroundColor] = React.useState('#12334c');
+
+  React.useEffect(() => {
+    if (homeSettings?.backgroundColor) setHomeBackgroundColor(homeSettings.backgroundColor);
+  }, [homeSettings?.backgroundColor]);
 
   const invalidate = () => utils.about.listWhyUsSections.invalidate();
+  const invalidateHome = () => utils.about.getWhyUsHomeSettings.invalidate();
+  const updateHomeSettings = trpc.about.updateWhyUsHomeSettings.useMutation({ onSuccess: invalidateHome });
   const createMutation = trpc.about.createWhyUsSection.useMutation({
     onSuccess: () => { invalidate(); setShowCreate(false); },
   });
@@ -223,6 +245,28 @@ export default function AdminAboutWhyUs() {
           )}
         </div>
 
+        <div style={sectionStyle}>
+          <SectionTitle>Why Us Homepage</SectionTitle>
+          <Field label="Homepage Background Color">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <input
+                type="color"
+                value={homeBackgroundColor}
+                onChange={e => setHomeBackgroundColor(e.target.value)}
+                style={{ width: 44, height: 34, padding: 0, border: '1px solid #ddd', background: 'transparent', cursor: 'pointer' }}
+              />
+              <TextInput value={homeBackgroundColor} onChange={setHomeBackgroundColor} placeholder="#12334c" />
+              <button
+                type="button"
+                onClick={() => updateHomeSettings.mutate({ backgroundColor: homeBackgroundColor })}
+                style={{ padding: '10px 20px', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', background: ACCENT, color: '#fff', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}
+              >
+                {updateHomeSettings.isPending ? 'Saving...' : 'Save Color'}
+              </button>
+            </div>
+          </Field>
+        </div>
+
         {/* Create form */}
         {showCreate && (
           <WhyUsSectionForm
@@ -250,6 +294,7 @@ export default function AdminAboutWhyUs() {
                     title: section.title,
                     content: section.content,
                     image: section.image || '',
+                    backgroundColor: (section as any).backgroundColor || '#12334c',
                     sortOrder: section.sortOrder ?? idx,
                   }}
                   onSubmit={data => updateMutation.mutate({ id: section.id, ...data, image: data.image || undefined })}
@@ -277,6 +322,7 @@ export default function AdminAboutWhyUs() {
                       {section.content}
                     </div>
                   </div>
+                  <div title={(section as any).backgroundColor || '#12334c'} style={{ width: 28, height: 28, borderRadius: 4, border: '1px solid #ddd', background: (section as any).backgroundColor || '#12334c', flexShrink: 0 }} />
                   {/* Actions */}
                   <button
                     onClick={() => setEditingId(section.id)}
