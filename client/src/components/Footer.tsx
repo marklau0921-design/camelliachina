@@ -1,5 +1,6 @@
 import { Youtube, Facebook, Instagram } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
+import { useEffect, useState } from 'react';
 
 /**
  * Footer Component
@@ -8,6 +9,13 @@ import { trpc } from '@/lib/trpc';
  */
 export default function Footer() {
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const logoUrl = homepageAssets?.logo?.url || '';
+  const [logoLoaded, setLogoLoaded] = useState(false);
+
+  useEffect(() => {
+    setLogoLoaded(false);
+  }, [logoUrl]);
+
   return (
     <footer className="bg-[#1a1a1a] text-white">
       <div className="w-full flex justify-center py-16">
@@ -17,19 +25,14 @@ export default function Footer() {
           
           {/* Brand Column */}
           <div className="flex items-center">
-            {homepageAssets?.logo ? (
-              <img 
-                src={homepageAssets.logo.url}
+            {logoUrl && (
+              <img
+                src={logoUrl}
                 alt="Logo"
                 className="h-20 object-contain"
-                style={{ backgroundColor: 'transparent' }}
-              />
-            ) : (
-              <img 
-                src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=800&fit=crop"
-                alt="Logo"
-                className="h-20 object-contain"
-                style={{ backgroundColor: 'transparent' }}
+                style={{ backgroundColor: 'transparent', display: logoLoaded ? 'block' : 'none' }}
+                onLoad={() => setLogoLoaded(true)}
+                onError={() => setLogoLoaded(false)}
               />
             )}
           </div>
