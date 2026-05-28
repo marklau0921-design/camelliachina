@@ -33,6 +33,9 @@ interface Slide {
 
 const DURATION = 900;
 const EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+const DISPLAY_FONT = "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)";
+const BODY_FONT = "var(--font-travel-sans, 'Cabin', 'Helvetica Neue', Arial, sans-serif)";
+const SERIF_FONT = "var(--font-travel-serif, 'Cormorant Garamond', Georgia, serif)";
 
 type Direction = 'forward' | 'backward';
 type AnimRole = 'entering' | 'exiting';
@@ -189,17 +192,17 @@ export default function WhyUs() {
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, ...textureLayer }} />
           <div style={{ position: 'absolute', top: 0, left: 0, width: '50%', height: '100%', overflow: 'hidden', zIndex: 1 }}>
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', paddingLeft: 'clamp(48px,12vw,240px)', willChange: 'transform', animation: anim('left') }}>
-              <h1 style={{ fontFamily: 'Impact, Haettenschweiler, Arial Narrow, sans-serif', fontSize: 'clamp(72px,12vw,172px)', fontWeight: 900, color: '#42b8a8', lineHeight: 0.9, letterSpacing: '0.06em', margin: 0 }}>
+              <h1 style={{ fontFamily: DISPLAY_FONT, fontSize: 'clamp(88px,13vw,188px)', fontWeight: 400, color: '#42b8a8', lineHeight: 0.86, letterSpacing: '0.05em', margin: 0, textTransform: 'uppercase' }}>
                 WHY US?
               </h1>
             </div>
           </div>
           <div style={{ position: 'absolute', top: 0, left: '50%', width: '50%', height: '100%', overflow: 'hidden', zIndex: 1 }}>
             <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingLeft: 'clamp(40px,8vw,140px)', paddingRight: 'clamp(56px,8vw,150px)', willChange: 'transform', animation: anim('right') }}>
-              <p style={{ fontFamily: 'Lato, sans-serif', fontSize: 'clamp(12px,1vw,16px)', fontWeight: 800, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#42b8a8', margin: '0 0 24px 0' }}>
+              <p style={{ fontFamily: BODY_FONT, fontSize: 'clamp(12px,1vw,16px)', fontWeight: 700, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#42b8a8', margin: '0 0 24px 0' }}>
                 What sets us apart
               </p>
-              <h2 style={{ fontFamily: 'Impact, Haettenschweiler, Arial Narrow, sans-serif', fontSize: 'clamp(30px,3.2vw,54px)', fontWeight: 900, color: '#ffffff', lineHeight: 1.35, letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'pre-line', margin: 0 }}>
+              <h2 style={{ fontFamily: DISPLAY_FONT, fontSize: 'clamp(42px,4.4vw,78px)', fontWeight: 400, color: '#ffffff', lineHeight: 0.98, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'pre-line', margin: 0 }}>
                 {slide.description}
               </h2>
             </div>
@@ -215,18 +218,18 @@ export default function WhyUs() {
       <div style={{ willChange: 'transform', animation: anim('left') }}>
         {slide.isCover ? (
           <>
-            <p style={{ fontFamily: 'sans-serif', fontSize: 'clamp(10px,1vw,13px)', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#c8b89a', margin: '0 0 24px 0' }}>
+            <p style={{ fontFamily: BODY_FONT, fontSize: 'clamp(10px,1vw,13px)', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#c8b89a', margin: '0 0 24px 0' }}>
               {slide.subtitle}
             </p>
-            <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(56px,9vw,120px)', fontWeight: 400, color: '#fff', lineHeight: 0.95, margin: 0 }}>
+            <h1 style={{ fontFamily: DISPLAY_FONT, fontSize: 'clamp(72px,10vw,140px)', fontWeight: 400, color: '#fff', lineHeight: 0.9, letterSpacing: '0.05em', margin: 0, textTransform: 'uppercase' }}>
               WHY<br />US?
             </h1>
-            <p style={{ fontFamily: 'sans-serif', fontSize: 'clamp(11px,1.1vw,14px)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', margin: '32px 0 0 0' }}>
+            <p style={{ fontFamily: BODY_FONT, fontSize: 'clamp(11px,1.1vw,14px)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', margin: '32px 0 0 0' }}>
               {slide.description}
             </p>
             <button
               onClick={() => goTo(1)}
-              style={{ marginTop: '48px', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'none', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', fontFamily: 'sans-serif', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', padding: '12px 28px', cursor: 'pointer', transition: 'border-color 0.25s,background 0.25s' }}
+              style={{ marginTop: '48px', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'none', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', fontFamily: BODY_FONT, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', padding: '12px 28px', cursor: 'pointer', transition: 'border-color 0.25s,background 0.25s' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = '#c8b89a'; e.currentTarget.style.background = 'rgba(200,184,154,0.08)'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; e.currentTarget.style.background = 'none'; }}
             >
@@ -235,13 +238,13 @@ export default function WhyUs() {
           </>
         ) : (
           <>
-            <p style={{ fontFamily: 'sans-serif', fontSize: 'clamp(10px,1vw,13px)', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#c8b89a', margin: '0 0 20px 0' }}>
+            <p style={{ fontFamily: BODY_FONT, fontSize: 'clamp(10px,1vw,13px)', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#c8b89a', margin: '0 0 20px 0' }}>
               {slide.num} / {String(SLIDES.length - 1).padStart(2, '0')}
             </p>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(26px,3.2vw,48px)', fontWeight: 400, color: '#fff', lineHeight: 1.2, margin: '0 0 28px 0', textTransform: 'uppercase' }}>
+            <h2 style={{ fontFamily: SERIF_FONT, fontSize: 'clamp(34px,4vw,62px)', fontWeight: 500, color: '#fff', lineHeight: 1.08, letterSpacing: '0.015em', margin: '0 0 28px 0' }}>
               {slide.title}
             </h2>
-            <p style={{ fontFamily: 'sans-serif', fontSize: 'clamp(13px,1.1vw,16px)', color: 'rgba(255,255,255,0.62)', lineHeight: 1.8, maxWidth: '400px', margin: 0 }}>
+            <p style={{ fontFamily: BODY_FONT, fontSize: 'clamp(14px,1.15vw,17px)', color: 'rgba(255,255,255,0.7)', lineHeight: 1.75, letterSpacing: '0.03em', maxWidth: '430px', margin: 0 }}>
               {slide.description}
             </p>
           </>
@@ -342,7 +345,7 @@ export default function WhyUs() {
                 onClick={() => goTo(idx)}
                 style={{
                   background: 'none', border: 'none', cursor: 'pointer',
-                  fontFamily: 'sans-serif', fontSize: '11px', fontWeight: 700,
+                  fontFamily: DISPLAY_FONT, fontSize: '30px', fontWeight: 400,
                   letterSpacing: '0.12em',
                   color: active ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.35)',
                   padding: '6px 0', transition: 'color 0.3s',
@@ -365,7 +368,7 @@ export default function WhyUs() {
       {current.index === 0 && (
         <div style={{ position: 'fixed', bottom: '32px', left: '50%', transform: 'translateX(-50%)', zIndex: 30, pointerEvents: 'none' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', animation: 'wsBounce 2s ease-in-out infinite' }}>
-            <span style={{ fontFamily: 'sans-serif', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Scroll</span>
+            <span style={{ fontFamily: BODY_FONT, fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Scroll</span>
             <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '16px' }}>↓</span>
           </div>
         </div>
@@ -373,7 +376,7 @@ export default function WhyUs() {
       {current.index > 0 && (
         <div style={{ position: 'fixed', bottom: '32px', left: 'clamp(40px,8vw,120px)', zIndex: 30 }}>
           <button onClick={() => goTo(current.index - 1)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'sans-serif', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)', padding: 0, transition: 'color 0.2s' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: BODY_FONT, fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)', padding: 0, transition: 'color 0.2s' }}
             onMouseEnter={e => { e.currentTarget.style.color = '#fff'; }}
             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.38)'; }}
           >
