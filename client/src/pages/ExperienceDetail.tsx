@@ -376,6 +376,8 @@ export default function ExperienceDetail() {
 
   // Fetch CTA background image from Media Library
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const ctaTexture = (homepageAssets as any)?.cta?.url || '';
+  const ctaTextureOpacity = Math.max(0, Math.min(1, Number((homepageAssets as any)?.cta?.opacity ?? 28) / 100));
 
   // Parse gallery
   const gallery: string[] = (() => {
@@ -518,12 +520,7 @@ export default function ExperienceDetail() {
 
       {/* ── Bottom CTA ── */}
       <section style={{ position: 'relative', width: '100%', height: 'clamp(260px, 30vw, 275px)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: (exp as any)?.ctaBgColor || '#1a1a1a' }}>
-        {(homepageAssets as any)?.cta?.url && (
-          <>
-            <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${(homepageAssets as any).cta.url})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-            <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.35)' }} />
-          </>
-        )}
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: ctaTexture ? `url(${ctaTexture})` : '', backgroundRepeat: 'repeat', backgroundSize: '420px 420px', opacity: ctaTextureOpacity, mixBlendMode: 'normal', filter: 'contrast(1.45) brightness(1.08)' }} />
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '28px', textAlign: 'center', padding: '0 24px' }}>
           <h2 style={{ fontFamily: EXP_DISPLAY, fontSize: '45px', fontWeight: 400, color: '#ffffff', letterSpacing: '2.25px', textTransform: 'uppercase', margin: 0, lineHeight: 1 }}>
             So, ready to start?

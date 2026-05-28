@@ -508,6 +508,9 @@ export default function ItineraryDetail() {
     { slug: slug! },
     { enabled: !!slug }
   );
+  const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const ctaTexture = (homepageAssets as any)?.cta?.url || '';
+  const ctaTextureOpacity = Math.max(0, Math.min(1, Number((homepageAssets as any)?.cta?.opacity ?? 28) / 100));
 
   // Parse sections - handle both JSON string and array formats
   let sections: ItinerarySection[] = [];
@@ -741,7 +744,7 @@ export default function ItineraryDetail() {
 
       {/* ── ENQUIRE CTA ── */}
       <section style={{ position: 'relative', width: '100%', height: 'clamp(260px, 30vw, 275px)', backgroundColor: '#a84900', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: '', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: ctaTexture ? `url(${ctaTexture})` : '', backgroundSize: '420px 420px', backgroundRepeat: 'repeat', opacity: ctaTextureOpacity, mixBlendMode: 'normal', filter: 'contrast(1.45) brightness(1.08)' }} />
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '28px', textAlign: 'center', padding: '0 24px' }}>
           <h2 style={{ fontFamily: ITIN_DISPLAY, fontSize: 'clamp(34px, 5vw, 56px)', fontWeight: 400, color: '#ffffff', letterSpacing: '0.06em', textTransform: 'uppercase', margin: 0, lineHeight: 0.95 }}>
             So, ready to start?

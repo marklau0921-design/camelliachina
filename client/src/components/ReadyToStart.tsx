@@ -4,6 +4,7 @@ import { trpc } from '@/lib/trpc';
 export default function ReadyToStart() {
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
   const ctaBg = homepageAssets?.cta?.url;
+  const textureOpacity = Math.max(0, Math.min(1, Number((homepageAssets?.cta as any)?.opacity ?? 28) / 100));
 
   return (
     <section
@@ -24,10 +25,11 @@ export default function ReadyToStart() {
           position: 'absolute',
           inset: 0,
           backgroundImage: `url(${ctaBg || ''})`,
-          backgroundSize: '400px 400px',
+          backgroundSize: '420px 420px',
           backgroundRepeat: 'repeat',
-          opacity: 0.65,
-          mixBlendMode: 'multiply',
+          opacity: textureOpacity,
+          mixBlendMode: 'normal',
+          filter: 'contrast(1.45) brightness(1.08)',
         }}
       />
 
