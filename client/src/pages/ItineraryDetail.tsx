@@ -25,6 +25,14 @@ interface ItinerarySection {
   galleryImages: string[];
 }
 
+const ITIN_DISPLAY = "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)";
+const ITIN_SANS = "var(--font-travel-sans, 'Cabin', 'Helvetica Neue', Arial, sans-serif)";
+const BT_PINK = '#e7247a';
+const BT_GREEN = '#379c8a';
+const BT_BLUE = '#5160a6';
+const BT_TEXT = '#444444';
+const BT_DARK = '#2f2f2f';
+
 // ─── Gallery Strip ────────────────────────────────────────────────────────────
 
 function GalleryStrip({ images }: { images: string[] }) {
@@ -361,10 +369,10 @@ function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
     >
       {/* Mobile: Title above carousel */}
       <div className="lg:hidden w-full px-6 mb-6 relative z-10">
-        <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: 400, fontSize: '28px', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: '12px', lineHeight: 1.1 }}>
+        <h2 style={{ fontFamily: ITIN_DISPLAY, fontWeight: 400, fontSize: '34px', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '12px', lineHeight: 0.95 }}>
           Explore Our Trips
         </h2>
-        <p style={{ fontSize: '13px', color: 'rgba(0,0,0,0.6)', fontStyle: 'italic', lineHeight: 1.6 }}>
+        <p style={{ fontFamily: ITIN_SANS, fontSize: '15px', color: '#666', fontStyle: 'italic', lineHeight: 1.55, letterSpacing: '0.02em' }}>
           Explore our sample trips or get in touch to begin your bespoke adventure.
         </p>
       </div>
@@ -398,10 +406,10 @@ function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
           {/* Title block - Desktop only (JS controlled) */}
           {isDesktop && (
             <div style={{ width: '260px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingTop: '8px' }}>
-              <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: '700', fontSize: '32px', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: '16px', lineHeight: 1.1 }}>
+              <h2 style={{ fontFamily: ITIN_DISPLAY, fontWeight: 400, fontSize: '40px', color: '#000000', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '16px', lineHeight: 0.95 }}>
                 Explore Our Trips
               </h2>
-              <p style={{ fontSize: '14px', color: 'rgba(0,0,0,0.6)', fontStyle: 'italic', lineHeight: 1.6 }}>
+              <p style={{ fontFamily: ITIN_SANS, fontSize: '17px', color: '#666', fontStyle: 'italic', lineHeight: 1.5, letterSpacing: '0.02em' }}>
                 Explore our sample trips or get in touch to begin your bespoke adventure.
               </p>
             </div>
@@ -412,12 +420,12 @@ function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
               <img src={trip.image} alt={trip.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" draggable={false} />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />
               <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
-                {trip.nights && <div className="text-xs font-bold uppercase tracking-wider text-yellow-300 text-right" style={{color: '#ffffff', fontWeight: '500'}}>{trip.nights} NIGHTS</div>}
+                {trip.nights && <div className="text-xs font-bold uppercase tracking-wider text-yellow-300 text-right" style={{ fontFamily: ITIN_SANS, color: '#ffffff', fontWeight: 700, letterSpacing: '0.1em' }}>{trip.nights} NIGHTS</div>}
                 <div>
-                  <h3 className="text-base font-bold uppercase tracking-wider mb-4 leading-tight opacity-85" style={{fontWeight: '300'}}>{trip.title}</h3>
+                  <h3 className="text-base font-bold uppercase tracking-wider mb-4 leading-tight opacity-85" style={{ fontFamily: ITIN_SANS, fontWeight: 700, letterSpacing: '0.1em', lineHeight: 1.25 }}>{trip.title}</h3>
                   <button
                     className="trip-btn px-4 py-2 text-white text-xs font-bold uppercase tracking-widest transition-all duration-200 opacity-85 relative overflow-hidden active:scale-95"
-                    style={{ pointerEvents: 'auto', cursor: 'pointer', background: 'rgba(20,20,20,0.55)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
+                    style={{ pointerEvents: 'auto', cursor: 'pointer', background: 'rgba(20,20,20,0.55)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', fontFamily: ITIN_SANS, letterSpacing: '0.1em' }}
                     onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,1)'; e.currentTarget.style.color = '#111'; }}
                     onMouseLeave={e => { e.currentTarget.style.background = 'rgba(20,20,20,0.55)'; e.currentTarget.style.color = '#fff'; }}
                     onMouseDown={(e) => {
@@ -446,10 +454,10 @@ function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
               style={{
                 backgroundColor: '#111111',
                 color: '#ffffff',
-                fontFamily: 'Lato, sans-serif',
-                fontSize: '13px',
+                fontFamily: ITIN_SANS,
+                fontSize: '12px',
                 fontWeight: 700,
-                letterSpacing: '0.15em',
+                letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 padding: '14px 36px',
                 border: '2px solid #111111',
@@ -577,7 +585,7 @@ export default function ItineraryDetail() {
   }
 
   return (
-    <div className="bg-white min-h-screen" style={{ fontFamily: 'var(--font-serif)' }}>
+    <div className="bg-white min-h-screen" style={{ fontFamily: ITIN_SANS, color: BT_TEXT }}>
       <style>{`
         @keyframes slideOut {
           from { transform: translateX(0); }
@@ -600,11 +608,11 @@ export default function ItineraryDetail() {
         )}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 24px' }}>
-          <h1 style={{ color: '#fff', fontSize: '40px', letterSpacing: '-0.01em', fontFamily: 'Lato', fontWeight: 500, lineHeight: 1.25, margin: '0 0 24px', maxWidth: '900px' }}>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(46px, 6vw, 78px)', letterSpacing: '0.045em', fontFamily: ITIN_DISPLAY, fontWeight: 400, lineHeight: 0.95, margin: '0 0 20px', maxWidth: '960px', textTransform: 'uppercase' }}>
             {itin.name}
           </h1>
           {itin.shortDescription && (
-            <p style={{ color: '#fff', fontSize: '30px', fontFamily: 'Lato', fontWeight: 500, letterSpacing: '0.02em', margin: 0, maxWidth: '900px', lineHeight: 1.3 }}>
+            <p style={{ color: '#fff', fontSize: 'clamp(15px, 1.5vw, 19px)', fontFamily: ITIN_SANS, fontWeight: 700, letterSpacing: '0.09em', margin: 0, maxWidth: '900px', lineHeight: 1.4, textTransform: 'uppercase' }}>
               {itin.shortDescription}
             </p>
           )}
@@ -613,11 +621,11 @@ export default function ItineraryDetail() {
 
       {/* ── STICKY SECTION NAV ── */}
       <div ref={tripNavRef} style={{ height: '48px', position: 'relative', zIndex: 39 }}>
-        <div style={{ position: stickyFixed ? 'fixed' : 'relative', top: stickyFixed ? 0 : 'auto', left: 0, right: 0, zIndex: 39, background: 'rgba(245,245,245,0.97)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px', overflowX: 'auto' }}>
+        <div style={{ position: stickyFixed ? 'fixed' : 'relative', top: stickyFixed ? 0 : 'auto', left: 0, right: 0, zIndex: 39, background: '#f9f9f9', borderBottom: '1px solid rgba(202,204,207,0.45)' }}>
+          <div style={{ minHeight: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px', overflowX: 'auto' }}>
             {navSections.map(s => (
               <button key={s.id} onClick={() => scrollToSection(s.id)}
-                style={{ position: 'relative', padding: '12px 20px', fontSize: 'clamp(8px, 2vw, 12px)', letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans)', color: activeSection === s.id ? '#111' : '#888', borderBottom: activeSection === s.id ? '2px solid #111' : '2px solid transparent', transition: 'color 0.2s' }}>
+                style={{ position: 'relative', padding: '16px 20px 14px', fontSize: 'clamp(10px, 1vw, 12px)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap', background: 'none', border: 'none', cursor: 'pointer', fontFamily: ITIN_SANS, color: activeSection === s.id ? BT_DARK : '#666', borderBottom: activeSection === s.id ? `2px solid ${BT_PINK}` : '2px solid transparent', transition: 'color 0.2s, border-color 0.2s' }}>
                 {s.label}
               </button>
             ))}
@@ -626,12 +634,12 @@ export default function ItineraryDetail() {
       </div>
 
       {/* ── OVERVIEW ── */}
-      <div id="overview" style={{ maxWidth: '720px', margin: '0 auto', padding: '64px 24px', textAlign: 'center', scrollMarginTop: '60px' }}>
-        <h2 style={{ fontSize: 'clamp(26px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.8, marginBottom: '32px', color: '#1a1a1a', fontFamily: 'var(--font-serif)', letterSpacing: '0.05em' }}>
+      <div id="overview" style={{ maxWidth: '760px', margin: '0 auto', padding: '64px 24px', textAlign: 'center', scrollMarginTop: '60px' }}>
+        <h2 style={{ fontSize: 'clamp(34px, 5vw, 58px)', fontWeight: 400, lineHeight: 0.98, marginBottom: '30px', color: '#000', fontFamily: ITIN_DISPLAY, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
           {itin.overviewTitle || itin.name}
         </h2>
         {itin.description && (
-          <p style={{ fontSize: '17px', color: '#555', lineHeight: 1.8, fontFamily: 'var(--font-serif)', marginBottom: '48px' }}>
+          <p style={{ fontSize: '17px', color: BT_TEXT, lineHeight: 1.58, fontFamily: ITIN_SANS, letterSpacing: '0.03em', marginBottom: '48px' }}>
             {itin.description}
           </p>
         )}
@@ -641,20 +649,20 @@ export default function ItineraryDetail() {
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px', borderTop: '1px solid #eee', paddingTop: '40px' }}>
             {itin.when && (
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#f49e0b', marginBottom: '10px', fontFamily: 'var(--font-sans)' }}>WHEN</p>
-                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5, fontFamily: 'var(--font-sans)' }}>{itin.when}</p>
+                <p style={{ fontSize: '28px', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase', color: BT_PINK, marginBottom: '10px', fontFamily: ITIN_DISPLAY }}>When</p>
+                <p style={{ fontStyle: 'italic', fontSize: '17px', color: '#666', lineHeight: 1.5, fontFamily: ITIN_SANS }}>{itin.when}</p>
               </div>
             )}
             {itin.price && (
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#1d902b', marginBottom: '10px', fontFamily: 'var(--font-sans)' }}>PRICE</p>
-                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5, fontFamily: 'var(--font-sans)' }}>{itin.price}</p>
+                <p style={{ fontSize: '28px', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase', color: BT_GREEN, marginBottom: '10px', fontFamily: ITIN_DISPLAY }}>Price</p>
+                <p style={{ fontStyle: 'italic', fontSize: '17px', color: '#666', lineHeight: 1.5, fontFamily: ITIN_SANS }}>{itin.price}</p>
               </div>
             )}
             {itin.howLong && (
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#2c6faa', marginBottom: '10px', fontFamily: 'var(--font-sans)' }}>HOW LONG</p>
-                <p style={{ fontStyle: 'italic', fontSize: '15px', color: '#6B6B6B', lineHeight: 1.5, fontFamily: 'var(--font-sans)' }}>{itin.howLong}</p>
+                <p style={{ fontSize: '28px', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase', color: BT_BLUE, marginBottom: '10px', fontFamily: ITIN_DISPLAY }}>How long</p>
+                <p style={{ fontStyle: 'italic', fontSize: '17px', color: '#666', lineHeight: 1.5, fontFamily: ITIN_SANS }}>{itin.howLong}</p>
               </div>
             )}
           </div>
@@ -683,16 +691,16 @@ export default function ItineraryDetail() {
               <div style={{ flex: 1, minWidth: 0, maxWidth: '964px' }}>
                 {/* Section header */}
                 <div style={{ paddingTop: '64px', paddingBottom: '32px' }}>
-                  <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', fontFamily: 'var(--font-sans)', marginBottom: '16px', color: '#1a1a1a' }}>
+                  <h2 style={{ fontSize: 'clamp(38px, 5vw, 64px)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: ITIN_DISPLAY, marginBottom: '16px', color: '#000', lineHeight: 0.98 }}>
                     {section.title}
                   </h2>
                   {section.description && (
-                    <p style={{ fontSize: '17px', color: '#555', lineHeight: 1.75, fontFamily: 'var(--font-serif)', maxWidth: '640px' }}>
+                    <p style={{ fontSize: '17px', color: BT_TEXT, lineHeight: 1.58, fontFamily: ITIN_SANS, letterSpacing: '0.03em', maxWidth: '640px' }}>
                       {section.description}
                     </p>
                   )}
                   {section.daysRange && (
-                    <p style={{ marginTop: '16px', fontSize: '12px', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600, fontFamily: 'var(--font-sans)', color: '#2d6a4f' }}>
+                    <p style={{ marginTop: '16px', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700, fontFamily: ITIN_SANS, color: BT_GREEN }}>
                       {section.daysRange}
                     </p>
                   )}
@@ -720,13 +728,13 @@ export default function ItineraryDetail() {
                             )}
                             {/* Text side */}
                             <div style={{ flex: 1, padding: '40px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', overflow: 'hidden' }}>
-                              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', letterSpacing: '0.15em', color: '#2d6a4f', fontWeight: 700, textTransform: 'uppercase', marginBottom: '10px' }}>
+                              <p style={{ fontFamily: ITIN_SANS, fontSize: '12px', letterSpacing: '0.1em', color: BT_GREEN, fontWeight: 700, textTransform: 'uppercase', marginBottom: '10px' }}>
                                 DAY {block.dayNumber}
                               </p>
-                              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(15px, 1.8vw, 21px)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '18px', lineHeight: 1.2, color: '#111' }}>
+                              <h3 style={{ fontFamily: ITIN_DISPLAY, fontSize: 'clamp(28px, 3vw, 42px)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '18px', lineHeight: 0.98, color: '#000' }}>
                                 {block.title}
                               </h3>
-                              <p style={{ fontFamily: 'var(--font-serif)', fontSize: '16px', color: '#555', lineHeight: 1.75 }}>
+                              <p style={{ fontFamily: ITIN_SANS, fontSize: '17px', color: BT_TEXT, lineHeight: 1.58, letterSpacing: '0.03em' }}>
                                 {block.description}
                               </p>
                             </div>
@@ -754,12 +762,12 @@ export default function ItineraryDetail() {
       <section style={{ position: 'relative', width: '100%', height: 'clamp(260px, 30vw, 275px)', backgroundColor: '#a84900', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: '', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '28px', textAlign: 'center', padding: '0 24px' }}>
-          <h2 style={{ fontFamily: 'AlternateGotNo1D', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, color: '#ffffff', letterSpacing: '0.05em', textTransform: 'uppercase', margin: 0, lineHeight: 1.1 }}>
+          <h2 style={{ fontFamily: ITIN_DISPLAY, fontSize: 'clamp(34px, 5vw, 56px)', fontWeight: 400, color: '#ffffff', letterSpacing: '0.06em', textTransform: 'uppercase', margin: 0, lineHeight: 0.95 }}>
             So, ready to start?
           </h2>
           <a href="/make-an-enquiry">
             <button
-              style={{ backgroundColor: '#111111', color: '#ffffff', fontFamily: 'Lato, sans-serif', fontSize: '13px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '14px 36px', border: '2px solid #111111', cursor: 'pointer', transition: 'background-color 0.2s, color 0.2s, transform 0.1s' }}
+              style={{ backgroundColor: '#111111', color: '#ffffff', fontFamily: ITIN_SANS, fontSize: '12px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '14px 36px', border: '2px solid #111111', cursor: 'pointer', transition: 'background-color 0.2s, color 0.2s, transform 0.1s' }}
               onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#111111'; }}
               onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#111111'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.transform = 'scale(1)'; }}
               onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.95)')}
