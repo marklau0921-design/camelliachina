@@ -624,25 +624,28 @@ export default function ItineraryDetail() {
 
         {/* WHEN / PRICE / HOW LONG */}
         {(itin.when || itin.price || itin.howLong) && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px', borderTop: '1px solid #eee', paddingTop: '40px' }}>
-            {itin.when && (
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontSize: '28px', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase', color: BT_PINK, marginBottom: '10px', fontFamily: ITIN_DISPLAY }}>When</p>
-                <p style={{ fontStyle: 'italic', fontSize: '17px', color: '#666', lineHeight: 1.5, fontFamily: ITIN_SANS }}>{itin.when}</p>
-              </div>
-            )}
-            {itin.price && (
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontSize: '28px', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase', color: BT_GREEN, marginBottom: '10px', fontFamily: ITIN_DISPLAY }}>Price</p>
-                <p style={{ fontStyle: 'italic', fontSize: '17px', color: '#666', lineHeight: 1.5, fontFamily: ITIN_SANS }}>{itin.price}</p>
-              </div>
-            )}
-            {itin.howLong && (
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontSize: '28px', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase', color: BT_BLUE, marginBottom: '10px', fontFamily: ITIN_DISPLAY }}>How long</p>
-                <p style={{ fontStyle: 'italic', fontSize: '17px', color: '#666', lineHeight: 1.5, fontFamily: ITIN_SANS }}>{itin.howLong}</p>
-              </div>
-            )}
+          <div>
+            <div style={{ width: 48, height: 1, background: '#ccc', margin: '0 auto 32px' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px' }}>
+              {itin.when && (
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <p style={{ fontSize: '28px', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase', color: BT_PINK, marginBottom: '10px', fontFamily: ITIN_DISPLAY }}>When</p>
+                  <p style={{ fontStyle: 'italic', fontSize: '17px', color: '#666', lineHeight: 1.5, fontFamily: ITIN_SANS }}>{itin.when}</p>
+                </div>
+              )}
+              {itin.price && (
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <p style={{ fontSize: '28px', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase', color: BT_GREEN, marginBottom: '10px', fontFamily: ITIN_DISPLAY }}>Price</p>
+                  <p style={{ fontStyle: 'italic', fontSize: '17px', color: '#666', lineHeight: 1.5, fontFamily: ITIN_SANS }}>{itin.price}</p>
+                </div>
+              )}
+              {itin.howLong && (
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <p style={{ fontSize: '28px', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase', color: BT_BLUE, marginBottom: '10px', fontFamily: ITIN_DISPLAY }}>How long</p>
+                  <p style={{ fontStyle: 'italic', fontSize: '17px', color: '#666', lineHeight: 1.5, fontFamily: ITIN_SANS }}>{itin.howLong}</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
