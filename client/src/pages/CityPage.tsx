@@ -5,6 +5,11 @@ import Footer from '@/components/Footer';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 
+const CITY_DISPLAY = "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)";
+const CITY_SANS = "var(--font-travel-sans, 'Cabin', 'Josefin Sans', 'Helvetica Neue', Arial, sans-serif)";
+const CITY_TEXT = '#52575c';
+const CITY_DARK = '#2f2f2f';
+
 /**
  * Dynamic City Destination Page
  * Uses city slug to load city data from database
@@ -29,7 +34,7 @@ function ExperienceItem({ item, index, onExplore }: { item: any; index: number; 
   const ExploreButton = () => (
     <button
       className="px-6 py-3 bg-black text-white text-xs font-semibold uppercase tracking-wider transition-all duration-300 w-fit"
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: 'pointer', fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}
       onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'white'; e.currentTarget.style.color = 'black'; e.currentTarget.style.boxShadow = 'inset 0 0 0 2px black'; }}
       onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'black'; e.currentTarget.style.color = 'white'; e.currentTarget.style.boxShadow = 'none'; }}
       onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.95)'; }}
@@ -54,10 +59,10 @@ function ExperienceItem({ item, index, onExplore }: { item: any; index: number; 
             />
           )}
           <div className="px-6 py-6">
-            <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6">
+            <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
               {title}
             </h3>
-            <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8">
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8" style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT }}>
               {description}
             </p>
             <ExploreButton />
@@ -70,10 +75,10 @@ function ExperienceItem({ item, index, onExplore }: { item: any; index: number; 
           <div className="hidden lg:flex items-center" style={{ minHeight: '380px' }}>
             <div className="w-1/2 px-3 flex flex-col justify-center items-center">
               <div className="max-w-md">
-                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6">
+                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
                   {title}
                 </h3>
-                <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8">
+                <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8" style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT }}>
                   {description}
                 </p>
                 <ExploreButton />
@@ -105,10 +110,10 @@ function ExperienceItem({ item, index, onExplore }: { item: any; index: number; 
             </div>
             <div className="w-1/2 px-3 flex flex-col justify-center items-center">
               <div className="max-w-md">
-                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6">
+                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
                   {title}
                 </h3>
-                <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8">
+                <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8" style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT }}>
                   {description}
                 </p>
                 <ExploreButton />
@@ -301,10 +306,13 @@ export default function CityPage() {
           <div className="absolute inset-0 bg-black/20"></div>
           <div className="relative h-full flex items-center justify-center">
             <h1 className="text-lg md:text-xl lg:text-2xl font-semibold text-white uppercase text-center px-6" style={{
-              letterSpacing: '0.12em',
+              fontFamily: CITY_DISPLAY,
+              fontSize: 'clamp(46px, 6vw, 60px)',
+              letterSpacing: '3px',
               textShadow: '2px 2px 8px rgba(0, 0, 0, 0.5)',
-              fontWeight: '600',
-              lineHeight: '1.8'
+              fontWeight: 400,
+              lineHeight: 0.9,
+              maxWidth: '980px'
             }}>
               {(city as any).bannerTitle}
             </h1>
@@ -360,10 +368,10 @@ export default function CityPage() {
       {/* Overview Section */}
       <div id="overview" className="w-full bg-white py-8 md:py-12" style={{ minHeight: '250px', display: 'flex', alignItems: 'center', marginBottom: '0' }}>
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6" style={{ fontFamily: "'Josefin Sans', sans-serif" }}>
+          <h2 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6" style={{ fontFamily: CITY_DISPLAY, fontSize: 'clamp(36px, 4vw, 45px)', fontWeight: 400, letterSpacing: '2.25px', lineHeight: 1, color: CITY_DARK }}>
             {(city as any).introductionTitle || `Why Should You Travel to ${cityName} With Us?`}
           </h2>
-          <p className="text-base md:text-lg text-gray-500 leading-relaxed">
+          <p className="text-base md:text-lg text-gray-500 leading-relaxed" style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT }}>
             {(city as any).introductionDescription || ''}
           </p>
         </div>
@@ -388,10 +396,10 @@ export default function CityPage() {
 
         {/* Mobile title */}
         <div className="lg:hidden w-full px-6 mb-6 relative z-10">
-          <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: 400, fontSize: '28px', color: 'white', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: '12px', lineHeight: 1.1 }}>
+          <h2 style={{ fontFamily: CITY_DISPLAY, fontWeight: 400, fontSize: '36px', color: 'white', textTransform: 'uppercase', letterSpacing: '2.25px', marginBottom: '12px', lineHeight: 1 }}>
             Explore Our Trips
           </h2>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', fontStyle: 'italic', lineHeight: 1.6 }}>
+          <p style={{ fontFamily: CITY_SANS, fontSize: '17px', color: 'rgba(255,255,255,0.78)', fontStyle: 'italic', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5 }}>
             Explore our sample trips or get in touch to begin your bespoke adventure.
           </p>
         </div>
@@ -420,10 +428,10 @@ export default function CityPage() {
             {isDesktop && <div style={{ width: '20vw', flexShrink: 0 }} />}
             {isDesktop && (
               <div style={{ width: '260px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingTop: '8px' }}>
-                <h2 style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: '700', fontSize: '32px', color: 'white', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: '16px', lineHeight: 1.1 }}>
+                <h2 style={{ fontFamily: CITY_DISPLAY, fontWeight: 400, fontSize: '45px', color: 'white', textTransform: 'uppercase', letterSpacing: '2.25px', marginBottom: '16px', lineHeight: 1 }}>
                   Explore Our Trips
                 </h2>
-                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', fontStyle: 'italic', lineHeight: 1.6 }}>
+                <p style={{ fontFamily: CITY_SANS, fontSize: '17px', color: 'rgba(255,255,255,0.78)', fontStyle: 'italic', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5 }}>
                   Explore our sample trips or get in touch to begin your bespoke adventure.
                 </p>
               </div>
@@ -436,12 +444,12 @@ export default function CityPage() {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />
                 <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
-                  <div className="text-xs font-bold uppercase tracking-wider text-right" style={{ color: '#ffffff', fontWeight: '500' }}>{7 + i * 2} NIGHTS</div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-right" style={{ fontFamily: CITY_SANS, color: '#ffffff', fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}>{7 + i * 2} NIGHTS</div>
                   <div>
-                    <h3 className="text-base font-bold uppercase tracking-wider mb-4 leading-tight opacity-85" style={{ fontWeight: '300' }}>{cityName}: Bespoke Journey {i}</h3>
+                    <h3 className="text-base font-bold uppercase tracking-wider mb-4 leading-tight opacity-85" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28 }}>{cityName}: Bespoke Journey {i}</h3>
                     <button
                       className="px-4 py-2 text-white text-xs font-bold uppercase tracking-widest transition-all duration-200 opacity-85"
-                      style={{ cursor: 'pointer', background: 'rgba(20,20,20,0.55)', backdropFilter: 'blur(6px)' }}
+                      style={{ cursor: 'pointer', background: 'rgba(20,20,20,0.55)', backdropFilter: 'blur(6px)', fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}
                       onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,1)'; e.currentTarget.style.color = '#111'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'rgba(20,20,20,0.55)'; e.currentTarget.style.color = '#fff'; }}
                     >
@@ -454,6 +462,7 @@ export default function CityPage() {
             <div className="flex-shrink-0" style={{ width: '155px', height: '550px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
               <button
                 className="px-6 py-3 rounded-sm transition-all duration-300 bg-white/20 border border-white/50 text-white font-semibold uppercase tracking-wider text-sm"
+                style={{ fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}
                 onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#000000'; }}
                 onMouseLeave={e => { e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = '#ffffff'; }}
               >View More</button>
@@ -477,7 +486,7 @@ export default function CityPage() {
       {whatToSeeItems.length > 0 && (
         <div id="see-do" className="w-full bg-white py-0" style={{ marginTop: '100px' }}>
           <div className="max-w-7xl mx-auto px-6">
-            <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-widest text-black mb-12 text-center font-display">
+            <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-widest text-black mb-12 text-center font-display" style={{ fontFamily: CITY_DISPLAY, fontSize: 'clamp(36px, 4vw, 45px)', fontWeight: 400, letterSpacing: '2.25px', lineHeight: 1, color: '#000' }}>
               What to See and Do in {cityName}
             </h2>
           </div>
@@ -519,7 +528,7 @@ export default function CityPage() {
                 <button
                   onClick={() => setExpandedSections(prev => ({ ...prev, siCuisine: !prev.siCuisine }))}
                   className="px-6 py-3 bg-black text-white text-xs font-semibold uppercase tracking-wider transition-all duration-300 w-fit"
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: 'pointer', fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}
                   onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'white'; e.currentTarget.style.color = 'black'; e.currentTarget.style.boxShadow = 'inset 0 0 0 2px black'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'black'; e.currentTarget.style.color = 'white'; e.currentTarget.style.boxShadow = 'none'; }}
                 >
@@ -533,7 +542,7 @@ export default function CityPage() {
 
       {/* Culinary Travel Section */}
       <div id="food" className="w-full bg-white" style={{ paddingTop: '100px', paddingBottom: '80px' }}>
-        <h2 className="text-center text-2xl md:text-4xl font-bold uppercase tracking-wider mb-16 px-4" style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: 400 }}>
+        <h2 className="text-center text-2xl md:text-4xl font-bold uppercase tracking-wider mb-16 px-4" style={{ fontFamily: CITY_DISPLAY, fontSize: 'clamp(36px, 4vw, 45px)', fontWeight: 400, letterSpacing: '2.25px', lineHeight: 1, color: '#000' }}>
           Culinary Travel
         </h2>
 
@@ -552,10 +561,10 @@ export default function CityPage() {
             </div>
             <div className="flex flex-col justify-center items-center bg-gray-100 pl-8 pr-8" style={{ width: '40%', height: '640px' }}>
               <div className="max-w-md">
-                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6">
+                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
                   {(city as any).culinaryTravelLargeTitle || `${cityName} Cuisine`}
                 </h3>
-                <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+                <p className="text-base md:text-lg text-gray-600 leading-relaxed" style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT }}>
                   {(city as any).culinaryTravelLargeDescription || ''}
                 </p>
               </div>
@@ -573,10 +582,10 @@ export default function CityPage() {
               />
             )}
             <div className="p-6">
-              <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6">
+              <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
                 {(city as any).culinaryTravelLargeTitle || `${cityName} Cuisine`}
               </h3>
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed" style={{ fontSize: '16px' }}>
+              <p className="text-base md:text-lg text-gray-600 leading-relaxed" style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT }}>
                 {(city as any).culinaryTravelLargeDescription || ''}
               </p>
             </div>
@@ -597,10 +606,10 @@ export default function CityPage() {
                 />
               )}
               <div className="p-6" style={{ height: '210px', overflow: 'hidden' }}>
-                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-4">
+                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-4" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
                   {(city as any).culinaryTravelSmall1Title || ''}
                 </h3>
-                <p className="text-base md:text-lg text-gray-600 leading-relaxed" style={{ fontSize: '16px' }}>
+                <p className="text-base md:text-lg text-gray-600 leading-relaxed" style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT }}>
                   {(city as any).culinaryTravelSmall1Description || ''}
                 </p>
               </div>
@@ -617,10 +626,10 @@ export default function CityPage() {
                 />
               )}
               <div className="p-6" style={{ height: '210px', overflow: 'hidden' }}>
-                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-4">
+                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-4" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
                   {(city as any).culinaryTravelSmall2Title || ''}
                 </h3>
-                <p className="text-base md:text-lg text-gray-600 leading-relaxed" style={{ fontSize: '16px' }}>
+                <p className="text-base md:text-lg text-gray-600 leading-relaxed" style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT }}>
                   {(city as any).culinaryTravelSmall2Description || ''}
                 </p>
               </div>
@@ -653,12 +662,12 @@ export default function CityPage() {
           <div style={{ position: 'absolute', inset: 0, backgroundImage: '', backgroundSize: '400px 400px', backgroundRepeat: 'repeat', opacity: 0.65, mixBlendMode: 'multiply' }} />
         )}
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: '12px', textAlign: 'left', flex: 1 }}>
-          <h2 style={{ fontFamily: 'AlternateGotNo1D', fontSize: '32px', fontWeight: 800, color: '#ffffff', letterSpacing: '0.05em', textTransform: 'uppercase', margin: 0, lineHeight: 1.1 }}>
+          <h2 style={{ fontFamily: CITY_DISPLAY, fontSize: '45px', fontWeight: 400, color: '#ffffff', letterSpacing: '2.25px', textTransform: 'uppercase', margin: 0, lineHeight: 1 }}>
             So, ready to start?
           </h2>
         </div>
         <button
-          style={{ position: 'relative', zIndex: 1, backgroundColor: '#111111', color: '#ffffff', fontFamily: 'Lato, sans-serif', fontSize: '13px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '14px 36px', border: '2px solid #111111', cursor: 'pointer', transition: 'background-color 0.2s, color 0.2s, transform 0.1s', whiteSpace: 'nowrap', marginLeft: '40px' }}
+          style={{ position: 'relative', zIndex: 1, backgroundColor: '#111111', color: '#ffffff', fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5, textTransform: 'uppercase', padding: '14px 36px', border: '2px solid #111111', cursor: 'pointer', transition: 'background-color 0.2s, color 0.2s, transform 0.1s', whiteSpace: 'nowrap', marginLeft: '40px' }}
           onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#111111'; }}
           onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#111111'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.transform = 'scale(1)'; }}
           onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.95)')}
@@ -778,7 +787,7 @@ function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
 
   return (
     <div className="w-full bg-white py-16 md:py-20">
-      <h2 className="text-center text-2xl md:text-4xl font-bold uppercase tracking-wider mb-12 md:mb-16 px-4" style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: 400 }}>
+      <h2 className="text-center text-2xl md:text-4xl font-bold uppercase tracking-wider mb-12 md:mb-16 px-4" style={{ fontFamily: CITY_DISPLAY, fontSize: 'clamp(36px, 4vw, 45px)', fontWeight: 400, letterSpacing: '2.25px', lineHeight: 1, color: '#000' }}>
         Other Popular Destinations
       </h2>
       <div
@@ -809,7 +818,7 @@ function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
             )}
             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-300" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <h3 className="text-white text-lg md:text-xl font-bold uppercase tracking-wider text-center" style={{ fontFamily: 'Alternate Gothic No1 D, sans-serif', fontWeight: 400 }}>
+              <h3 className="text-white text-lg md:text-xl font-bold uppercase tracking-wider text-center" style={{ fontFamily: CITY_DISPLAY, fontSize: 'clamp(30px, 2.5vw, 38px)', fontWeight: 400, letterSpacing: '1.9px', lineHeight: 1 }}>
                 {dest.name}
               </h3>
             </div>
