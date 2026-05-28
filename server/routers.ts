@@ -15,7 +15,7 @@ import path from "path";
 import { nanoid } from "nanoid";
 import {
   createMediaAsset, listMediaAssets, listHomepageAssets, getActiveHomepageAsset, getActiveBanners,
-  setAssetActive, updateAssetSortOrder, replaceMediaAsset, deleteMediaAsset, getMediaAsset,
+  setAssetActive, updateAssetSortOrder, updateAssetOpacity, replaceMediaAsset, deleteMediaAsset, getMediaAsset,
 } from "./db-media";
 import { storagePut, UPLOADS_ROOT, storageDelete } from "./storage";
 import { generateStaticPages, generateNavData, clearStaticCache, STATIC_CACHE_DIR } from "./staticGenerator";
@@ -1185,6 +1185,13 @@ export const appRouter = router({
       }),
 
     // 替换图片（保持原记录，更新 URL）
+    updateOpacity: publicProcedure
+      .input(z.object({ id: z.number(), opacity: z.number().min(0).max(100) }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        return updateAssetOpacity(input.id, input.opacity);
+      }),
+
     replace: publicProcedure
       .input(z.object({
         id: z.number(),

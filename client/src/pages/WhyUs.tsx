@@ -63,6 +63,7 @@ export default function WhyUs() {
   const { data: homeSettings } = trpc.about.getWhyUsHomeSettings.useQuery();
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
   const backgroundTexture = homepageAssets?.cta?.url;
+  const textureOpacity = Math.max(0, Math.min(1, Number((homepageAssets?.cta as any)?.opacity ?? 28) / 100));
 
   // Build slides from CMS data once per data update so navigation callbacks use the latest count.
   const SLIDES = useMemo<Slide[]>(() => {
@@ -162,7 +163,7 @@ export default function WhyUs() {
           backgroundImage: `url(${backgroundTexture})`,
           backgroundRepeat: 'repeat',
           backgroundSize: '420px 420px',
-          opacity: 0.28,
+          opacity: textureOpacity,
           mixBlendMode: 'screen' as const,
         }
       : {

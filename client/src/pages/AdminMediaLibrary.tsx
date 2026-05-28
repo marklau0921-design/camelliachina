@@ -77,6 +77,7 @@ type MediaAsset = {
   sourceUrl?: string | null;
   assetType: "logo" | "banner" | "cta" | "general";
   isActive: boolean;
+  opacity?: number | string | null;
   sortOrder: number;
   createdAt: Date;
 };
@@ -167,6 +168,7 @@ function HomepageAssetsTab() {
   const uploadMut = trpc.media.upload.useMutation({ onSuccess: invalidate });
   const setActiveMut = trpc.media.setActive.useMutation({ onSuccess: () => utils.media.listByType.invalidate() });
   const updateSortMut = trpc.media.updateSortOrder.useMutation({ onSuccess: () => utils.media.listByType.invalidate() });
+  const updateOpacityMut = trpc.media.updateOpacity.useMutation({ onSuccess: () => utils.media.listByType.invalidate() });
   const replaceMut = trpc.media.replace.useMutation({ onSuccess: invalidate });
 
   const handleUpload = async (file: File, assetType: "logo" | "banner" | "cta") => {
@@ -220,6 +222,25 @@ function HomepageAssetsTab() {
             </div>
           ))}
         </div>
+        {(ctas as MediaAsset[]).filter((cta) => cta.isActive).map((cta) => {
+          const opacity = Number(cta.opacity ?? 28);
+          return (
+            <div key={`opacity-${cta.id}`} style={{ marginBottom: 16, padding: "14px 16px", border: "1px solid #f0f0f0", borderRadius: 8, background: "#fafafa" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 10 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#444" }}>Texture Opacity</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#F5569B", minWidth: 44, textAlign: "right" }}>{opacity}%</div>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={opacity}
+                onChange={(e) => updateOpacityMut.mutate({ id: cta.id, opacity: Number(e.target.value) })}
+                style={{ width: "100%", accentColor: "#F5569B" }}
+              />
+            </div>
+          );
+        })}
         <UploadZone onUpload={(f) => handleUpload(f, "cta")} loading={uploadMut.isPending} label="Upload new CTA background (drag & drop or click)" />
       </div>
     </div>

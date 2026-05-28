@@ -63,37 +63,46 @@ export async function listMediaAssets(search?: string, assetType?: "logo" | "ban
 
 // ─── 查询 Homepage Assets（按类型）──────────────────────────────────────────
 export async function listHomepageAssets(assetType: "logo" | "banner" | "cta") {
-  const db = await getDb();
-  if (!db) return [];
-  return db
-    .select()
-    .from(mediaAssets)
-    .where(eq(mediaAssets.assetType, assetType))
-    .orderBy(mediaAssets.sortOrder);
+  const pool = await getPool();
+  if (!pool) return [];
+  const opacitySelect = await mediaOpacitySelect(pool);
+  const [rows] = await pool.query(
+    `SELECT *, ${opacitySelect} FROM media_assets WHERE assetType = ? ORDER BY sortOrder`,
+    [assetType]
+  );
+  return rows as any[];
 }
 
 // ─── 获取当前激活的 Homepage Asset ──────────────────────────────────────────
 export async function getActiveHomepageAsset(assetType: "logo" | "cta") {
-  const db = await getDb();
-  if (!db) return null;
-  const rows = await db
-    .select()
-    .from(mediaAssets)
-    .where(and(eq(mediaAssets.assetType, assetType), eq(mediaAssets.isActive, true)))
-    .orderBy(desc(mediaAssets.createdAt))
-    .limit(1);
-  return rows[0] ?? null;
+  const pool = await getPool();
+  if (!pool) return null;
+  const opacitySelect = await mediaOpacitySelect(pool);
+  const [rows] = await pool.query(
+    `SELECT *, ${opacitySelect} FROM media_assets WHERE assetType = ? AND isActive = true ORDER BY createdAt DESC LIMIT 1`,
+    [assetType]
+  );
+  return (rows as any[])[0] ?? null;
 }
 
 // ─── 获取激活的 Banner 列表 ──────────────────────────────────────────────────
 export async function getActiveBanners() {
-  const db = await getDb();
-  if (!db) return [];
-  return db
-    .select()
-    .from(mediaAssets)
-    .where(and(eq(mediaAssets.assetType, "banner"), eq(mediaAssets.isActive, true)))
-    .orderBy(mediaAssets.sortOrder);
+  const pool = await getPool();
+  if (!pool) return [];
+  const opacitySelect = await mediaOpacitySelect(pool);
+  const [rows] = await pool.query(
+    `SELECT *, ${opacitySelect} FROM media_assets WHERE assetType = 'banner' AND isActive = true ORDER BY sortOrder`
+  );
+  return rows as any[];
+}
+
+async function mediaHasColumn(pool: any, columnName: string) {
+  const [columns] = await pool.query("SHOW COLUMNS FROM media_assets");
+  return (columns as any[]).some((column) => column.Field === columnName);
+}
+
+async function mediaOpacitySelect(pool: any) {
+  return (await mediaHasColumn(pool, "opacity")) ? "opacity" : "28 as opacity";
 }
 
 // ─── 设置激活状态（Logo/CTA：单选；Banner：多选）────────────────────────────
@@ -114,6 +123,15 @@ export async function updateAssetSortOrder(id: number, sortOrder: number) {
   const db = await getDb();
   if (!db) return;
   await db.update(mediaAssets).set({ sortOrder }).where(eq(mediaAssets.id, id));
+}
+
+export async function updateAssetOpacity(id: number, opacity: number) {
+  const pool = await getPool();
+  if (!pool) return { saved: false };
+  if (!(await mediaHasColumn(pool, "opacity"))) return { saved: false };
+  const clamped = Math.max(0, Math.min(100, Math.round(opacity)));
+  await pool.execute("UPDATE media_assets SET opacity = ? WHERE id = ?", [clamped, id]);
+  return { saved: true, opacity: clamped };
 }
 
 // ─── 替换图片（保持 URL 不变，更新 storageKey）──────────────────────────────
