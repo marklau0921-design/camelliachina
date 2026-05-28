@@ -164,7 +164,8 @@ export default function WhyUs() {
           backgroundRepeat: 'repeat',
           backgroundSize: '420px 420px',
           opacity: textureOpacity,
-          mixBlendMode: 'screen' as const,
+          mixBlendMode: 'normal' as const,
+          filter: 'contrast(1.45) brightness(1.08)',
         }
       : {
           backgroundImage: 'radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08), transparent 30%)',
