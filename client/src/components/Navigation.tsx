@@ -51,6 +51,9 @@ const DEFAULT_ABOUT_ITEMS: AboutMenuItem[] = [
   { label: 'Our Team', route: '/about/our-team' },
 ];
 
+const NAV_SANS = "var(--font-travel-sans, 'Cabin', 'Helvetica Neue', Arial, sans-serif)";
+const NAV_DISPLAY = "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)";
+
 // ── Component ──────────────────────────────────────────────────────────────
 interface NavigationProps {
   forceHide?: boolean;
@@ -235,8 +238,9 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
         .bt-dest-row {
           display: flex; align-items: center; justify-content: space-between;
           padding: 5px 0; cursor: pointer;
-          font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 600;
-          letter-spacing: 0.05em; text-transform: uppercase; color: #111;
+          font-family: var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif);
+          font-size: 23px; font-weight: 400;
+          letter-spacing: 0.04em; text-transform: uppercase; color: #111;
           transition: color 0.15s; white-space: nowrap;
         }
         .bt-dest-row:hover, .bt-dest-row.bt-active { color: #F5569B; }
@@ -252,8 +256,9 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
         .bt-exp-row {
           display: flex; align-items: center; justify-content: space-between;
           padding: 5px 0; cursor: pointer;
-          font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 600;
-          letter-spacing: 0.05em; text-transform: uppercase; color: #444;
+          font-family: var(--font-travel-sans, 'Cabin', 'Helvetica Neue', Arial, sans-serif);
+          font-size: 17px; font-weight: 500;
+          letter-spacing: 0.05em; color: #444;
           transition: color 0.15s; white-space: nowrap;
         }
         .bt-exp-row:hover { color: #F5569B; }
@@ -267,8 +272,9 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
         .exp-cat-row {
           display: flex; align-items: center; justify-content: space-between;
           padding: 5px 0; cursor: pointer;
-          font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 600;
-          letter-spacing: 0.05em; text-transform: uppercase; color: #111;
+          font-family: var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif);
+          font-size: 23px; font-weight: 400;
+          letter-spacing: 0.04em; text-transform: uppercase; color: #111;
           transition: color 0.15s; white-space: nowrap;
         }
         .exp-cat-row:hover, .exp-cat-row.exp-active { color: #F5569B; }
@@ -284,8 +290,9 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
         .exp-sub-row {
           display: flex; align-items: center; justify-content: space-between;
           padding: 5px 0; cursor: pointer;
-          font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 600;
-          letter-spacing: 0.05em; text-transform: uppercase; color: #444;
+          font-family: var(--font-travel-sans, 'Cabin', 'Helvetica Neue', Arial, sans-serif);
+          font-size: 17px; font-weight: 500;
+          letter-spacing: 0.05em; color: #444;
           transition: color 0.15s; white-space: nowrap;
         }
         .exp-sub-row:hover { color: #F5569B; }
@@ -359,7 +366,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                 <button
                   key={item.key}
                   onClick={() => toggleMenu(item.key)}
-                  style={{ color: textColor, fontFamily: 'sans-serif', fontSize: '12px', letterSpacing: '0.15em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                  style={{ color: textColor, fontFamily: NAV_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                 >
                   <span className={`nav-link-underline${activeMenu === item.key ? ' nav-active' : ''}`}>
                     {item.label}
@@ -368,7 +375,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
               ))}
               <button
                 onClick={() => toggleMenu('about')}
-                style={{ color: textColor, fontFamily: 'sans-serif', fontSize: '12px', letterSpacing: '0.15em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                style={{ color: textColor, fontFamily: NAV_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
               >
                 <span className={`nav-link-underline${activeMenu === 'about' ? ' nav-active' : ''}`}>About</span>
               </button>
@@ -383,8 +390,8 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                 onClick={() => setLocation('/make-an-enquiry')}
                 style={{
                   background: '#F5569B', color: '#fff',
-                  fontFamily: 'sans-serif', fontSize: '11px',
-                  letterSpacing: '0.18em', textTransform: 'uppercase',
+                  fontFamily: NAV_SANS, fontSize: '10px',
+                  letterSpacing: '0.05em', textTransform: 'uppercase',
                   padding: '8px 20px', border: '2px solid #F5569B', cursor: 'pointer',
                   fontWeight: 500, transition: 'all 0.2s',
                 }}
@@ -409,8 +416,8 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                 onClick={() => setLocation('/make-an-enquiry')}
                 style={{
                   background: '#F5569B', color: '#fff',
-                  fontFamily: 'sans-serif', fontSize: '10px',
-                  letterSpacing: '0.15em', textTransform: 'uppercase',
+                  fontFamily: NAV_SANS, fontSize: '10px',
+                  letterSpacing: '0.05em', textTransform: 'uppercase',
                   padding: '6px 12px', border: 'none', cursor: 'pointer', fontWeight: 500,
                 }}
               >
@@ -448,14 +455,14 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                   <button
                     key={item.key}
                     onClick={() => { toggleMenu(item.key); setIsOpen(false); }}
-                    style={{ color: '#fff', fontFamily: 'sans-serif', fontSize: '12px', letterSpacing: '0.15em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '12px 0' }}
+                    style={{ color: '#fff', fontFamily: NAV_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '12px 0' }}
                   >
                     {item.label}
                   </button>
                 ))}
                 <button
                   onClick={() => { toggleMenu('about'); setIsOpen(false); }}
-                  style={{ color: '#fff', fontFamily: 'sans-serif', fontSize: '12px', letterSpacing: '0.15em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '12px 0' }}
+                  style={{ color: '#fff', fontFamily: NAV_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '12px 0' }}
                 >
                   About
                 </button>
@@ -556,11 +563,11 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                 {destPortraitPage === 2 && (
                   <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', paddingTop: '12px', paddingBottom: '40px', paddingLeft: '32px', paddingRight: '64px', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', alignItems: 'center', height: '32px', marginBottom: '28px' }}>
-                      <button onClick={() => setDestPortraitPage(1)} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer', color: '#222', fontFamily: 'sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', padding: 0 }}>
+                      <button onClick={() => setDestPortraitPage(1)} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer', color: '#222', fontFamily: NAV_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', padding: 0 }}>
                         <ChevronLeft size={16} /><span>Back</span>
                       </button>
                     </div>
-                    <div style={{ fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#222', marginBottom: '16px' }}>
+                    <div style={{ fontFamily: NAV_DISPLAY, fontSize: '23px', fontWeight: 400, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#222', marginBottom: '16px' }}>
                       {activeDestination.name}
                     </div>
                     {(activeDestination.experienceRoutes || activeDestination.experiences.map(e => ({ label: e, route: undefined }))).map((exp, i) => (
@@ -629,7 +636,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                 {/* Col 1 */}
                 <div style={{ flexShrink: 0, overflowY: 'hidden', paddingTop: '60px', paddingBottom: '40px', paddingRight: '20px', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', minWidth: '320px', boxSizing: 'content-box', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                   {categories.length === 0 ? (
-                    <div style={{ color: '#aaa', fontSize: '13px', paddingTop: '8px' }}>Loading...</div>
+                    <div style={{ color: '#aaa', fontFamily: NAV_SANS, fontSize: '13px', paddingTop: '8px' }}>Loading...</div>
                   ) : categories.map(cat => (
                     <div
                       key={cat.id}
@@ -688,11 +695,11 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                 {expPortraitPage === 2 && effectiveCategory && (
                   <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', paddingTop: '12px', paddingBottom: '40px', paddingLeft: '32px', paddingRight: '64px', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', alignItems: 'center', height: '32px', marginBottom: '28px' }}>
-                      <button onClick={() => setExpPortraitPage(1)} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer', color: '#222', fontFamily: 'sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', padding: 0 }}>
+                      <button onClick={() => setExpPortraitPage(1)} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer', color: '#222', fontFamily: NAV_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', padding: 0 }}>
                         <ChevronLeft size={16} /><span>Back</span>
                       </button>
                     </div>
-                    <div style={{ fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#222', marginBottom: '16px' }}>
+                    <div style={{ fontFamily: NAV_DISPLAY, fontSize: '23px', fontWeight: 400, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#222', marginBottom: '16px' }}>
                       {effectiveCategory.name}
                     </div>
                     {effectiveCategory.items.map((item, i) => (
