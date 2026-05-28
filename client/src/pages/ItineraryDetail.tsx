@@ -503,10 +503,6 @@ export default function ItineraryDetail() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
   const [activeSection, setActiveSection] = useState('overview');
-  const [stickyFixed, setStickyFixed] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const tripNavRef = useRef<HTMLDivElement>(null);
-  const lastScrollY = useRef(0);
 
   const { data: itin, isLoading, error } = trpc.cms.getItineraryBySlug.useQuery(
     { slug: slug! },
@@ -528,41 +524,15 @@ export default function ItineraryDetail() {
     }
   }
   const navSections = [
-    { id: 'overview', label: 'OVERVIEW' },
-    ...sections.map(s => ({ id: `section-${s.id}`, label: s.title.toUpperCase() || 'SECTION' })),
+    { id: 'overview', label: 'Overview' },
+    ...sections.map(s => ({ id: `section-${s.id}`, label: s.title || 'Section' })),
   ];
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      const scrollingDown = currentY > lastScrollY.current;
-      const heroHeight = heroRef.current?.offsetHeight || window.innerHeight;
-      if (currentY > heroHeight) {
-        setStickyFixed(scrollingDown);
-      } else {
-        setStickyFixed(false);
-      }
-      lastScrollY.current = currentY;
-
-      const navOffset = stickyFixed ? 48 : 0;
-      const triggerY = currentY + navOffset + 60;
-      let current = 'overview';
-      navSections.forEach(s => {
-        const el = document.getElementById(s.id);
-        if (el && el.getBoundingClientRect().top + currentY <= triggerY) current = s.id;
-      });
-      setActiveSection(current);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [stickyFixed, navSections.length]);
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
       setActiveSection(id);
-      const offset = stickyFixed ? 48 : 0;
-      window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
+      el.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -597,10 +567,10 @@ export default function ItineraryDetail() {
         }
       `}</style>
 
-      <Navigation forceHide={stickyFixed} />
+      <Navigation />
 
       {/* ── HERO BANNER ── */}
-      <div ref={heroRef} style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>
         {itin.bannerImage ? (
           <img src={itin.bannerImage} alt={itin.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
@@ -619,17 +589,25 @@ export default function ItineraryDetail() {
         </div>
       </div>
 
-      {/* ── STICKY SECTION NAV ── */}
-      <div ref={tripNavRef} style={{ height: '48px', position: 'relative', zIndex: 39 }}>
-        <div style={{ position: stickyFixed ? 'fixed' : 'relative', top: stickyFixed ? 0 : 'auto', left: 0, right: 0, zIndex: 39, background: '#f9f9f9', borderBottom: '1px solid rgba(202,204,207,0.45)' }}>
-          <div style={{ minHeight: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px', overflowX: 'auto' }}>
+      {/* ── SECTION NAV ── */}
+      <div className="w-full" style={{ height: '48px', backgroundColor: '#F3F3F3' }}>
+        <style>{`
+          .tab-underline { position: relative; padding-bottom: 2px; }
+          .tab-underline::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: #F5569B; transition: width 0.25s ease; }
+          .tab-underline:hover::after, .tab-underline.tab-active::after { width: 100%; }
+        `}</style>
+        <div className="h-full flex items-center justify-center px-4 md:px-0">
+          <nav className="flex gap-3 md:gap-12 h-full items-center flex-wrap md:flex-nowrap justify-center">
             {navSections.map(s => (
-              <button key={s.id} onClick={() => scrollToSection(s.id)}
-                style={{ position: 'relative', padding: '16px 20px 14px', fontSize: 'clamp(10px, 1vw, 12px)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap', background: 'none', border: 'none', cursor: 'pointer', fontFamily: ITIN_SANS, color: activeSection === s.id ? BT_DARK : '#666', borderBottom: activeSection === s.id ? `2px solid ${BT_PINK}` : '2px solid transparent', transition: 'color 0.2s, border-color 0.2s' }}>
+              <button
+                key={s.id}
+                onClick={() => scrollToSection(s.id)}
+                className={`tab-underline text-xs font-semibold uppercase tracking-wider text-black flex-shrink-0 ${activeSection === s.id ? 'tab-active' : ''}`}
+              >
                 {s.label}
               </button>
             ))}
-          </div>
+          </nav>
         </div>
       </div>
 
