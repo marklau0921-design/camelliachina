@@ -86,7 +86,6 @@ export default function Home() {
   const activeBanners = heroBackgroundImage
     ? [heroBackgroundImage]
     : (apiBanners && apiBanners.length > 0) ? apiBanners.map((b) => b.url) : [FALLBACK_BANNER];
-  const activeCta = homepageAssets?.cta?.url;
 
   const [, navigate] = useLocation();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -284,7 +283,7 @@ export default function Home() {
           minHeight: '680px',
           paddingTop: '50px',
           paddingBottom: '50px',
-          backgroundImage: `url(${activeCta || activeBanners[0]})`,
+          backgroundImage: `url(${activeBanners[0]})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'scroll',
