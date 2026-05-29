@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
-import { Upload, X } from "lucide-react";
+import { Maximize2, Upload, X } from "lucide-react";
+import ImageCropPreview from "./ImageCropPreview";
 
 interface MultiImageUploaderProps {
   value?: string[]; // Array of image URLs
@@ -31,6 +32,7 @@ export default function MultiImageUploader({
   const [urlInput, setUrlInput] = useState("");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const upload = trpc.media.upload.useMutation();
 
@@ -127,6 +129,19 @@ export default function MultiImageUploader({
               >
                 <X size={12} />
               </button>
+              <button
+                type="button"
+                onClick={() => setPreviewUrl(url)}
+                title="Preview crop"
+                style={{
+                  position: "absolute", bottom: "4px", right: "4px",
+                  background: "rgba(0,0,0,0.62)", border: "none", cursor: "pointer",
+                  color: "#fff", width: "22px", height: "22px", display: "flex", alignItems: "center", justifyContent: "center",
+                  borderRadius: "2px",
+                }}
+              >
+                <Maximize2 size={12} />
+              </button>
             </div>
           ))}
         </div>
@@ -200,6 +215,10 @@ export default function MultiImageUploader({
 
       {error && (
         <p style={{ fontSize: "12px", color: "#e53e3e", marginTop: "6px" }}>{error}</p>
+      )}
+
+      {previewUrl && (
+        <ImageCropPreview imageUrl={previewUrl} onClose={() => setPreviewUrl(null)} />
       )}
     </div>
   );
