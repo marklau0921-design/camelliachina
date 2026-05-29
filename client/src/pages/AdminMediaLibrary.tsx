@@ -78,6 +78,8 @@ type MediaAsset = {
   assetType: "logo" | "banner" | "cta" | "general";
   isActive: boolean;
   opacity?: number | string | null;
+  usageCount?: number;
+  usageSources?: { label: string; url: string; table: string; column?: string }[];
   sortOrder: number;
   createdAt: Date;
 };
@@ -94,7 +96,9 @@ function ImageCard({
   const [copied, setCopied] = useState(false);
   const [showUsage, setShowUsage] = useState(false);
   const [replaceLoading, setReplaceLoading] = useState(false);
-  const isInUse = !!asset.sourceUrl;
+  const usageCount = asset.usageCount ?? (asset.sourceUrl ? 1 : 0);
+  const usageSources = asset.usageSources ?? (asset.sourceUrl ? [{ label: asset.sourceLabel ?? "Linked source", url: asset.sourceUrl, table: "media_assets" }] : []);
+  const isInUse = usageCount > 0;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(asset.url);
@@ -120,15 +124,19 @@ function ImageCard({
         <div>
           {isInUse ? (
             <button onClick={() => setShowUsage(!showUsage)} style={{ fontSize: 11, color: "#F5569B", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}>
-              {showUsage ? "Hide usage" : "Used in 1 page ▾"}
+              {showUsage ? "Hide usage" : `Used in ${usageCount} place${usageCount === 1 ? "" : "s"}`}
             </button>
           ) : (
             <span style={{ fontSize: 11, color: "#bbb" }}>Not in use</span>
           )}
           {showUsage && isInUse && (
             <div style={{ marginTop: 4, fontSize: 11, color: "#555", background: "#f9f9f9", borderRadius: 4, padding: "4px 8px" }}>
-              {asset.sourceLabel && <div style={{ fontWeight: 600 }}>{asset.sourceLabel}</div>}
-              <div style={{ color: "#888" }}>{asset.sourceUrl}</div>
+              {usageSources.map((usage, index) => (
+                <div key={`${usage.table}-${usage.url}-${index}`} style={{ marginBottom: index === usageSources.length - 1 ? 0 : 6 }}>
+                  <div style={{ fontWeight: 600 }}>{usage.label}</div>
+                  <div style={{ color: "#888" }}>{usage.url}</div>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -425,11 +433,12 @@ function AllImagesTab() {
                 key={asset.id}
                 style={{
                   position: "relative",
-                  border: selectedIds.has(asset.id) ? "3px solid #F5569B" : "1px solid #e8e8e8",
+                  border: "1px solid #e8e8e8",
                   borderRadius: 8,
                   overflow: "hidden",
                   background: selectedIds.has(asset.id) ? "#fff0f6" : "#fff",
-                  transition: "all 0.2s",
+                  boxShadow: selectedIds.has(asset.id) ? "0 0 0 2px #F5569B" : "0 0 0 0 rgba(245, 86, 155, 0)",
+                  transition: "background-color 0.15s, box-shadow 0.15s",
                 }}
               >
                 {/* Checkbox */}

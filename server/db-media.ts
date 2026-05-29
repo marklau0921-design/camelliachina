@@ -2,6 +2,28 @@ import { getDb, getPool } from "./db";
 import { mediaAssets } from "../drizzle/schema";
 import { eq, like, or, desc, and } from "drizzle-orm";
 
+type MediaUsage = {
+  label: string;
+  url: string;
+  table: string;
+  column?: string;
+};
+
+const usageTables = [
+  { table: "cities", label: "City", title: "name", route: (row: any) => `/destinations/${row.slug ?? row.id}`, columns: ["coverImage", "cityCardImage", "culinaryTravelLargeImage", "culinaryTravelSmall1Image", "culinaryTravelSmall2Image"] },
+  { table: "experience_types", label: "Experience Type", title: "name", route: (row: any) => `/experiences/${row.slug ?? row.id}`, columns: ["coverImage"] },
+  { table: "experiences", label: "Experience", title: "name", route: (row: any) => `/experiences/${row.slug ?? row.id}`, columns: ["gallery", "recommendationImage", "cityDisplayImage"] },
+  { table: "experience_details", label: "Experience Detail", title: "id", route: (row: any) => `/admin/experiences/edit/${row.experienceId}`, columns: ["imageUrl"] },
+  { table: "team_members", label: "Team Member", title: "name", route: (row: any) => `/about/our-team`, columns: ["image", "storyImage", "storyImage2"] },
+  { table: "itineraries", label: "Itinerary", title: "name", route: (row: any) => `/itineraries/${row.slug ?? row.id}`, columns: ["bannerImage", "coverImage", "sections"] },
+  { table: "stories", label: "Story", title: "title", route: (row: any) => `/stories/${row.slug ?? row.id}`, columns: ["coverImage"] },
+  { table: "videos", label: "Video", title: "title", route: (row: any) => `/videos/${row.slug ?? row.id}`, columns: ["coverImage"] },
+  { table: "homepage_hero", label: "Homepage Hero", title: "title", route: () => "/", columns: ["backgroundImage"] },
+  { table: "homepage_stories", label: "Homepage Story", title: "name", route: () => "/", columns: ["image"] },
+  { table: "homepage_sponsors", label: "Homepage Sponsor", title: "name", route: () => "/", columns: ["logo", "backgroundTexture"] },
+  { table: "why_us_sections", label: "Why Us", title: "title", route: () => "/about/why-us", columns: ["image"] },
+];
+
 // ─── 新增媒体资产 ──────────────────────────────────────────────────────────────
 export async function createMediaAsset(data: {
   url: string;
@@ -54,11 +76,78 @@ export async function listMediaAssets(search?: string, assetType?: "logo" | "ban
     filters.push(eq(mediaAssets.assetType, assetType));
   }
 
-  return db
+  const assets = await db
     .select()
     .from(mediaAssets)
     .where(filters.length > 0 ? and(...filters) : undefined)
     .orderBy(desc(mediaAssets.createdAt));
+  return Promise.all(assets.map(async (asset) => {
+    const usageSources = await findMediaAssetUsages(asset);
+    const primaryUsage = usageSources[0];
+    return {
+      ...asset,
+      usageCount: usageSources.length,
+      usageSources,
+      sourceLabel: asset.sourceLabel ?? primaryUsage?.label ?? null,
+      sourceUrl: asset.sourceUrl ?? primaryUsage?.url ?? null,
+    };
+  }));
+}
+
+async function getExistingColumns(pool: any, table: string) {
+  try {
+    const [columns] = await pool.query(`SHOW COLUMNS FROM \`${table}\``);
+    return new Set((columns as any[]).map(column => column.Field));
+  } catch {
+    return new Set<string>();
+  }
+}
+
+export async function findMediaAssetUsages(asset: { url: string; assetType?: string; isActive?: boolean | number | null; sourceLabel?: string | null; sourceUrl?: string | null }) {
+  const pool = await getPool();
+  if (!pool) return [];
+  const usages: MediaUsage[] = [];
+
+  if (asset.sourceUrl) {
+    usages.push({ label: asset.sourceLabel ?? "Linked source", url: asset.sourceUrl, table: "media_assets" });
+  }
+
+  if (asset.assetType && asset.assetType !== "general" && !!asset.isActive) {
+    usages.push({ label: `Active ${asset.assetType} asset`, url: "/admin/media-library", table: "media_assets", column: "isActive" });
+  }
+
+  for (const spec of usageTables) {
+    const existingColumns = await getExistingColumns(pool, spec.table);
+    const searchableColumns = spec.columns.filter(column => existingColumns.has(column));
+    if (searchableColumns.length === 0) continue;
+
+    const titleColumn = existingColumns.has(spec.title) ? spec.title : "id";
+    const slugSelect = existingColumns.has("slug") ? "slug" : "NULL AS slug";
+    const experienceIdSelect = existingColumns.has("experienceId") ? "experienceId" : "NULL AS experienceId";
+    const where = searchableColumns.map(column => `\`${column}\` LIKE ?`).join(" OR ");
+    const params = searchableColumns.map(() => `%${asset.url}%`);
+    const [rows] = await pool.execute(
+      `SELECT id, \`${titleColumn}\` AS usageTitle, ${slugSelect}, ${experienceIdSelect} FROM \`${spec.table}\` WHERE ${where} LIMIT 20`,
+      params
+    );
+
+    for (const row of rows as any[]) {
+      const title = row.usageTitle ? String(row.usageTitle) : `#${row.id}`;
+      usages.push({
+        label: `${spec.label}: ${title}`,
+        url: spec.route(row),
+        table: spec.table,
+      });
+    }
+  }
+
+  const seen = new Set<string>();
+  return usages.filter(usage => {
+    const key = `${usage.table}:${usage.label}:${usage.url}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 // ─── 查询 Homepage Assets（按类型）──────────────────────────────────────────

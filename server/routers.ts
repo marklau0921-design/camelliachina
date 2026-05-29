@@ -16,6 +16,7 @@ import { nanoid } from "nanoid";
 import {
   createMediaAsset, listMediaAssets, listHomepageAssets, getActiveHomepageAsset, getActiveBanners,
   setAssetActive, updateAssetSortOrder, updateAssetOpacity, replaceMediaAsset, deleteMediaAsset, getMediaAsset,
+  findMediaAssetUsages,
 } from "./db-media";
 import { storagePut, UPLOADS_ROOT, storageDelete } from "./storage";
 import { generateStaticPages, generateNavData, clearStaticCache, STATIC_CACHE_DIR } from "./staticGenerator";
@@ -1217,10 +1218,11 @@ export const appRouter = router({
         const asset = await getMediaAsset(input.id);
         if (!asset) throw new TRPCError({ code: "NOT_FOUND" });
         // 检查引用：sourceUrl 不为空说明被引用
-        if (asset.sourceUrl) {
+        const usages = await findMediaAssetUsages(asset);
+        if (usages.length > 0) {
           throw new TRPCError({
             code: "PRECONDITION_FAILED",
-            message: "This image is currently in use.",
+            message: `This image is currently in use in ${usages.length} place${usages.length === 1 ? "" : "s"}.`,
           });
         }
                 // 删除本地文件
@@ -1241,10 +1243,11 @@ export const appRouter = router({
           const asset = await getMediaAsset(id);
           if (!asset) continue;
           // 检查引用：sourceUrl 不为空说明被引用
-          if (asset.sourceUrl) {
+          const usages = await findMediaAssetUsages(asset);
+          if (usages.length > 0) {
             throw new TRPCError({
               code: "PRECONDITION_FAILED",
-              message: `Image "${asset.filename}" is currently in use.`,
+              message: `Image "${asset.filename}" is currently in use in ${usages.length} place${usages.length === 1 ? "" : "s"}.`,
             });
           }
           // 删除本地文件
