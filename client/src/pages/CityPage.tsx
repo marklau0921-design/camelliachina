@@ -152,6 +152,11 @@ export default function CityPage() {
     { enabled: !!city?.id }
   );
 
+  const { data: cityTrips = [] } = trpc.cms.listItinerariesByCityTag.useQuery(
+    { cityName: city?.name ?? '', citySlug: city?.slug ?? slug ?? '' },
+    { enabled: !!city?.name && !!city?.slug }
+  );
+
   // ── Explore Our Trips carousel ──
   const tripsTrackRef = useRef<HTMLDivElement>(null);
   const tripsDraggingRef = useRef(false);
@@ -258,6 +263,10 @@ export default function CityPage() {
     };
   }, []);
 
+  useEffect(() => {
+    requestAnimationFrame(tripsUpdateButtonVisibility);
+  }, [cityTrips.length, isDesktop]);
+
   if (cityLoading) {
     return (
       <div className="w-full bg-white min-h-screen">
@@ -290,6 +299,12 @@ export default function CityPage() {
   // Visible items (first 3) and hidden items (rest)
   const visibleItems = whatToSeeItems.slice(0, 3);
   const hiddenItems = whatToSeeItems.slice(3);
+  const cityTabs = [
+    { label: 'Overview', id: 'overview' },
+    ...(cityTrips.length > 0 ? [{ label: 'Itineraries', id: 'itineraries' }] : []),
+    { label: 'See & Do', id: 'see-do' },
+    { label: 'Food', id: 'food' }
+  ];
 
   return (
     <div className="w-full bg-white min-h-screen">
@@ -344,12 +359,7 @@ export default function CityPage() {
         `}</style>
         <div className="h-full flex items-center justify-center px-4 md:px-0">
           <nav className="flex gap-3 md:gap-12 h-full items-center flex-wrap md:flex-nowrap justify-center">
-            {[
-              { label: 'Overview', id: 'overview' },
-              { label: 'Itineraries', id: 'itineraries' },
-              { label: 'See & Do', id: 'see-do' },
-              { label: 'Food', id: 'food' }
-            ].map((tab) => (
+            {cityTabs.map((tab) => (
               <button
                 key={tab.label}
                 onClick={() => {
@@ -379,109 +389,113 @@ export default function CityPage() {
       </div>
 
       {/* Explore Our Trips Section */}
-      <div
-        id="itineraries"
-        className="w-full relative flex flex-col lg:flex-row lg:items-center"
-        style={{
-          minHeight: '680px',
-          marginTop: '48px',
-          paddingTop: '50px',
-          paddingBottom: '50px',
-          backgroundImage: `url(${(city as any).coverImage || ''})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'scroll',
-        }}
-      >
-        <div className="absolute inset-0" style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', backgroundColor: 'rgba(10,10,10,0.85)', zIndex: 0 }} />
-
-        {/* Mobile title */}
-        <div className="lg:hidden w-full px-6 mb-6 relative z-10">
-          <h2 style={{ fontFamily: CITY_DISPLAY, fontWeight: 400, fontSize: '36px', color: 'white', textTransform: 'uppercase', letterSpacing: '2.25px', marginBottom: '12px', lineHeight: 1 }}>
-            Explore Our Trips
-          </h2>
-          <p style={{ fontFamily: CITY_SANS, fontSize: '17px', color: 'rgba(255,255,255,0.78)', fontStyle: 'italic', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5 }}>
-            Explore our sample trips or get in touch to begin your bespoke adventure.
-          </p>
-        </div>
-
-        {isDesktop && (
-          <button
-            style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(0,0,0,0.45)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20, transition: 'background 0.2s, opacity 0.2s', opacity: tripsShowLeftBtn ? 1 : 0, pointerEvents: tripsShowLeftBtn ? 'auto' : 'none' }}
-            onClick={() => tripsScrollBy(-600)}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.7)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.45)')}
-          >
-            <ChevronLeft size={20} color="white" strokeWidth={2} />
-          </button>
-        )}
-
+      {cityTrips.length > 0 && (
         <div
-          ref={tripsTrackRef}
-          className="similar-track"
-          onMouseDown={tripsOnMouseDown}
-          onMouseLeave={tripsOnMouseLeave}
-          onMouseUp={tripsOnMouseUp}
-          onMouseMove={tripsOnMouseMove}
-          style={{ position: 'relative', zIndex: 1, width: '100%', overflowX: 'scroll', overflowY: 'hidden', cursor: 'grab', userSelect: 'none', paddingLeft: isDesktop ? '60px' : '24px', paddingRight: isDesktop ? '60px' : '24px' } as React.CSSProperties}
+          id="itineraries"
+          className="w-full relative flex flex-col lg:flex-row lg:items-center"
+          style={{
+            minHeight: '680px',
+            marginTop: '48px',
+            paddingTop: '50px',
+            paddingBottom: '50px',
+            backgroundImage: `url(${(city as any).coverImage || ''})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'scroll',
+          }}
         >
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '25px', alignItems: 'flex-start', minWidth: 'max-content', paddingBottom: '8px' }}>
-            {isDesktop && <div style={{ width: '20vw', flexShrink: 0 }} />}
-            {isDesktop && (
-              <div style={{ width: '260px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingTop: '8px' }}>
-                <h2 style={{ fontFamily: CITY_DISPLAY, fontWeight: 400, fontSize: '45px', color: 'white', textTransform: 'uppercase', letterSpacing: '2.25px', marginBottom: '16px', lineHeight: 1 }}>
-                  Explore Our Trips
-                </h2>
-                <p style={{ fontFamily: CITY_SANS, fontSize: '17px', color: 'rgba(255,255,255,0.78)', fontStyle: 'italic', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5 }}>
-                  Explore our sample trips or get in touch to begin your bespoke adventure.
-                </p>
-              </div>
-            )}
-            {/* Placeholder trip cards */}
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="relative group overflow-hidden flex-shrink-0" style={{ width: '310px', height: '550px', userSelect: 'none', background: '#222' }}>
-                {(city as any).coverImage && (
-                  <img src={(city as any).coverImage} alt={cityName} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" draggable={false} />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />
-                <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
-                  <div className="text-xs font-bold uppercase tracking-wider text-right" style={{ fontFamily: CITY_SANS, color: '#ffffff', fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}>{7 + i * 2} NIGHTS</div>
-                  <div>
-                    <h3 className="text-base font-bold uppercase tracking-wider mb-4 leading-tight opacity-85" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28 }}>{cityName}: Bespoke Journey {i}</h3>
-                    <button
-                      className="px-4 py-2 text-white text-xs font-bold uppercase tracking-widest transition-all duration-200 opacity-85"
-                      style={{ cursor: 'pointer', background: 'rgba(20,20,20,0.55)', backdropFilter: 'blur(6px)', fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}
-                      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,1)'; e.currentTarget.style.color = '#111'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(20,20,20,0.55)'; e.currentTarget.style.color = '#fff'; }}
-                    >
-                      Explore Trip
-                    </button>
+          <div className="absolute inset-0" style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', backgroundColor: 'rgba(10,10,10,0.85)', zIndex: 0 }} />
+
+          {/* Mobile title */}
+          <div className="lg:hidden w-full px-6 mb-6 relative z-10">
+            <h2 style={{ fontFamily: CITY_DISPLAY, fontWeight: 400, fontSize: '36px', color: 'white', textTransform: 'uppercase', letterSpacing: '2.25px', marginBottom: '12px', lineHeight: 1 }}>
+              Explore Our Trips
+            </h2>
+            <p style={{ fontFamily: CITY_SANS, fontSize: '17px', color: 'rgba(255,255,255,0.78)', fontStyle: 'italic', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5 }}>
+              Explore our sample trips or get in touch to begin your bespoke adventure.
+            </p>
+          </div>
+
+          {isDesktop && (
+            <button
+              style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(0,0,0,0.45)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20, transition: 'background 0.2s, opacity 0.2s', opacity: tripsShowLeftBtn ? 1 : 0, pointerEvents: tripsShowLeftBtn ? 'auto' : 'none' }}
+              onClick={() => tripsScrollBy(-600)}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.7)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.45)')}
+            >
+              <ChevronLeft size={20} color="white" strokeWidth={2} />
+            </button>
+          )}
+
+          <div
+            ref={tripsTrackRef}
+            className="similar-track"
+            onMouseDown={tripsOnMouseDown}
+            onMouseLeave={tripsOnMouseLeave}
+            onMouseUp={tripsOnMouseUp}
+            onMouseMove={tripsOnMouseMove}
+            style={{ position: 'relative', zIndex: 1, width: '100%', overflowX: 'scroll', overflowY: 'hidden', cursor: 'grab', userSelect: 'none', paddingLeft: isDesktop ? '60px' : '24px', paddingRight: isDesktop ? '60px' : '24px' } as React.CSSProperties}
+          >
+            <div style={{ display: 'flex', flexDirection: 'row', gap: '25px', alignItems: 'flex-start', minWidth: 'max-content', paddingBottom: '8px' }}>
+              {isDesktop && <div style={{ width: '20vw', flexShrink: 0 }} />}
+              {isDesktop && (
+                <div style={{ width: '260px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingTop: '8px' }}>
+                  <h2 style={{ fontFamily: CITY_DISPLAY, fontWeight: 400, fontSize: '45px', color: 'white', textTransform: 'uppercase', letterSpacing: '2.25px', marginBottom: '16px', lineHeight: 1 }}>
+                    Explore Our Trips
+                  </h2>
+                  <p style={{ fontFamily: CITY_SANS, fontSize: '17px', color: 'rgba(255,255,255,0.78)', fontStyle: 'italic', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5 }}>
+                    Explore our sample trips or get in touch to begin your bespoke adventure.
+                  </p>
+                </div>
+              )}
+              {cityTrips.map((trip: any) => (
+                <div key={trip.id} className="relative group overflow-hidden flex-shrink-0" style={{ width: '310px', height: '550px', userSelect: 'none', background: '#222' }}>
+                  {(trip.coverImage || trip.bannerImage || (city as any).coverImage) && (
+                    <img src={trip.coverImage || trip.bannerImage || (city as any).coverImage} alt={trip.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" draggable={false} />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/80" />
+                  <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
+                    <div className="text-xs font-bold uppercase tracking-wider text-right" style={{ fontFamily: CITY_SANS, color: '#ffffff', fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}>
+                      {trip.howLong || `${trip.days ?? 1} DAYS`}
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold uppercase tracking-wider mb-3 leading-tight opacity-90" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28 }}>
+                        {trip.name}
+                      </h3>
+                      {trip.shortDescription && (
+                        <p style={{ fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 400, letterSpacing: '0.45px', lineHeight: 1.45, color: 'rgba(255,255,255,0.82)', marginBottom: '16px' }}>
+                          {trip.shortDescription}
+                        </p>
+                      )}
+                      <button
+                        className="px-4 py-2 text-white text-xs font-bold uppercase tracking-widest transition-all duration-200 opacity-90"
+                        style={{ cursor: 'pointer', background: 'rgba(20,20,20,0.55)', backdropFilter: 'blur(6px)', fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}
+                        onClick={(e) => { e.stopPropagation(); navigate(`/itinerary/${trip.slug}`); }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,1)'; e.currentTarget.style.color = '#111'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(20,20,20,0.55)'; e.currentTarget.style.color = '#fff'; }}
+                      >
+                        Explore Trip
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            <div className="flex-shrink-0" style={{ width: '155px', height: '550px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-              <button
-                className="px-6 py-3 rounded-sm transition-all duration-300 bg-white/20 border border-white/50 text-white font-semibold uppercase tracking-wider text-sm"
-                style={{ fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}
-                onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#000000'; }}
-                onMouseLeave={e => { e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = '#ffffff'; }}
-              >View More</button>
+              ))}
+              <div className="flex-shrink-0" style={{ width: '155px', height: '550px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }} />
             </div>
           </div>
-        </div>
 
-        {isDesktop && (
-          <button
-            style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(0,0,0,0.45)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20, transition: 'background 0.2s, opacity 0.2s', opacity: tripsShowRightBtn ? 1 : 0, pointerEvents: tripsShowRightBtn ? 'auto' : 'none' }}
-            onClick={() => tripsScrollBy(600)}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.7)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.45)')}
-          >
-            <ChevronRight size={20} color="white" strokeWidth={2} />
-          </button>
-        )}
-      </div>
+          {isDesktop && (
+            <button
+              style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(0,0,0,0.45)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20, transition: 'background 0.2s, opacity 0.2s', opacity: tripsShowRightBtn ? 1 : 0, pointerEvents: tripsShowRightBtn ? 'auto' : 'none' }}
+              onClick={() => tripsScrollBy(600)}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.7)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.45)')}
+            >
+              <ChevronRight size={20} color="white" strokeWidth={2} />
+            </button>
+          )}
+        </div>
+      )}
 
       {/* What to See and Do Section */}
       {whatToSeeItems.length > 0 && (

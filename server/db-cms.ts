@@ -560,6 +560,34 @@ export async function listItineraries(includeInactive = false) {
   return await db.select().from(itineraries).orderBy(itineraries.sortOrder, itineraries.name);
 }
 
+export async function listItinerariesByCityTag(cityName: string, citySlug: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const normalizedName = cityName.trim().toLowerCase();
+  const normalizedSlug = citySlug.trim().toLowerCase();
+  if (!normalizedName && !normalizedSlug) return [];
+
+  const rows = await db
+    .select({ itinerary: itineraries })
+    .from(itineraries)
+    .innerJoin(itineraryTags, eq(itineraries.id, itineraryTags.itineraryId))
+    .innerJoin(tags, eq(itineraryTags.tagId, tags.id))
+    .where(and(
+      eq(itineraries.isActive, true),
+      sql`LOWER(${tags.name}) IN (${normalizedName}, ${normalizedSlug})`
+    ))
+    .orderBy(itineraries.sortOrder, itineraries.name);
+
+  const seen = new Set<number>();
+  return rows
+    .map(row => row.itinerary)
+    .filter(itinerary => {
+      if (seen.has(itinerary.id)) return false;
+      seen.add(itinerary.id);
+      return true;
+    });
+}
+
 export async function getItineraryById(id: number) {
   const db = await getDb();
   if (!db) return null;

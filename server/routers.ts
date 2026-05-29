@@ -35,7 +35,7 @@ import {
   // Team Members
   listTeamMembers, getTeamMemberById, createTeamMember, updateTeamMember, deleteTeamMember,
   // Other CMS
-  listItineraries, getItineraryById, getItineraryTagIds, createItinerary, updateItinerary, deleteItinerary,
+  listItineraries, listItinerariesByCityTag, getItineraryById, getItineraryTagIds, createItinerary, updateItinerary, deleteItinerary,
   listStories, getStoryById, getStoryTagIds, createStory, updateStory, deleteStory,
   listVideos, getVideoById, getVideoTagIds, createVideo, updateVideo, deleteVideo,
   listImages, createImageRecord, deleteImageRecord,
@@ -983,6 +983,10 @@ export const appRouter = router({
     listTeamMembers: publicProcedure.query(() => listTeamMembers(false)),
 
     listItineraries: publicProcedure.query(() => listItineraries(false)),
+
+    listItinerariesByCityTag: publicProcedure
+      .input(z.object({ cityName: z.string(), citySlug: z.string() }))
+      .query(({ input }) => listItinerariesByCityTag(input.cityName, input.citySlug)),
 
     getItineraryBySlug: publicProcedure
       .input(z.object({ slug: z.string() }))
