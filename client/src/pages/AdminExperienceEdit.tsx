@@ -4,7 +4,7 @@ import AdminLayout from "@/components/AdminLayout";
 import ImageUploader from "@/components/ImageUploader";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Plus, Trash2, X, ArrowLeft, Save, Upload } from "lucide-react";
+import { Plus, Trash2, X, ArrowLeft, Save, Upload, GripVertical } from "lucide-react";
 
 // ─── Detail Block ─────────────────────────────────────────────────────────────
 type DetailBlock = {
@@ -158,6 +158,8 @@ function GalleryManager({
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragTargetIndex, setDragTargetIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadImageMut = trpc.images.upload.useMutation();
 
@@ -170,6 +172,15 @@ function GalleryManager({
 
   function removeUrl(idx: number) {
     onChange(gallery.filter((_, i) => i !== idx));
+  }
+
+  function reorderUrl(fromIndex: number, toIndex: number) {
+    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) return;
+    const next = [...gallery];
+    const [moved] = next.splice(fromIndex, 1);
+    if (!moved) return;
+    next.splice(toIndex, 0, moved);
+    onChange(next);
   }
 
   async function handleFileUpload(files: FileList | null) {
@@ -225,13 +236,60 @@ function GalleryManager({
       {gallery.length > 0 && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "16px" }}>
           {gallery.map((url, idx) => (
-            <div key={url} style={{ position: "relative", aspectRatio: "16/9", background: "#f2f2f2", border: "1px solid #ddd", overflow: "hidden" }}>
+            <div
+              key={`${url}-${idx}`}
+              draggable
+              onDragStart={e => {
+                setDraggedIndex(idx);
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", String(idx));
+              }}
+              onDragOver={e => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+                setDragTargetIndex(idx);
+              }}
+              onDragLeave={() => setDragTargetIndex(current => current === idx ? null : current)}
+              onDrop={e => {
+                e.preventDefault();
+                const fromIndex = draggedIndex ?? Number(e.dataTransfer.getData("text/plain"));
+                reorderUrl(fromIndex, idx);
+                setDraggedIndex(null);
+                setDragTargetIndex(null);
+              }}
+              onDragEnd={() => {
+                setDraggedIndex(null);
+                setDragTargetIndex(null);
+              }}
+              style={{
+                position: "relative",
+                aspectRatio: "16/9",
+                background: "#f2f2f2",
+                border: dragTargetIndex === idx ? "2px solid #F5569B" : "1px solid #ddd",
+                overflow: "hidden",
+                cursor: "grab",
+                opacity: draggedIndex === idx ? 0.55 : 1,
+                transition: "border-color 0.15s, opacity 0.15s",
+              }}
+              title="Drag to reorder"
+            >
               <img
                 src={url}
                 alt=""
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
+              <div
+                style={{
+                  position: "absolute", top: "4px", left: "4px",
+                  background: "rgba(0,0,0,0.5)", color: "#fff", border: "none",
+                  padding: "4px 6px", display: "flex", alignItems: "center", gap: "4px",
+                  fontSize: "10px", letterSpacing: "0.08em", lineHeight: 1,
+                }}
+              >
+                <GripVertical size={11} />
+                {String(idx + 1).padStart(2, "0")}
+              </div>
               <button
                 onClick={() => removeUrl(idx)}
                 style={{
