@@ -20,7 +20,7 @@ const usageTables = [
   { table: "videos", label: "Video", title: "title", route: (row: any) => `/videos/${row.slug ?? row.id}`, columns: ["coverImage"] },
   { table: "homepage_hero", label: "Homepage Hero", title: "title", route: () => "/", columns: ["backgroundImage"] },
   { table: "homepage_stories", label: "Homepage Story", title: "name", route: () => "/", columns: ["image"] },
-  { table: "homepage_sponsors", label: "Homepage Sponsor", title: "name", route: () => "/", columns: ["logo", "backgroundTexture"] },
+  { table: "homepage_sponsors", label: "Homepage Sponsor", title: "name", route: () => "/", columns: ["logo", "logoUrls", "backgroundTexture"] },
   { table: "why_us_sections", label: "Why Us", title: "title", route: () => "/about/why-us", columns: ["image"] },
 ];
 
@@ -103,10 +103,31 @@ async function getExistingColumns(pool: any, table: string) {
   }
 }
 
-export async function findMediaAssetUsages(asset: { url: string; assetType?: string; isActive?: boolean | number | null; sourceLabel?: string | null; sourceUrl?: string | null }) {
+function getUrlNeedles(asset: { url: string; storageKey?: string | null }) {
+  const values = new Set<string>();
+  if (asset.url) {
+    values.add(asset.url);
+    try {
+      const parsed = new URL(asset.url);
+      values.add(parsed.pathname);
+    } catch {
+      // Relative URLs are expected for local uploads.
+    }
+  }
+  if (asset.storageKey) {
+    values.add(asset.storageKey);
+    values.add(`/uploads/${asset.storageKey.replace(/^\/+/, "")}`);
+  }
+  const filename = asset.url?.split("/").pop();
+  if (filename) values.add(filename);
+  return Array.from(values).filter(Boolean);
+}
+
+export async function findMediaAssetUsages(asset: { url: string; storageKey?: string | null; assetType?: string; isActive?: boolean | number | null; sourceLabel?: string | null; sourceUrl?: string | null }) {
   const pool = await getPool();
   if (!pool) return [];
   const usages: MediaUsage[] = [];
+  const urlNeedles = getUrlNeedles(asset);
 
   if (asset.sourceUrl) {
     usages.push({ label: asset.sourceLabel ?? "Linked source", url: asset.sourceUrl, table: "media_assets" });
@@ -124,8 +145,9 @@ export async function findMediaAssetUsages(asset: { url: string; assetType?: str
     const titleColumn = existingColumns.has(spec.title) ? spec.title : "id";
     const slugSelect = existingColumns.has("slug") ? "slug" : "NULL AS slug";
     const experienceIdSelect = existingColumns.has("experienceId") ? "experienceId" : "NULL AS experienceId";
-    const where = searchableColumns.map(column => `\`${column}\` LIKE ?`).join(" OR ");
-    const params = searchableColumns.map(() => `%${asset.url}%`);
+    const where = searchableColumns.flatMap(column => urlNeedles.map(() => `\`${column}\` LIKE ?`)).join(" OR ");
+    const params = searchableColumns.flatMap(() => urlNeedles.map(needle => `%${needle}%`));
+    if (params.length === 0) continue;
     const [rows] = await pool.execute(
       `SELECT id, \`${titleColumn}\` AS usageTitle, ${slugSelect}, ${experienceIdSelect} FROM \`${spec.table}\` WHERE ${where} LIMIT 20`,
       params
