@@ -1112,7 +1112,7 @@ export const appRouter = router({
         sourceId: z.number().optional(),
         sourceLabel: z.string().optional(),
         sourceUrl: z.string().optional(),
-        assetType: z.enum(["logo", "banner", "cta", "general"]).default("general"),
+        assetType: z.enum(["logo", "banner", "cta", "page_bg", "general"]).default("general"),
       }))
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);
@@ -1140,7 +1140,7 @@ export const appRouter = router({
 
     // 列出所有媒体资产（支持搜索）
     list: publicProcedure
-      .input(z.object({ search: z.string().optional(), assetType: z.enum(["logo", "banner", "cta", "general"]).optional() }))
+      .input(z.object({ search: z.string().optional(), assetType: z.enum(["logo", "banner", "cta", "page_bg", "general"]).optional() }))
       .query(async ({ ctx, input }) => {
         await requireAdmin(ctx);
         return listMediaAssets(input.search, input.assetType);
@@ -1155,7 +1155,7 @@ export const appRouter = router({
 
     // 列出 Homepage Assets（按类型）
     listByType: publicProcedure
-      .input(z.object({ assetType: z.enum(["logo", "banner", "cta"]) }))
+      .input(z.object({ assetType: z.enum(["logo", "banner", "cta", "page_bg"]) }))
       .query(async ({ ctx, input }) => {
         await requireAdmin(ctx);
         return listHomepageAssets(input.assetType);
@@ -1163,12 +1163,13 @@ export const appRouter = router({
 
     // 公开接口：获取首页动态资产
     getHomepageAssets: publicProcedure.query(async () => {
-      const [logo, cta, banners] = await Promise.all([
+      const [logo, cta, pageBg, banners] = await Promise.all([
         getActiveHomepageAsset("logo"),
         getActiveHomepageAsset("cta"),
+        getActiveHomepageAsset("page_bg"),
         getActiveBanners(),
       ]);
-      return { logo, cta, banners };
+      return { logo, cta, pageBg, banners };
     }),
 
     // 设置激活状态
@@ -1176,7 +1177,7 @@ export const appRouter = router({
       .input(z.object({
         id: z.number(),
         isActive: z.boolean(),
-        assetType: z.enum(["logo", "banner", "cta"]),
+        assetType: z.enum(["logo", "banner", "cta", "page_bg"]),
       }))
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);

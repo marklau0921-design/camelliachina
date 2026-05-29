@@ -75,7 +75,7 @@ type MediaAsset = {
   source?: string | null;
   sourceLabel?: string | null;
   sourceUrl?: string | null;
-  assetType: "logo" | "banner" | "cta" | "general";
+  assetType: "logo" | "banner" | "cta" | "page_bg" | "general";
   isActive: boolean;
   opacity?: number | string | null;
   usageCount?: number;
@@ -170,6 +170,7 @@ function HomepageAssetsTab() {
   const { data: logos = [], isLoading: logosLoading } = trpc.media.listByType.useQuery({ assetType: "logo" });
   const { data: banners = [], isLoading: bannersLoading } = trpc.media.listByType.useQuery({ assetType: "banner" });
   const { data: ctas = [], isLoading: ctasLoading } = trpc.media.listByType.useQuery({ assetType: "cta" });
+  const { data: pageBgs = [], isLoading: pageBgsLoading } = trpc.media.listByType.useQuery({ assetType: "page_bg" });
 
   const invalidate = () => { utils.media.listByType.invalidate(); utils.media.list.invalidate(); };
 
@@ -179,7 +180,7 @@ function HomepageAssetsTab() {
   const updateOpacityMut = trpc.media.updateOpacity.useMutation({ onSuccess: () => utils.media.listByType.invalidate() });
   const replaceMut = trpc.media.replace.useMutation({ onSuccess: invalidate });
 
-  const handleUpload = async (file: File, assetType: "logo" | "banner" | "cta") => {
+  const handleUpload = async (file: File, assetType: "logo" | "banner" | "cta" | "page_bg") => {
     const base64 = await fileToBase64(file);
     await uploadMut.mutateAsync({ filename: file.name, base64, mimeType: file.type || "image/jpeg", fileSize: file.size, source: assetType, assetType });
   };
@@ -250,6 +251,41 @@ function HomepageAssetsTab() {
           );
         })}
         <UploadZone onUpload={(f) => handleUpload(f, "cta")} loading={uploadMut.isPending} label="Upload new CTA background (drag & drop or click)" />
+      </div>
+
+      {/* Page Background Texture */}
+      <div style={sectionStyle}>
+        <div style={sectionTitle}>Page Background Texture</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
+          {pageBgsLoading ? <div style={{ color: "#aaa", fontSize: 13 }}>Loading...</div> : pageBgs.length === 0 ? <div style={{ color: "#aaa", fontSize: 13 }}>No page background textures uploaded yet.</div> : (pageBgs as MediaAsset[]).map((pageBg) => (
+            <div key={pageBg.id} onClick={() => setActiveMut.mutate({ id: pageBg.id, isActive: !pageBg.isActive, assetType: "page_bg" })}
+              style={{ width: 160, border: `2px solid ${pageBg.isActive ? "#F5569B" : "#e8e8e8"}`, borderRadius: 8, overflow: "hidden", cursor: "pointer", background: pageBg.isActive ? "#fff0f6" : "#fafafa", position: "relative", transition: "all 0.2s" }}>
+              <img src={pageBg.url} alt={pageBg.filename} style={{ width: "100%", height: 90, objectFit: "cover" }} />
+              {pageBg.isActive && <div style={{ position: "absolute", top: 4, right: 4, background: "#F5569B", color: "#fff", fontSize: 10, borderRadius: 4, padding: "1px 5px" }}>Active</div>}
+              <div style={{ fontSize: 10, color: "#888", padding: "4px 6px", textAlign: "center", borderTop: "1px solid #f0f0f0" }}>{pageBg.filename.length > 18 ? pageBg.filename.slice(0, 16) + "..." : pageBg.filename}</div>
+            </div>
+          ))}
+        </div>
+        {(pageBgs as MediaAsset[]).filter((pageBg) => pageBg.isActive).map((pageBg) => {
+          const opacity = Number(pageBg.opacity ?? 28);
+          return (
+            <div key={`page-bg-opacity-${pageBg.id}`} style={{ marginBottom: 16, padding: "14px 16px", border: "1px solid #f0f0f0", borderRadius: 8, background: "#fafafa" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 10 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#444" }}>Page Texture Opacity</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#F5569B", minWidth: 44, textAlign: "right" }}>{opacity}%</div>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={opacity}
+                onChange={(e) => updateOpacityMut.mutate({ id: pageBg.id, opacity: Number(e.target.value) })}
+                style={{ width: "100%", accentColor: "#F5569B" }}
+              />
+            </div>
+          );
+        })}
+        <UploadZone onUpload={(f) => handleUpload(f, "page_bg")} loading={uploadMut.isPending} label="Upload new page background texture (drag & drop or click)" />
       </div>
     </div>
   );

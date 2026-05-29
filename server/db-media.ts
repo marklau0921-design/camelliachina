@@ -2,6 +2,9 @@ import { getDb, getPool } from "./db";
 import { mediaAssets } from "../drizzle/schema";
 import { eq, like, or, desc, and } from "drizzle-orm";
 
+type MediaAssetType = "logo" | "banner" | "cta" | "page_bg" | "general";
+type BrandAssetType = Exclude<MediaAssetType, "general">;
+
 type MediaUsage = {
   label: string;
   url: string;
@@ -35,7 +38,7 @@ export async function createMediaAsset(data: {
   sourceId?: number;
   sourceLabel?: string;
   sourceUrl?: string;
-  assetType?: "logo" | "banner" | "cta" | "general";
+  assetType?: MediaAssetType;
   isActive?: boolean;
   sortOrder?: number;
 }) {
@@ -64,7 +67,7 @@ export async function createMediaAsset(data: {
 }
 
 // ─── 查询所有媒体资产（支持搜索）──────────────────────────────────────────────
-export async function listMediaAssets(search?: string, assetType?: "logo" | "banner" | "cta" | "general") {
+export async function listMediaAssets(search?: string, assetType?: MediaAssetType) {
   const db = await getDb();
   if (!db) return [];
   const filters = [];
@@ -176,7 +179,7 @@ export async function findMediaAssetUsages(asset: { url: string; storageKey?: st
 }
 
 // ─── 查询 Homepage Assets（按类型）──────────────────────────────────────────
-export async function listHomepageAssets(assetType: "logo" | "banner" | "cta") {
+export async function listHomepageAssets(assetType: BrandAssetType) {
   const pool = await getPool();
   if (!pool) return [];
   const opacitySelect = await mediaOpacitySelect(pool);
@@ -188,7 +191,7 @@ export async function listHomepageAssets(assetType: "logo" | "banner" | "cta") {
 }
 
 // ─── 获取当前激活的 Homepage Asset ──────────────────────────────────────────
-export async function getActiveHomepageAsset(assetType: "logo" | "cta") {
+export async function getActiveHomepageAsset(assetType: "logo" | "cta" | "page_bg") {
   const pool = await getPool();
   if (!pool) return null;
   const opacitySelect = await mediaOpacitySelect(pool);
@@ -220,7 +223,7 @@ async function mediaOpacitySelect(pool: any) {
 }
 
 // ─── 设置激活状态（Logo/CTA：单选；Banner：多选）────────────────────────────
-export async function setAssetActive(id: number, isActive: boolean, assetType: "logo" | "banner" | "cta") {
+export async function setAssetActive(id: number, isActive: boolean, assetType: BrandAssetType) {
   const db = await getDb();
   if (!db) return;
   if (assetType !== "banner" && isActive) {

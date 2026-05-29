@@ -312,7 +312,7 @@ export const mediaAssets = mysqlTable("media_assets", {
   sourceLabel: varchar("sourceLabel", { length: 200 }),    // 来源内容名称（展示用）
   sourceUrl: varchar("sourceUrl", { length: 512 }),        // 前端页面 URL
   // Homepage Assets 专用
-  assetType: mysqlEnum("assetType", ["logo", "banner", "cta", "general"]).default("general").notNull(),
+  assetType: mysqlEnum("assetType", ["logo", "banner", "cta", "page_bg", "general"]).default("general").notNull(),
   isActive: boolean("isActive").default(true).notNull(),   // logo/cta 当前使用中
   sortOrder: int("sortOrder").default(0).notNull(),        // banner 排序
   createdAt: timestamp("createdAt").defaultNow().notNull(),
