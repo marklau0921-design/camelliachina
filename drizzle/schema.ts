@@ -221,6 +221,7 @@ export const itineraries = mysqlTable("itineraries", {
   howLong: varchar("howLong", { length: 200 }),
   days: int("days").notNull().default(1),
   sections: json("sections"),
+  timelineColor: varchar("timelineColor", { length: 32 }).default("#52b788"),
   isActive: boolean("isActive").default(true).notNull(),
   sortOrder: int("sortOrder").default(0),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

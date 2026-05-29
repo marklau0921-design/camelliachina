@@ -557,6 +557,8 @@ export default function ItineraryDetail() {
     );
   }
 
+  const timelineColor = (itin as any).timelineColor || '#52b788';
+
   return (
     <div className="bg-white min-h-screen" style={{ fontFamily: ITIN_SANS, color: BT_TEXT }}>
       <style>{`
@@ -660,13 +662,13 @@ export default function ItineraryDetail() {
             <div style={{ display: 'flex', padding: '0 24px 0 0', maxWidth: '1100px', margin: '0 auto' }}>
               {/* Left: timeline */}
               <div style={{ width: '55px', flexShrink: 0, position: 'relative', alignSelf: 'stretch' }}>
-                <div style={{ position: 'absolute', left: '20px', top: 0, bottom: 0, width: '2px', background: 'repeating-linear-gradient(to bottom, #52b788 0px, #52b788 3px, transparent 3px, transparent 5px)', transform: 'translateX(-50%)', zIndex: 0 }} />
+                <div style={{ position: 'absolute', left: '20px', top: 0, bottom: 0, width: '2px', background: `repeating-linear-gradient(to bottom, ${timelineColor} 0px, ${timelineColor} 3px, transparent 3px, transparent 5px)`, transform: 'translateX(-50%)', zIndex: 0 }} />
                 {section.blocks.map((_, i) => {
                   const HEADER = 210, GAP = 50;
                   let topOffset = HEADER;
                   for (let j = 0; j < i; j++) topOffset += (j % 2 === 0 ? 480 : 510) + GAP;
                   return (
-                    <div key={i} style={{ position: 'absolute', left: '20px', top: `${topOffset + 40}px`, width: '15px', height: '15px', borderRadius: '50%', background: '#52b788', zIndex: 3, transform: 'translateX(-50%)', pointerEvents: 'none' }} />
+                    <div key={i} style={{ position: 'absolute', left: '20px', top: `${topOffset + 40}px`, width: '15px', height: '15px', borderRadius: '50%', background: timelineColor, zIndex: 3, transform: 'translateX(-50%)', pointerEvents: 'none' }} />
                   );
                 })}
               </div>

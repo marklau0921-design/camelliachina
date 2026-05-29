@@ -42,6 +42,7 @@ const emptyForm = {
   howLong: "",
   days: 1,
   sections: [] as ItinerarySection[],
+  timelineColor: "#52b788",
   isActive: true,
   sortOrder: 0,
   tagIds: [] as number[],
@@ -506,6 +507,18 @@ function ItineraryForm({ initial, onSave, onCancel, saving, title }: {
               <label style={labelStyle}>How Long</label>
               <FocusInput value={form.howLong} onChange={v => set("howLong", v)} placeholder="e.g. 10 nights" />
             </div>
+            <div>
+              <label style={labelStyle}>Timeline Line / Dot Color</label>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                <input
+                  type="color"
+                  value={form.timelineColor || "#52b788"}
+                  onChange={e => set("timelineColor", e.target.value)}
+                  style={{ width: "44px", height: "36px", padding: "2px", border: "1px solid #ddd", background: "#fff", cursor: "pointer" }}
+                />
+                <FocusInput value={form.timelineColor || "#52b788"} onChange={v => set("timelineColor", v || "#52b788")} placeholder="#52b788" style={{ flex: 1 }} />
+              </div>
+            </div>
 
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={labelStyle}>Short Description (card summary)</label>
@@ -716,6 +729,7 @@ export default function AdminItineraries() {
                 price: itinDetail.price || "",
                 howLong: itinDetail.howLong || "",
                 days: itinDetail.days,
+                timelineColor: (itinDetail as any).timelineColor || "#52b788",
                 sections: (() => {
                   let sections = itinDetail.sections;
                   // Handle double serialization

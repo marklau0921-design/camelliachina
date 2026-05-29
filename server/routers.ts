@@ -190,6 +190,7 @@ const itineraryInput = z.object({
   howLong: z.string().optional(),
   days: z.number().min(1).default(1),
   sections: z.array(z.any()).default([]),
+  timelineColor: z.string().optional().default("#52b788"),
   isActive: z.boolean().default(true),
   sortOrder: z.number().default(0),
   tagIds: z.array(z.number()).default([]),
