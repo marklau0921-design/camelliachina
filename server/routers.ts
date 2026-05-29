@@ -131,6 +131,7 @@ const experienceTypeInput = z.object({
 const experienceInput = z.object({
   typeId: z.number().optional().nullable(),
   name: z.string().min(1),
+  title: z.string().optional(),
   slug: z.string().optional(),
   when: z.string().optional(),
   price: z.string().optional(),
@@ -630,6 +631,7 @@ export const appRouter = router({
           typeId: input.targetTypeId ?? null,
           cityId: input.targetCityId ?? null,
           name: src.name,
+          title: src.title ?? undefined,
           slug: newSlug,
           when: src.when ?? undefined,
           price: src.price ?? undefined,

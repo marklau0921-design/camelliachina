@@ -466,11 +466,18 @@ export default function ExperienceDetail() {
       {/* ── Body Content ── */}
       <div className="tea-body">
         {/* Intro / description */}
-        {exp?.description && (
+        {(exp?.title || exp?.description) && (
           <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 24px', marginBottom: 48, textAlign: 'center', boxSizing: 'border-box' }}>
-            <p style={{ fontSize: 17, lineHeight: 1.5, color: EXP_TEXT, fontWeight: 400, fontFamily: EXP_SANS, letterSpacing: '0.85px', margin: 0, whiteSpace: 'pre-line' }}>
-              {exp?.description}
-            </p>
+            {exp?.title && (
+              <h2 style={{ fontFamily: EXP_DISPLAY, fontSize: 'clamp(34px, 4vw, 45px)', fontWeight: 400, lineHeight: 1, letterSpacing: '2.25px', color: '#000', margin: '0 0 18px', textTransform: 'uppercase' }}>
+                {exp.title}
+              </h2>
+            )}
+            {exp?.description && (
+              <p style={{ fontSize: 17, lineHeight: 1.5, color: EXP_TEXT, fontWeight: 400, fontFamily: EXP_SANS, letterSpacing: '0.85px', margin: 0, whiteSpace: 'pre-line' }}>
+                {exp.description}
+              </p>
+            )}
           </div>
         )}
 

@@ -417,6 +417,7 @@ export default function AdminExperienceEdit() {
 
   // Form state
   const [name, setName] = useState("");
+  const [title, setTitle] = useState("");
   const [when, setWhen] = useState("");
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("");
@@ -444,6 +445,7 @@ export default function AdminExperienceEdit() {
   useEffect(() => {
     if (!exp || loaded) return;
     setName(exp.name ?? "");
+    setTitle((exp as any).title ?? "");
     setWhen((exp as any).when ?? "");
     setPrice(exp.price ?? "");
     setDuration(exp.duration ?? "");
@@ -497,6 +499,7 @@ export default function AdminExperienceEdit() {
       await updateMut.mutateAsync({
         id: expId,
         name: name.trim(),
+        title: title || undefined,
         when: when || undefined,
         price: price || undefined,
         duration: duration || undefined,
@@ -655,6 +658,18 @@ export default function AdminExperienceEdit() {
 
           <div style={{ marginTop: "16px" }}>
             <SectionTitle>Short Description</SectionTitle>
+            <div style={{ marginBottom: "16px" }}>
+              <label style={labelStyle}>Title</label>
+              <input
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                placeholder="Title shown above the short description"
+                style={inputStyle}
+                onFocus={e => { e.target.style.borderColor = "#F5569B"; }}
+                onBlur={e => { e.target.style.borderColor = "#ddd"; }}
+              />
+            </div>
+            <label style={labelStyle}>Short Description</label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
