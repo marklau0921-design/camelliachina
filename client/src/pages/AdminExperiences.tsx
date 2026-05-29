@@ -298,6 +298,7 @@ export default function AdminExperiences() {
             <div style={{ display: "flex", alignItems: "center", padding: "10px 20px", background: "#e8e8e8", borderBottom: "1px solid #d8d8d8" }}>
               <span style={{ width: "48px" }} />
               <span style={{ flex: 1, fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#888" }}>Type Name</span>
+              <span style={{ width: "140px", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#888" }}>Experiences</span>
               <span style={{ width: "100px" }} />
             </div>
 
@@ -336,6 +337,10 @@ export default function AdminExperiences() {
                   <span style={{ fontSize: "14px", color: "#1a1a1a" }}>{type.name}</span>
                   <ArrowRight size={13} style={{ color: "#bbb" }} />
                 </button>
+
+                <span style={{ width: "140px", fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#888", flexShrink: 0 }}>
+                  {(type as any).experienceCount ?? 0} experience{((type as any).experienceCount ?? 0) === 1 ? "" : "s"}
+                </span>
 
                 {/* Actions */}
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>

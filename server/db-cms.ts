@@ -258,7 +258,19 @@ export async function removeCityWhatToSee(id: number) {
 export async function listExperienceTypes() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(experienceTypes).orderBy(experienceTypes.sortOrder, experienceTypes.name);
+  const types = await db.select().from(experienceTypes).orderBy(experienceTypes.sortOrder, experienceTypes.name);
+  const counts = await db
+    .select({
+      typeId: experiences.typeId,
+      experienceCount: sql<number>`count(*)`.mapWith(Number),
+    })
+    .from(experiences)
+    .groupBy(experiences.typeId);
+  const countByType = new Map(counts.map(row => [row.typeId, row.experienceCount]));
+  return types.map(type => ({
+    ...type,
+    experienceCount: countByType.get(type.id) ?? 0,
+  }));
 }
 
 export async function getExperienceTypeById(id: number) {
