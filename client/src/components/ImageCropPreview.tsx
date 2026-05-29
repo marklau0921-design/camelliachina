@@ -1,20 +1,30 @@
 import { useState } from "react";
 import { Move, X } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 type FitMode = "cover" | "contain";
 
-type AspectPreset = {
+type UsageSource = {
   label: string;
-  value: string;
+  url: string;
+  table: string;
+  column?: string;
 };
 
-const aspectPresets: AspectPreset[] = [
-  { label: "Hero", value: "16 / 7" },
-  { label: "Wide", value: "16 / 9" },
-  { label: "Card", value: "4 / 3" },
-  { label: "Square", value: "1 / 1" },
-  { label: "Portrait", value: "3 / 4" },
-  { label: "Logo", value: "5 / 2" },
+type PreviewScene = {
+  name: string;
+  detail: string;
+  aspectRatio: string;
+  fit: FitMode;
+};
+
+const genericScenes: PreviewScene[] = [
+  { name: "Hero", detail: "Generic full-width hero preview", aspectRatio: "16 / 7", fit: "cover" },
+  { name: "Wide", detail: "Generic wide image preview", aspectRatio: "16 / 9", fit: "cover" },
+  { name: "Card", detail: "Generic card thumbnail preview", aspectRatio: "4 / 3", fit: "cover" },
+  { name: "Square", detail: "Generic square preview", aspectRatio: "1 / 1", fit: "cover" },
+  { name: "Portrait", detail: "Generic portrait preview", aspectRatio: "3 / 4", fit: "cover" },
+  { name: "Logo", detail: "Generic logo preview", aspectRatio: "5 / 2", fit: "contain" },
 ];
 
 interface ImageCropPreviewProps {
@@ -36,17 +46,139 @@ function clampPosition(value: number) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
+function sceneForUsage(usage: UsageSource): PreviewScene {
+  const key = `${usage.table}.${usage.column ?? ""}`;
+  if (usage.table === "homepage_sponsors" || key.includes("logo") || key.includes("logoUrls")) {
+    return { name: usage.label, detail: "Sponsor logo container, contain fit", aspectRatio: "5 / 2", fit: "contain" };
+  }
+  if (key === "homepage_hero.backgroundImage") {
+    return { name: usage.label, detail: "Homepage hero background", aspectRatio: "16 / 7", fit: "cover" };
+  }
+  if (key === "itineraries.bannerImage") {
+    return { name: usage.label, detail: "Itinerary full-width banner", aspectRatio: "16 / 7", fit: "cover" };
+  }
+  if (key === "itineraries.coverImage") {
+    return { name: usage.label, detail: "Itinerary card cover", aspectRatio: "4 / 3", fit: "cover" };
+  }
+  if (key === "itineraries.sections") {
+    return { name: usage.label, detail: "Itinerary section/gallery image", aspectRatio: "16 / 9", fit: "cover" };
+  }
+  if (key === "cities.coverImage") {
+    return { name: usage.label, detail: "City banner image", aspectRatio: "16 / 7", fit: "cover" };
+  }
+  if (usage.table === "cities") {
+    return { name: usage.label, detail: "City page image block", aspectRatio: "4 / 3", fit: "cover" };
+  }
+  if (key === "experiences.gallery") {
+    return { name: usage.label, detail: "Experience gallery image", aspectRatio: "16 / 9", fit: "cover" };
+  }
+  if (key === "experiences.recommendationImage" || key === "experiences.cityDisplayImage") {
+    return { name: usage.label, detail: "Experience card image", aspectRatio: "4 / 3", fit: "cover" };
+  }
+  if (usage.table === "experience_details") {
+    return { name: usage.label, detail: "Experience detail image", aspectRatio: "4 / 3", fit: "cover" };
+  }
+  if (key === "team_members.image") {
+    return { name: usage.label, detail: "Team portrait image", aspectRatio: "3 / 4", fit: "cover" };
+  }
+  if (usage.table === "team_members") {
+    return { name: usage.label, detail: "Team story image", aspectRatio: "16 / 9", fit: "cover" };
+  }
+  if (usage.table === "why_us_sections") {
+    return { name: usage.label, detail: "Why Us section image", aspectRatio: "16 / 9", fit: "cover" };
+  }
+  if (usage.table === "stories" || usage.table === "homepage_stories" || usage.table === "videos") {
+    return { name: usage.label, detail: "Story/video card image", aspectRatio: "4 / 3", fit: "cover" };
+  }
+  return { name: usage.label, detail: usage.column ? `${usage.table}.${usage.column}` : usage.table, aspectRatio: "16 / 9", fit: "cover" };
+}
+
+function ScenePreview({
+  imageUrl,
+  scene,
+  objectPosition,
+  marker,
+  onPointer,
+}: {
+  imageUrl: string;
+  scene: PreviewScene;
+  objectPosition: string;
+  marker: { x: number; y: number };
+  onPointer: (event: React.PointerEvent<HTMLDivElement>, fit: FitMode) => void;
+}) {
+  return (
+    <div style={{ border: "1px solid #eee", borderRadius: 8, overflow: "hidden", background: "#fff" }}>
+      <div style={{ padding: "12px 14px", borderBottom: "1px solid #eee" }}>
+        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#1a1a1a" }}>{scene.name}</div>
+        <div style={{ fontSize: 11, color: "#888", marginTop: 3 }}>{scene.detail}</div>
+      </div>
+      <div
+        onPointerDown={event => onPointer(event, scene.fit)}
+        onPointerMove={event => { if (event.buttons === 1) onPointer(event, scene.fit); }}
+        style={{
+          width: "100%",
+          aspectRatio: scene.aspectRatio,
+          background: "#151515",
+          overflow: "hidden",
+          position: "relative",
+          cursor: scene.fit === "cover" ? "crosshair" : "default",
+        }}
+      >
+        <img
+          src={imageUrl}
+          alt={scene.name}
+          draggable={false}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: scene.fit,
+            objectPosition,
+            display: "block",
+            userSelect: "none",
+          }}
+        />
+        {scene.fit === "cover" && (
+          <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px)", backgroundSize: "33.333% 33.333%" }} />
+        )}
+        {scene.fit === "cover" && (
+          <div
+            style={{
+              position: "absolute",
+              left: `${marker.x}%`,
+              top: `${marker.y}%`,
+              transform: "translate(-50%, -50%)",
+              width: 30,
+              height: 30,
+              borderRadius: "50%",
+              background: "#F5569B",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 18px rgba(0,0,0,0.28)",
+              pointerEvents: "none",
+            }}
+          >
+            <Move size={14} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ImageCropPreview({
   imageUrl,
   onClose,
   initialPosition = "50% 50%",
   onPositionChange,
 }: ImageCropPreviewProps) {
-  const [fitMode, setFitMode] = useState<FitMode>("cover");
-  const [aspectRatio, setAspectRatio] = useState("16 / 9");
   const [position, setPosition] = useState(parsePosition(initialPosition));
+  const { data: usages = [], isLoading } = trpc.media.getUsagePreview.useQuery({ url: imageUrl }, { enabled: !!imageUrl });
 
   const objectPosition = `${position.x}% ${position.y}%`;
+  const usageScenes = (usages as UsageSource[]).map(sceneForUsage);
+  const scenes = usageScenes.length > 0 ? usageScenes : genericScenes;
 
   const updatePosition = (x: number, y: number) => {
     const next = { x: clampPosition(x), y: clampPosition(y) };
@@ -54,8 +186,8 @@ export default function ImageCropPreview({
     onPositionChange?.(`${next.x}% ${next.y}%`);
   };
 
-  const handlePointer = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (fitMode !== "cover") return;
+  const handlePointer = (event: React.PointerEvent<HTMLDivElement>, fit: FitMode) => {
+    if (fit !== "cover") return;
     const rect = event.currentTarget.getBoundingClientRect();
     updatePosition(
       ((event.clientX - rect.left) / rect.width) * 100,
@@ -82,7 +214,7 @@ export default function ImageCropPreview({
       <div
         onClick={event => event.stopPropagation()}
         style={{
-          width: "min(980px, 94vw)",
+          width: "min(1100px, 94vw)",
           maxHeight: "92vh",
           overflow: "auto",
           background: "#fff",
@@ -92,8 +224,10 @@ export default function ImageCropPreview({
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 22px", borderBottom: "1px solid #eee" }}>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a1a1a" }}>Crop Preview</div>
-            <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>Drag inside the frame to test the visible focus area.</div>
+            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a1a1a" }}>Usage Preview</div>
+            <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
+              {isLoading ? "Checking where this image is used..." : usageScenes.length > 0 ? `Showing ${usageScenes.length} current usage preview${usageScenes.length === 1 ? "" : "s"}.` : "No current usage found; showing generic preview ratios."}
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -105,99 +239,22 @@ export default function ImageCropPreview({
         </div>
 
         <div style={{ padding: "20px 22px 24px" }}>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
-            {aspectPresets.map(preset => (
-              <button
-                key={preset.value}
-                onClick={() => setAspectRatio(preset.value)}
-                style={{
-                  padding: "7px 11px",
-                  border: "1px solid #ddd",
-                  borderColor: aspectRatio === preset.value ? "#F5569B" : "#ddd",
-                  background: aspectRatio === preset.value ? "#fff0f6" : "#fff",
-                  color: aspectRatio === preset.value ? "#F5569B" : "#555",
-                  borderRadius: 6,
-                  fontSize: 12,
-                  cursor: "pointer",
-                }}
-              >
-                {preset.label}
-              </button>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+            {scenes.map((scene, index) => (
+              <ScenePreview
+                key={`${scene.name}-${scene.detail}-${index}`}
+                imageUrl={imageUrl}
+                scene={scene}
+                objectPosition={objectPosition}
+                marker={position}
+                onPointer={handlePointer}
+              />
             ))}
-            <button
-              onClick={() => setFitMode(fitMode === "cover" ? "contain" : "cover")}
-              style={{
-                marginLeft: "auto",
-                padding: "7px 12px",
-                border: "1px solid #ddd",
-                background: "#f8f8f8",
-                color: "#333",
-                borderRadius: 6,
-                fontSize: 12,
-                cursor: "pointer",
-              }}
-            >
-              {fitMode === "cover" ? "Cover crop" : "Contain fit"}
-            </button>
-          </div>
-
-          <div
-            onPointerDown={handlePointer}
-            onPointerMove={event => { if (event.buttons === 1) handlePointer(event); }}
-            style={{
-              width: "100%",
-              aspectRatio,
-              maxHeight: "62vh",
-              background: "#151515",
-              overflow: "hidden",
-              position: "relative",
-              cursor: fitMode === "cover" ? "crosshair" : "default",
-              borderRadius: 6,
-            }}
-          >
-            <img
-              src={imageUrl}
-              alt="Crop preview"
-              draggable={false}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: fitMode,
-                objectPosition,
-                display: "block",
-                userSelect: "none",
-              }}
-            />
-            {fitMode === "cover" && (
-              <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px)", backgroundSize: "33.333% 33.333%" }} />
-            )}
-            {fitMode === "cover" && (
-              <div
-                style={{
-                  position: "absolute",
-                  left: `${position.x}%`,
-                  top: `${position.y}%`,
-                  transform: "translate(-50%, -50%)",
-                  width: 34,
-                  height: 34,
-                  borderRadius: "50%",
-                  background: "#F5569B",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: "0 4px 18px rgba(0,0,0,0.28)",
-                  pointerEvents: "none",
-                }}
-              >
-                <Move size={15} />
-              </div>
-            )}
           </div>
 
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginTop: 14, flexWrap: "wrap" }}>
             <div style={{ fontSize: 12, color: "#666" }}>
-              Current object-position: <span style={{ fontWeight: 700, color: "#1a1a1a" }}>{objectPosition}</span>
+              Preview object-position: <span style={{ fontWeight: 700, color: "#1a1a1a" }}>{objectPosition}</span>
             </div>
             <button
               onClick={() => updatePosition(50, 50)}

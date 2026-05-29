@@ -145,27 +145,30 @@ export async function findMediaAssetUsages(asset: { url: string; storageKey?: st
     const titleColumn = existingColumns.has(spec.title) ? spec.title : "id";
     const slugSelect = existingColumns.has("slug") ? "slug" : "NULL AS slug";
     const experienceIdSelect = existingColumns.has("experienceId") ? "experienceId" : "NULL AS experienceId";
-    const where = searchableColumns.flatMap(column => urlNeedles.map(() => `\`${column}\` LIKE ?`)).join(" OR ");
-    const params = searchableColumns.flatMap(() => urlNeedles.map(needle => `%${needle}%`));
-    if (params.length === 0) continue;
-    const [rows] = await pool.execute(
-      `SELECT id, \`${titleColumn}\` AS usageTitle, ${slugSelect}, ${experienceIdSelect} FROM \`${spec.table}\` WHERE ${where} LIMIT 20`,
-      params
-    );
+    for (const column of searchableColumns) {
+      const where = urlNeedles.map(() => `\`${column}\` LIKE ?`).join(" OR ");
+      const params = urlNeedles.map(needle => `%${needle}%`);
+      if (params.length === 0) continue;
+      const [rows] = await pool.execute(
+        `SELECT id, \`${titleColumn}\` AS usageTitle, ${slugSelect}, ${experienceIdSelect} FROM \`${spec.table}\` WHERE ${where} LIMIT 20`,
+        params
+      );
 
-    for (const row of rows as any[]) {
-      const title = row.usageTitle ? String(row.usageTitle) : `#${row.id}`;
-      usages.push({
-        label: `${spec.label}: ${title}`,
-        url: spec.route(row),
-        table: spec.table,
-      });
+      for (const row of rows as any[]) {
+        const title = row.usageTitle ? String(row.usageTitle) : `#${row.id}`;
+        usages.push({
+          label: `${spec.label}: ${title}`,
+          url: spec.route(row),
+          table: spec.table,
+          column,
+        });
+      }
     }
   }
 
   const seen = new Set<string>();
   return usages.filter(usage => {
-    const key = `${usage.table}:${usage.label}:${usage.url}`;
+    const key = `${usage.table}:${usage.column ?? ""}:${usage.label}:${usage.url}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;

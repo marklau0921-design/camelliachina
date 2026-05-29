@@ -1145,6 +1145,13 @@ export const appRouter = router({
         return listMediaAssets(input.search, input.assetType);
       }),
 
+    getUsagePreview: publicProcedure
+      .input(z.object({ url: z.string().min(1) }))
+      .query(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        return findMediaAssetUsages({ url: input.url });
+      }),
+
     // 列出 Homepage Assets（按类型）
     listByType: publicProcedure
       .input(z.object({ assetType: z.enum(["logo", "banner", "cta"]) }))
