@@ -10,7 +10,10 @@ import { trpc } from '@/lib/trpc';
 
 export default function LuxuryTravelExperts() {
   const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
+  const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const pageTexture = (homepageAssets as any)?.pageBg?.url || '';
+  const pageTextureOpacity = Math.max(0, Math.min(1, Number((homepageAssets as any)?.pageBg?.opacity ?? 28) / 100));
 
   const testimonials = [
     {
@@ -80,9 +83,25 @@ export default function LuxuryTravelExperts() {
   };
 
   return (
-    <section className="w-full bg-[#F5F3EF] relative" style={{ paddingTop: 'clamp(50px, 5vw, 64px)', paddingBottom: 'clamp(50px, 5vw, 64px)', backgroundColor: '#ffffff' }}>
+    <section className="w-full bg-[#F5F3EF] relative overflow-hidden" style={{ paddingTop: 'clamp(50px, 5vw, 64px)', paddingBottom: 'clamp(50px, 5vw, 64px)', backgroundColor: '#ffffff' }}>
+      {pageTexture && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${pageTexture})`,
+            backgroundSize: '420px 420px',
+            backgroundRepeat: 'repeat',
+            opacity: pageTextureOpacity,
+            mixBlendMode: 'normal',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+      )}
       {/* Left Wave Decoration */}
-      <div className="absolute left-0 top-0 bottom-0 w-48 pointer-events-none hidden md:flex items-center justify-start overflow-hidden">
+      <div className="absolute left-0 top-0 bottom-0 w-48 pointer-events-none hidden md:flex items-center justify-start overflow-hidden" style={{ zIndex: 1 }}>
         <svg 
           className="w-full h-full" 
           viewBox="0 0 200 800" 
@@ -97,7 +116,7 @@ export default function LuxuryTravelExperts() {
       </div>
 
       {/* Right Wave Decoration */}
-      <div className="absolute right-0 top-0 bottom-0 w-48 pointer-events-none hidden md:flex items-center justify-end overflow-hidden">
+      <div className="absolute right-0 top-0 bottom-0 w-48 pointer-events-none hidden md:flex items-center justify-end overflow-hidden" style={{ zIndex: 1 }}>
         <svg 
           className="w-full h-full" 
           viewBox="0 0 200 800" 
@@ -111,7 +130,7 @@ export default function LuxuryTravelExperts() {
         </svg>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 relative" style={{ zIndex: 2 }}>
         {/* Title and Description - DB driven, fallback to static */}
         {(!homepageData?.intro || homepageData.intro.isVisible !== false) && (
         <div className="text-center mb-16">
