@@ -581,7 +581,7 @@ export default function ItineraryDetail() {
         )}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 24px' }}>
-          <h1 style={{ color: '#fff', fontSize: 'clamp(46px, 6vw, 78px)', letterSpacing: '0.045em', fontFamily: ITIN_DISPLAY, fontWeight: 400, lineHeight: 0.95, margin: '0 0 20px', maxWidth: '960px', textTransform: 'uppercase' }}>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(46px, 6vw, 60px)', letterSpacing: '3px', fontFamily: ITIN_DISPLAY, fontWeight: 400, lineHeight: 0.9, margin: '0 0 20px', maxWidth: '980px', textTransform: 'uppercase', textShadow: '2px 2px 8px rgba(0, 0, 0, 0.5)' }}>
             {itin.name}
           </h1>
           {itin.shortDescription && (
