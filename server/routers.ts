@@ -148,12 +148,14 @@ const experienceInput = z.object({
 
 const experienceDetailInput = z.object({
   experienceId: z.number(),
+  title: z.string().optional(),
   description: z.string().optional(),
   imageUrl: z.string().optional(),
   sortOrder: z.number().default(0),
 });
 
 const detailBlockSchema = z.object({
+  title: z.string().optional(),
   description: z.string().optional(),
   imageUrl: z.string().optional(),
   sortOrder: z.number(),
@@ -642,6 +644,7 @@ export const appRouter = router({
         // Copy details
         if (srcDetails.length > 0) {
           await replaceExperienceDetails(newExp.id, srcDetails.map((d: any, i: number) => ({
+            title: d.title ?? undefined,
             description: d.description ?? undefined,
             imageUrl: d.imageUrl ?? undefined,
             sortOrder: i,

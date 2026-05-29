@@ -483,6 +483,11 @@ export default function ExperienceDetail() {
                 <>
                   <div className="tea-detail-text">
                     <div className="tea-detail-text-inner">
+                      {block.title && (
+                        <h3 style={{ fontFamily: EXP_DISPLAY, fontSize: 'clamp(34px, 3.6vw, 45px)', fontWeight: 400, lineHeight: 1, letterSpacing: '2.25px', color: '#000', margin: '0 0 18px', textTransform: 'uppercase' }}>
+                          {block.title}
+                        </h3>
+                      )}
                       <p style={{ fontSize: 17, lineHeight: 1.5, color: EXP_TEXT, fontWeight: 400, fontFamily: EXP_SANS, letterSpacing: '0.85px', margin: 0, whiteSpace: 'pre-line' }}>
                         {block.description}
                       </p>
@@ -503,6 +508,11 @@ export default function ExperienceDetail() {
                   )}
                   <div className="tea-detail-text">
                     <div className="tea-detail-text-inner">
+                      {block.title && (
+                        <h3 style={{ fontFamily: EXP_DISPLAY, fontSize: 'clamp(34px, 3.6vw, 45px)', fontWeight: 400, lineHeight: 1, letterSpacing: '2.25px', color: '#000', margin: '0 0 18px', textTransform: 'uppercase' }}>
+                          {block.title}
+                        </h3>
+                      )}
                       <p style={{ fontSize: 17, lineHeight: 1.5, color: EXP_TEXT, fontWeight: 400, fontFamily: EXP_SANS, letterSpacing: '0.85px', margin: 0, whiteSpace: 'pre-line' }}>
                         {block.description}
                       </p>

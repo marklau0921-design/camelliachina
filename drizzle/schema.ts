@@ -154,6 +154,7 @@ export type InsertExperience = typeof experiences.$inferInsert;
 export const experienceDetails = mysqlTable("experience_details", {
   id: int("id").autoincrement().primaryKey(),
   experienceId: int("experienceId").notNull(),
+  title: varchar("title", { length: 255 }),
   description: text("description"),
   imageUrl: varchar("imageUrl", { length: 512 }),
   sortOrder: int("sortOrder").default(0).notNull(),

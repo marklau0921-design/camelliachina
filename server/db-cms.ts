@@ -443,13 +443,14 @@ export async function deleteExperienceDetail(id: number) {
   await db.delete(experienceDetails).where(eq(experienceDetails.id, id));
 }
 
-export async function replaceExperienceDetails(experienceId: number, details: Array<{ description?: string; imageUrl?: string; sortOrder: number }>) {
+export async function replaceExperienceDetails(experienceId: number, details: Array<{ title?: string; description?: string; imageUrl?: string; sortOrder: number }>) {
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");
   await db.delete(experienceDetails).where(eq(experienceDetails.experienceId, experienceId));
   if (details.length > 0) {
     await db.insert(experienceDetails).values(details.map(d => ({
       experienceId,
+      title: d.title ?? null,
       description: d.description ?? null,
       imageUrl: d.imageUrl ?? null,
       sortOrder: d.sortOrder,

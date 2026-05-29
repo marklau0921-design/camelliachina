@@ -9,6 +9,7 @@ import { Plus, Trash2, X, ArrowLeft, Save, Upload, GripVertical } from "lucide-r
 // ─── Detail Block ─────────────────────────────────────────────────────────────
 type DetailBlock = {
   id?: number;
+  title: string;
   description: string;
   imageUrl: string;
   sortOrder: number;
@@ -42,6 +43,19 @@ function DetailBlockEditor({
       </div>
 
       <div className="space-y-4">
+        {/* Title */}
+        <div>
+          <label style={{ display: "block", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#888", marginBottom: "8px" }}>Title</label>
+          <input
+            value={block.title}
+            onChange={e => onChange({ ...block, title: e.target.value })}
+            placeholder="Enter block title..."
+            style={{ width: "100%", padding: "9px 12px", fontSize: "13px", background: "#f2f2f2", border: "1px solid #ddd", outline: "none", color: "#2d2d2d", boxSizing: "border-box" }}
+            onFocus={e => { e.target.style.borderColor = "#F5569B"; }}
+            onBlur={e => { e.target.style.borderColor = "#ddd"; }}
+          />
+        </div>
+
         {/* Description */}
         <div>
           <label style={{ display: "block", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#888", marginBottom: "8px" }}>Description</label>
@@ -387,6 +401,14 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a1a1a", marginBottom: "20px", paddingBottom: "12px", borderBottom: "1px solid #eee" }}>
+      {children}
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function AdminExperienceEdit() {
   const params = useParams<{ id: string }>();
@@ -403,9 +425,9 @@ export default function AdminExperienceEdit() {
   const [ctaBgColor, setCtaBgColor] = useState("#1a1a1a");
   const [isActive, setIsActive] = useState(true);
   const [details, setDetails] = useState<DetailBlock[]>([
-    { description: "", imageUrl: "", sortOrder: 0 },
-    { description: "", imageUrl: "", sortOrder: 1 },
-    { description: "", imageUrl: "", sortOrder: 2 },
+    { title: "", description: "", imageUrl: "", sortOrder: 0 },
+    { title: "", description: "", imageUrl: "", sortOrder: 1 },
+    { title: "", description: "", imageUrl: "", sortOrder: 2 },
   ]);
   const [labels, setLabels] = useState<string[]>([]);
   const [recommendationImage, setRecommendationImage] = useState("");
@@ -437,6 +459,7 @@ export default function AdminExperienceEdit() {
     if (exp.details && exp.details.length > 0) {
       setDetails(exp.details.map((d: any, i: number) => ({
         id: d.id,
+        title: d.title ?? "",
         description: d.description ?? "",
         imageUrl: d.imageUrl ?? "",
         sortOrder: d.sortOrder ?? i,
@@ -489,6 +512,7 @@ export default function AdminExperienceEdit() {
       await saveDetailsMut.mutateAsync({
         experienceId: expId,
         details: details.map((d, i) => ({
+          title: d.title || undefined,
           description: d.description || undefined,
           imageUrl: d.imageUrl || undefined,
           sortOrder: i,
@@ -504,7 +528,7 @@ export default function AdminExperienceEdit() {
   }
 
   function addDetailBlock() {
-    setDetails(prev => [...prev, { description: "", imageUrl: "", sortOrder: prev.length }]);
+    setDetails(prev => [...prev, { title: "", description: "", imageUrl: "", sortOrder: prev.length }]);
   }
 
   function updateDetail(idx: number, block: DetailBlock) {
@@ -630,7 +654,7 @@ export default function AdminExperienceEdit() {
           </div>
 
           <div style={{ marginTop: "16px" }}>
-            <label style={labelStyle}>Short Description</label>
+            <SectionTitle>Short Description</SectionTitle>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
