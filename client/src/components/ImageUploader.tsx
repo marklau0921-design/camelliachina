@@ -3,6 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Maximize2, Upload, X } from "lucide-react";
 import ImageCropPreview from "./ImageCropPreview";
 import { useMediaObjectPosition } from "@/lib/media-position";
+import { prepareImageForUpload } from "@/lib/image-upload";
 
 interface ImageUploaderProps {
   value?: string;
@@ -44,24 +45,15 @@ export default function ImageUploader({
       setError("Please select an image file.");
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      setError("File size must be under 10MB.");
-      return;
-    }
     setError("");
     setUploading(true);
     try {
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve((reader.result as string).split(",")[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+      const uploadFile = await prepareImageForUpload(file);
       const result = await upload.mutateAsync({
-        filename: file.name,
-        base64,
-        mimeType: file.type,
-        fileSize: file.size,
+        filename: uploadFile.filename,
+        base64: uploadFile.base64,
+        mimeType: uploadFile.mimeType,
+        fileSize: uploadFile.fileSize,
         source: source ?? category ?? "general",
         sourceId,
         sourceLabel,

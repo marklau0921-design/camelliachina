@@ -3,6 +3,7 @@ import { useLocation, useParams } from "wouter";
 import AdminLayout from "@/components/AdminLayout";
 import ImageUploader from "@/components/ImageUploader";
 import { trpc } from "@/lib/trpc";
+import { prepareImageForUpload } from "@/lib/image-upload";
 import { toast } from "sonner";
 import { Plus, Trash2, X, ArrowLeft, Save, Upload, GripVertical } from "lucide-react";
 
@@ -210,23 +211,13 @@ function GalleryManager({
       const file = imageFiles[i];
       setUploadProgress({ current: i + 1, total: imageFiles.length });
       
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error(`${file.name} is over 5MB, skipped`);
-        continue;
-      }
-      
       try {
-        const base64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve((reader.result as string).split(",")[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
+        const uploadFile = await prepareImageForUpload(file);
         
         const result = await uploadImageMut.mutateAsync({
-          filename: file.name,
-          base64,
-          mimeType: file.type,
+          filename: uploadFile.filename,
+          base64: uploadFile.base64,
+          mimeType: uploadFile.mimeType,
         });
         newUrls.push(result.url);
       } catch (err: any) {
