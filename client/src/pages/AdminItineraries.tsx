@@ -4,6 +4,7 @@ import { trpc } from "@/lib/trpc";
 import AdminLayout from "@/components/AdminLayout";
 import ImageUploader from "@/components/ImageUploader";
 import TagSelector from "@/components/TagSelector";
+import { prepareImageForUpload } from "@/lib/image-upload";
 import { Plus, Edit2, Trash2, ChevronDown, ChevronUp, GripVertical, Image as ImageIcon, X } from "lucide-react";
 
 const ACCENT = "#F5569B";
@@ -139,14 +140,6 @@ function BlockEditor({ block, onChange, onDelete }: {
     onChange({ ...block, images: nextImages, image: nextImages[0] ?? "" });
   };
 
-  const fileToBase64 = (file: File) =>
-    new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve((reader.result as string).split(",")[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     const imageFiles = Array.from(files).filter(file => file.type.startsWith("image/"));
@@ -162,13 +155,12 @@ function BlockEditor({ block, onChange, onDelete }: {
       const file = imageFiles[i];
       setUploadProgress({ current: i + 1, total: imageFiles.length });
       try {
-        if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} is over 10MB.`);
-        const base64 = await fileToBase64(file);
+        const prepared = await prepareImageForUpload(file);
         const result = await upload.mutateAsync({
-          filename: file.name,
-          base64,
-          mimeType: file.type,
-          fileSize: file.size,
+          filename: prepared.filename,
+          base64: prepared.base64,
+          mimeType: prepared.mimeType,
+          fileSize: prepared.fileSize,
           source: "itinerary",
           sourceLabel: block.title || `Day ${block.dayNumber}`,
           sourceUrl: "",

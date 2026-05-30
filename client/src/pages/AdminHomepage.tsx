@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import ImageUploader from "@/components/ImageUploader";
 import MultiImageUploader from "@/components/MultiImageUploader";
 import AdminLayout from "@/components/AdminLayout";
+import { prepareImageForUpload } from "@/lib/image-upload";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface VideoStoryForm {
@@ -255,18 +256,13 @@ export default function AdminHomepage() {
       const file = imageFiles[i];
       setImageUploadProgress({ current: i + 1, total: imageFiles.length });
       try {
-        const base64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve((reader.result as string).split(",")[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
+        const prepared = await prepareImageForUpload(file);
         const result = await uploadImageMutation.mutateAsync({
-          filename: file.name, base64, mimeType: file.type, fileSize: file.size,
+          filename: prepared.filename, base64: prepared.base64, mimeType: prepared.mimeType, fileSize: prepared.fileSize,
           source: "homepage", assetType: "general",
         });
         await createImageStory.mutateAsync({
-          title: file.name.replace(/\.[^.]+$/, ""),
+          title: prepared.filename.replace(/\.[^.]+$/, ""),
           type: "image",
           thumbnailUrl: result.url,
           isVisible: true,
@@ -294,14 +290,9 @@ export default function AdminHomepage() {
       const file = imageFiles[i];
       setSponsorUploadProgress({ current: i + 1, total: imageFiles.length });
       try {
-        const base64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve((reader.result as string).split(",")[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
+        const prepared = await prepareImageForUpload(file);
         const result = await uploadImageMutation.mutateAsync({
-          filename: file.name, base64, mimeType: file.type, fileSize: file.size,
+          filename: prepared.filename, base64: prepared.base64, mimeType: prepared.mimeType, fileSize: prepared.fileSize,
           source: "homepage", assetType: "general",
         });
         logoUrls.push(result.url);
