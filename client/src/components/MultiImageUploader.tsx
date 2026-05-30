@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { Maximize2, Upload, X } from "lucide-react";
 import ImageCropPreview from "./ImageCropPreview";
+import { useMediaObjectPosition } from "@/lib/media-position";
 
 interface MultiImageUploaderProps {
   value?: string[]; // Array of image URLs
@@ -33,6 +34,7 @@ export default function MultiImageUploader({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const getObjectPosition = useMediaObjectPosition();
   const fileRef = useRef<HTMLInputElement>(null);
   const upload = trpc.media.upload.useMutation();
 
@@ -218,7 +220,7 @@ export default function MultiImageUploader({
       )}
 
       {previewUrl && (
-        <ImageCropPreview imageUrl={previewUrl} onClose={() => setPreviewUrl(null)} />
+        <ImageCropPreview imageUrl={previewUrl} initialPosition={getObjectPosition(previewUrl)} onClose={() => setPreviewUrl(null)} />
       )}
     </div>
   );

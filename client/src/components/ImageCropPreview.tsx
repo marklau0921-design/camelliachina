@@ -174,7 +174,18 @@ export default function ImageCropPreview({
   onPositionChange,
 }: ImageCropPreviewProps) {
   const [position, setPosition] = useState(parsePosition(initialPosition));
+  const [saveState, setSaveState] = useState<"idle" | "saved" | "error">("idle");
   const { data: usages = [], isLoading } = trpc.media.getUsagePreview.useQuery({ url: imageUrl }, { enabled: !!imageUrl });
+  const utils = trpc.useUtils();
+  const updatePositionMutation = trpc.media.updateObjectPosition.useMutation({
+    onSuccess: (result) => {
+      setSaveState(result.saved ? "saved" : "error");
+      utils.media.getObjectPositions.invalidate();
+      utils.media.list.invalidate();
+      utils.media.listByType.invalidate();
+    },
+    onError: () => setSaveState("error"),
+  });
 
   const objectPosition = `${position.x}% ${position.y}%`;
   const usageScenes = (usages as UsageSource[]).map(sceneForUsage);
@@ -183,7 +194,17 @@ export default function ImageCropPreview({
   const updatePosition = (x: number, y: number) => {
     const next = { x: clampPosition(x), y: clampPosition(y) };
     setPosition(next);
+    setSaveState("idle");
     onPositionChange?.(`${next.x}% ${next.y}%`);
+  };
+
+  const savePosition = async () => {
+    setSaveState("idle");
+    try {
+      await updatePositionMutation.mutateAsync({ url: imageUrl, objectPosition });
+    } catch {
+      setSaveState("error");
+    }
   };
 
   const handlePointer = (event: React.PointerEvent<HTMLDivElement>, fit: FitMode) => {
@@ -257,12 +278,24 @@ export default function ImageCropPreview({
               Preview object-position: <span style={{ fontWeight: 700, color: "#1a1a1a" }}>{objectPosition}</span>
             </div>
             <button
+              onClick={savePosition}
+              disabled={updatePositionMutation.isPending}
+              style={{ padding: "8px 13px", border: "1px solid #F5569B", background: "#F5569B", color: "#fff", borderRadius: 6, fontSize: 12, cursor: updatePositionMutation.isPending ? "not-allowed" : "pointer" }}
+            >
+              {updatePositionMutation.isPending ? "Saving..." : saveState === "saved" ? "Applied" : "Apply crop"}
+            </button>
+            <button
               onClick={() => updatePosition(50, 50)}
               style={{ padding: "8px 13px", border: "1px solid #ddd", background: "#fff", color: "#555", borderRadius: 6, fontSize: 12, cursor: "pointer" }}
             >
               Reset center
             </button>
           </div>
+          {saveState === "error" && (
+            <div style={{ fontSize: 12, color: "#d33", marginTop: 8 }}>
+              Could not save this crop. Make sure the image is in the media library.
+            </div>
+          )}
         </div>
       </div>
     </div>

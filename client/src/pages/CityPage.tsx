@@ -4,6 +4,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
+import { useMediaObjectPosition } from '@/lib/media-position';
 
 const CITY_DISPLAY = "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)";
 const CITY_SANS = "var(--font-travel-sans, 'Cabin', 'Josefin Sans', 'Helvetica Neue', Arial, sans-serif)";
@@ -30,6 +31,7 @@ function ExperienceItem({ item, index, onExplore }: { item: any; index: number; 
   const image = item.cityDisplayImage || item.experienceSlug;
   const title = item.experienceTitle || item.experienceName;
   const description = item.experienceDescription || '';
+  const getObjectPosition = useMediaObjectPosition();
 
   const ExploreButton = () => (
     <button
@@ -55,7 +57,7 @@ function ExperienceItem({ item, index, onExplore }: { item: any; index: number; 
               src={image}
               alt={title}
               className="w-full object-cover"
-              style={{ height: '375px', objectFit: 'cover' }}
+              style={{ height: '375px', objectFit: 'cover', objectPosition: getObjectPosition(image) }}
             />
           )}
           <div className="px-6 py-6">
@@ -90,7 +92,7 @@ function ExperienceItem({ item, index, onExplore }: { item: any; index: number; 
                   src={image}
                   alt={title}
                   className="object-cover"
-                  style={{ width: '940px', height: '630px', objectFit: 'cover' }}
+                  style={{ width: '940px', height: '630px', objectFit: 'cover', objectPosition: getObjectPosition(image) }}
                 />
               )}
             </div>
@@ -104,7 +106,7 @@ function ExperienceItem({ item, index, onExplore }: { item: any; index: number; 
                   src={image}
                   alt={title}
                   className="object-cover"
-                  style={{ width: '940px', height: '630px', objectFit: 'cover' }}
+                  style={{ width: '940px', height: '630px', objectFit: 'cover', objectPosition: getObjectPosition(image) }}
                 />
               )}
             </div>
@@ -136,6 +138,7 @@ export default function CityPage() {
   const [tripsShowRightBtn, setTripsShowRightBtn] = useState(true);
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024);
   const [bannerImageLoaded, setBannerImageLoaded] = useState(false);
+  const getObjectPosition = useMediaObjectPosition();
 
   // Fetch city data by slug
   const { data: city, isLoading: cityLoading, error: cityError } = trpc.cms.getCityBySlug.useQuery(
@@ -315,7 +318,7 @@ export default function CityPage() {
         <div className="relative w-full bg-cover bg-center" style={{
           backgroundImage: `url(${(city as any).coverImage || ''})`,
           backgroundAttachment: 'scroll',
-          backgroundPosition: 'center',
+          backgroundPosition: getObjectPosition((city as any).coverImage),
           backgroundSize: 'cover',
           height: '400px',
         }}>
@@ -400,7 +403,7 @@ export default function CityPage() {
             paddingBottom: '50px',
             backgroundImage: `url(${(city as any).coverImage || ''})`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundPosition: getObjectPosition((city as any).coverImage),
             backgroundAttachment: 'scroll',
           }}
         >
@@ -451,7 +454,7 @@ export default function CityPage() {
               {cityTrips.map((trip: any) => (
                 <div key={trip.id} className="relative group overflow-hidden flex-shrink-0" style={{ width: '310px', height: '550px', userSelect: 'none', background: '#222' }}>
                   {(trip.coverImage || trip.bannerImage || (city as any).coverImage) && (
-                    <img src={trip.coverImage || trip.bannerImage || (city as any).coverImage} alt={trip.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" draggable={false} />
+                    <img src={trip.coverImage || trip.bannerImage || (city as any).coverImage} alt={trip.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" style={{ objectPosition: getObjectPosition(trip.coverImage || trip.bannerImage || (city as any).coverImage) }} draggable={false} />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/80" />
                   <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
@@ -570,7 +573,7 @@ export default function CityPage() {
                   src={(city as any).culinaryTravelLargeImage}
                   alt={`${cityName} Cuisine`}
                   className="object-cover"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: getObjectPosition((city as any).culinaryTravelLargeImage) }}
                 />
               )}
             </div>
@@ -593,7 +596,7 @@ export default function CityPage() {
                 src={(city as any).culinaryTravelLargeImage}
                 alt={`${cityName} Cuisine`}
                 className="w-full object-cover"
-                style={{ height: '375px', objectFit: 'cover' }}
+                style={{ height: '375px', objectFit: 'cover', objectPosition: getObjectPosition((city as any).culinaryTravelLargeImage) }}
               />
             )}
             <div className="p-6">
@@ -617,7 +620,7 @@ export default function CityPage() {
                   src={(city as any).culinaryTravelSmall1Image}
                   alt={(city as any).culinaryTravelSmall1Title || ''}
                   className="w-full object-cover"
-                  style={{ height: '390px', objectFit: 'cover' }}
+                  style={{ height: '390px', objectFit: 'cover', objectPosition: getObjectPosition((city as any).culinaryTravelSmall1Image) }}
                 />
               )}
               <div className="p-6" style={{ height: '210px', overflow: 'hidden' }}>
@@ -637,7 +640,7 @@ export default function CityPage() {
                   src={(city as any).culinaryTravelSmall2Image}
                   alt={(city as any).culinaryTravelSmall2Title || ''}
                   className="w-full object-cover"
-                  style={{ height: '390px', objectFit: 'cover' }}
+                  style={{ height: '390px', objectFit: 'cover', objectPosition: getObjectPosition((city as any).culinaryTravelSmall2Image) }}
                 />
               )}
               <div className="p-6" style={{ height: '210px', overflow: 'hidden' }}>

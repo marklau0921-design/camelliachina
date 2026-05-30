@@ -252,6 +252,37 @@ export async function updateAssetOpacity(id: number, opacity: number) {
 }
 
 // ─── 替换图片（保持 URL 不变，更新 storageKey）──────────────────────────────
+function isValidObjectPosition(position: string) {
+  return /^([0-9]|[1-9][0-9]|100)%\s+([0-9]|[1-9][0-9]|100)%$/.test(position.trim());
+}
+
+export async function updateAssetObjectPositionByUrl(url: string, objectPosition: string) {
+  const pool = await getPool();
+  if (!pool) return { saved: false };
+  if (!(await mediaHasColumn(pool, "objectPosition"))) return { saved: false };
+  const position = objectPosition.trim();
+  if (!isValidObjectPosition(position)) return { saved: false };
+  const needles = getUrlNeedles({ url });
+  if (needles.length === 0) return { saved: false };
+  const where = needles.map(() => "`url` LIKE ? OR `storageKey` LIKE ?").join(" OR ");
+  const params = needles.flatMap(needle => [`%${needle}%`, `%${needle}%`]);
+  const [result] = await pool.execute(
+    `UPDATE media_assets SET objectPosition = ? WHERE ${where}`,
+    [position, ...params]
+  ) as any;
+  return { saved: Number(result?.affectedRows ?? 0) > 0, objectPosition: position };
+}
+
+export async function listMediaObjectPositions() {
+  const pool = await getPool();
+  if (!pool) return [];
+  if (!(await mediaHasColumn(pool, "objectPosition"))) return [];
+  const [rows] = await pool.query(
+    "SELECT url, storageKey, objectPosition FROM media_assets WHERE objectPosition IS NOT NULL AND objectPosition <> '50% 50%'"
+  );
+  return rows as Array<{ url: string; storageKey?: string | null; objectPosition: string | null }>;
+}
+
 export async function replaceMediaAsset(id: number, newUrl: string, newStorageKey: string, newFilename: string) {
   const db = await getDb();
   if (!db) return;

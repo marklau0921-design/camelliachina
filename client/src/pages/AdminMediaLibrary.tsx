@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback } from "react";
 import AdminLayout from "../components/AdminLayout";
 import { trpc } from "../lib/trpc";
+import ImageCropPreview from "../components/ImageCropPreview";
+import { useMediaObjectPosition } from "../lib/media-position";
 
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -96,6 +98,8 @@ function ImageCard({
   const [copied, setCopied] = useState(false);
   const [showUsage, setShowUsage] = useState(false);
   const [replaceLoading, setReplaceLoading] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const getObjectPosition = useMediaObjectPosition();
   const usageCount = asset.usageCount ?? (asset.sourceUrl ? 1 : 0);
   const usageSources = asset.usageSources ?? (asset.sourceUrl ? [{ label: asset.sourceLabel ?? "Linked source", url: asset.sourceUrl, table: "media_assets" }] : []);
   const isInUse = usageCount > 0;
@@ -144,6 +148,9 @@ function ImageCard({
           <button onClick={handleCopy} style={{ fontSize: 11, padding: "3px 10px", borderRadius: 4, border: "1px solid #ddd", background: copied ? "#e8f5e9" : "#f2f2f2", color: copied ? "#388e3c" : "#555", cursor: "pointer" }}>
             {copied ? "Copied!" : "Copy URL"}
           </button>
+          <button onClick={(e) => { e.stopPropagation(); setPreviewOpen(true); }} style={{ fontSize: 11, padding: "3px 10px", borderRadius: 4, border: "1px solid #ddd", background: "#f2f2f2", color: "#555", cursor: "pointer" }}>
+            Preview
+          </button>
           {onReplace && (
             <label style={{ fontSize: 11, padding: "3px 10px", borderRadius: 4, border: "1px solid #ddd", background: "#f2f2f2", color: "#555", cursor: replaceLoading ? "not-allowed" : "pointer" }}>
               {replaceLoading ? "Replacing..." : "Replace"}
@@ -161,6 +168,9 @@ function ImageCard({
           )}
         </div>
       </div>
+      {previewOpen && (
+        <ImageCropPreview imageUrl={asset.url} initialPosition={getObjectPosition(asset.url)} onClose={() => setPreviewOpen(false)} />
+      )}
     </div>
   );
 }

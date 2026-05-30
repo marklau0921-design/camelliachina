@@ -10,6 +10,7 @@ import { Link, useParams } from 'wouter';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { trpc } from '@/lib/trpc';
+import { useMediaObjectPosition } from '@/lib/media-position';
 
 const EXP_DISPLAY = "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)";
 const EXP_SANS = "var(--font-travel-sans, 'Cabin', 'Helvetica Neue', Arial, sans-serif)";
@@ -34,6 +35,7 @@ const FIXED_HEIGHT_MAX = 720; // px
 const GAP_PX = 0;
 
 function HeroCarousel({ images }: { images: string[] }) {
+  const getObjectPosition = useMediaObjectPosition();
   const extended = [images[images.length - 1], ...images, images[0]];
   const [internalIdx, setInternalIdx] = useState(1);
   const idxRef = useRef(1);
@@ -149,7 +151,7 @@ function HeroCarousel({ images }: { images: string[] }) {
       <div style={{ background: '#fff', padding: '0 0 48px' }}>
         <div style={{ overflow: 'hidden' }}>
           <div style={{ width: 'auto', margin: '0 auto', maxHeight: FIXED_HEIGHT_MAX, aspectRatio: '16/9' }}>
-            <img src={images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <img src={images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: getObjectPosition(images[0]), display: 'block' }} />
           </div>
         </div>
       </div>
@@ -191,7 +193,7 @@ function HeroCarousel({ images }: { images: string[] }) {
                 }}
                 onClick={() => { if (!isActive) { if (i < internalIdx) prevSlide(); else nextSlide(); } }}
               >
-                <img src={src} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} />
+                <img src={src} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: getObjectPosition(src), display: 'block', pointerEvents: 'none' }} />
               </div>
             );
           })}
@@ -216,6 +218,7 @@ function HeroCarousel({ images }: { images: string[] }) {
 
 // ── Similar Experiences Carousel ───────────────────────────────────────────────
 function SimilarCarousel({ items, bgImage }: { items: any[]; bgImage: string }) {
+  const getObjectPosition = useMediaObjectPosition();
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
@@ -269,7 +272,7 @@ function SimilarCarousel({ items, bgImage }: { items: any[]; bgImage: string }) 
 
   return (
     <div className="w-full relative flex flex-col lg:flex-row lg:items-center"
-      style={{ minHeight: '680px', paddingTop: '50px', paddingBottom: '50px', backgroundImage: `url(${bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      style={{ minHeight: '680px', paddingTop: '50px', paddingBottom: '50px', backgroundImage: `url(${bgImage})`, backgroundSize: 'cover', backgroundPosition: getObjectPosition(bgImage) }}>
       <div className="absolute inset-0" style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', backgroundColor: 'rgba(10,10,10,0.85)', zIndex: 0 }} />
 
       <div className="lg:hidden w-full px-6 mb-6 relative z-10">
@@ -311,7 +314,7 @@ function SimilarCarousel({ items, bgImage }: { items: any[]; bgImage: string }) 
             const href = item.typeId ? `/experiences/${categorySlug}/${item.slug}` : `/experience-preview/${item.slug}`;
             return (
               <div key={item.id} className="relative group overflow-hidden flex-shrink-0" style={{ width: '310px', height: '550px', userSelect: 'none' }}>
-                <img src={coverImg} alt={title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" draggable={false} />
+                <img src={coverImg} alt={title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" style={{ objectPosition: getObjectPosition(coverImg) }} draggable={false} />
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />
                 <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
                   {subtitle && <div className="text-xs font-bold uppercase tracking-wider text-right" style={{ fontFamily: EXP_SANS, color: '#ffffff', fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}>{subtitle}</div>}
@@ -368,6 +371,7 @@ function SimilarCarousel({ items, bgImage }: { items: any[]; bgImage: string }) 
 export default function ExperienceDetail() {
   const params = useParams<{ id?: string; categorySlug?: string; slug?: string }>();
   const slug = params.id ?? params.slug ?? params.categorySlug ?? '';
+  const getObjectPosition = useMediaObjectPosition();
 
   const { data: exp, isLoading, isError } = trpc.cms.getExperienceBySlug.useQuery(
     { slug },
@@ -502,7 +506,7 @@ export default function ExperienceDetail() {
                   </div>
                   {block.imageUrl && (
                     <div className="tea-detail-img-wrap">
-                      <img src={block.imageUrl} alt="" className="tea-detail-img" />
+                      <img src={block.imageUrl} alt="" className="tea-detail-img" style={{ objectPosition: getObjectPosition(block.imageUrl) }} />
                     </div>
                   )}
                 </>
@@ -510,7 +514,7 @@ export default function ExperienceDetail() {
                 <>
                   {block.imageUrl && (
                     <div className="tea-detail-img-wrap">
-                      <img src={block.imageUrl} alt="" className="tea-detail-img" />
+                      <img src={block.imageUrl} alt="" className="tea-detail-img" style={{ objectPosition: getObjectPosition(block.imageUrl) }} />
                     </div>
                   )}
                   <div className="tea-detail-text">

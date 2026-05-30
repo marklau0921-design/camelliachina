@@ -1,6 +1,7 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { trpc } from '@/lib/trpc';
+import { useMediaObjectPosition } from '@/lib/media-position';
 
 const TEAM_DISPLAY = "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)";
 const TEAM_SANS = "var(--font-travel-sans, 'Cabin', 'Josefin Sans', 'Helvetica Neue', Arial, sans-serif)";
@@ -52,12 +53,13 @@ function slugify(value: string) {
 
 function TeamMemberSection({ member, index }: { member: TeamMember; index: number }) {
   const mirrored = index % 2 === 1;
+  const getObjectPosition = useMediaObjectPosition();
   const layoutClass = mirrored ? 'layout-mirror' : 'layout-normal';
   const storyClass = mirrored ? 'story-mirror' : 'story-normal';
 
   const photo = (
     <div className="ot-photo-col" style={{ flex: '0 0 27vw', maxWidth: '425px', aspectRatio: '425 / 525', marginTop: '-65px', position: 'relative', zIndex: 2 }}>
-      {member.image && <img src={member.image} alt={member.name} style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover', objectPosition: 'top center', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }} />}
+      {member.image && <img src={member.image} alt={member.name} style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover', objectPosition: getObjectPosition(member.image, 'top center'), boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }} />}
     </div>
   );
 
@@ -109,10 +111,11 @@ function StoryText({ member }: { member: TeamMember }) {
 }
 
 function StoryImages({ member, mirrored = false }: { member: TeamMember; mirrored?: boolean }) {
+  const getObjectPosition = useMediaObjectPosition();
   return (
     <div className="ot-story-images" style={{ flex: 1, minWidth: 0, position: 'relative', height: 'clamp(320px, 36vw, 480px)' }}>
-      {member.storyImage && <img src={member.storyImage} alt={member.storySubtitle || member.name} style={{ position: 'absolute', top: 0, [mirrored ? 'left' : 'right']: 0, width: '84%', height: '70%', objectFit: 'cover', objectPosition: 'center center', display: 'block', zIndex: 1, boxShadow: '0 4px 20px rgba(0,0,0,0.10)' }} />}
-      {member.storyImage2 && <img src={member.storyImage2} alt={member.name} style={{ position: 'absolute', bottom: 0, [mirrored ? 'right' : 'left']: 0, width: '46%', height: '86%', objectFit: 'cover', objectPosition: 'top center', display: 'block', zIndex: 2, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }} />}
+      {member.storyImage && <img src={member.storyImage} alt={member.storySubtitle || member.name} style={{ position: 'absolute', top: 0, [mirrored ? 'left' : 'right']: 0, width: '84%', height: '70%', objectFit: 'cover', objectPosition: getObjectPosition(member.storyImage, 'center center'), display: 'block', zIndex: 1, boxShadow: '0 4px 20px rgba(0,0,0,0.10)' }} />}
+      {member.storyImage2 && <img src={member.storyImage2} alt={member.name} style={{ position: 'absolute', bottom: 0, [mirrored ? 'right' : 'left']: 0, width: '46%', height: '86%', objectFit: 'cover', objectPosition: getObjectPosition(member.storyImage2, 'top center'), display: 'block', zIndex: 2, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }} />}
     </div>
   );
 }

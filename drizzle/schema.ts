@@ -316,6 +316,7 @@ export const mediaAssets = mysqlTable("media_assets", {
   assetType: mysqlEnum("assetType", ["logo", "banner", "cta", "page_bg", "general"]).default("general").notNull(),
   isActive: boolean("isActive").default(true).notNull(),   // logo/cta 当前使用中
   sortOrder: int("sortOrder").default(0).notNull(),        // banner 排序
+  objectPosition: varchar("objectPosition", { length: 32 }).default("50% 50%"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Navigation from '@/components/Navigation';
 import { trpc } from '@/lib/trpc';
+import { useMediaObjectPosition } from '@/lib/media-position';
 
 /**
  * WhyUs Page — Full-screen paged layout
@@ -64,6 +65,7 @@ export default function WhyUs() {
   const { data: dbSections } = trpc.about.listWhyUsSections.useQuery();
   const { data: homeSettings } = trpc.about.getWhyUsHomeSettings.useQuery();
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const getObjectPosition = useMediaObjectPosition();
   const backgroundTexture = homepageAssets?.cta?.url;
   const textureOpacity = Math.max(0, Math.min(1, Number((homepageAssets?.cta as any)?.opacity ?? 28) / 100));
 
@@ -253,7 +255,7 @@ export default function WhyUs() {
 
     const imageBlock = (
       slide.image ? (
-        <img src={slide.image} alt={slide.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <img src={slide.image} alt={slide.title} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: getObjectPosition(slide.image), display: 'block' }} />
       ) : (
         <div style={{ width: '100%', height: '100%', background: slideBg, position: 'relative' }}>
           <div style={{ position: 'absolute', inset: 0, ...textureLayer }} />

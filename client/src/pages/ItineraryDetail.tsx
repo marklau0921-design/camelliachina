@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import { trpc } from '../lib/trpc';
+import { useMediaObjectPosition } from '../lib/media-position';
 
 // ─── Types (mirrors AdminItineraries) ────────────────────────────────────────
 
@@ -149,6 +150,7 @@ const CURSOR_LEFT = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 const CURSOR_RIGHT = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Ccircle cx='15' cy='15' r='14' fill='rgba(0%2C0%2C0%2C0.45)'/%3E%3Cpolyline points='13%2C10 18%2C15 13%2C20' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") 15 15, e-resize`;
 
 function ImageCarousel({ images, alt }: { images: string[]; alt: string }) {
+  const getObjectPosition = useMediaObjectPosition();
   const [current, setCurrent] = useState(0);
   const [mouseOnLeft, setMouseOnLeft] = useState(false);
   const [mouseInside, setMouseInside] = useState(false);
@@ -207,9 +209,9 @@ function ImageCarousel({ images, alt }: { images: string[]; alt: string }) {
       onClick={handleClick} onMouseMove={handleMouseMove} onMouseLeave={() => setMouseInside(false)}
       onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       {prev !== null && (
-        <img key={`prev-${animKey}`} src={images[prev]} alt={alt} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: `slideOut 460ms cubic-bezier(0.23,1,0.32,1) forwards`, ['--exit-to' as any]: exitTo }} />
+        <img key={`prev-${animKey}`} src={images[prev]} alt={alt} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: getObjectPosition(images[prev]), animation: `slideOut 460ms cubic-bezier(0.23,1,0.32,1) forwards`, ['--exit-to' as any]: exitTo }} />
       )}
-      <img key={`curr-${animKey}`} src={images[current]} alt={alt} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: prev !== null ? `slideIn 460ms cubic-bezier(0.23,1,0.32,1) forwards` : 'none', ['--enter-from' as any]: enterFrom }} />
+      <img key={`curr-${animKey}`} src={images[current]} alt={alt} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: getObjectPosition(images[current]), animation: prev !== null ? `slideIn 460ms cubic-bezier(0.23,1,0.32,1) forwards` : 'none', ['--enter-from' as any]: enterFrom }} />
       {images.length > 1 && (
         <div style={{ position: 'absolute', bottom: '12px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '6px', zIndex: 10, pointerEvents: 'none' }}>
           {images.map((_, idx) => (
@@ -233,6 +235,7 @@ interface Trip {
 
 function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
   const [, navigate] = useLocation();
+  const getObjectPosition = useMediaObjectPosition();
   const trackRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
   const startXRef = useRef(0);
@@ -417,7 +420,7 @@ function SimilarTripsSection({ currentSlug }: { currentSlug: string }) {
           {/* Trip Cards */}
           {(itineraries && itineraries.length > 0 ? itineraries : []).map((trip) => (
             <div key={trip.id} className="relative group overflow-hidden flex-shrink-0" style={{ width: '310px', height: '550px', userSelect: 'none' }}>
-              <img src={trip.image} alt={trip.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" draggable={false} />
+              <img src={trip.image} alt={trip.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" style={{ objectPosition: getObjectPosition(trip.image) }} draggable={false} />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />
               <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
                 {trip.nights && <div className="text-xs font-bold uppercase tracking-wider text-yellow-300 text-right" style={{ fontFamily: ITIN_SANS, color: '#ffffff', fontWeight: 700, letterSpacing: '0.1em' }}>{trip.nights} NIGHTS</div>}
@@ -503,6 +506,7 @@ export default function ItineraryDetail() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
   const [activeSection, setActiveSection] = useState('overview');
+  const getObjectPosition = useMediaObjectPosition();
 
   const { data: itin, isLoading, error } = trpc.cms.getItineraryBySlug.useQuery(
     { slug: slug! },
@@ -577,7 +581,7 @@ export default function ItineraryDetail() {
       {/* ── HERO BANNER ── */}
       <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>
         {itin.bannerImage ? (
-          <img src={itin.bannerImage} alt={itin.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img src={itin.bannerImage} alt={itin.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: getObjectPosition(itin.bannerImage) }} />
         ) : (
           <div style={{ width: '100%', height: '100%', background: '#1a1a1a' }} />
         )}

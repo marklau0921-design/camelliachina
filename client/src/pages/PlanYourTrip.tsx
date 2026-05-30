@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
+import { useMediaObjectPosition } from '@/lib/media-position';
 import './PlanYourTrip.css';
 
 interface TravelCard {
@@ -16,6 +17,7 @@ const PlanYourTrip: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'destination' | 'experience'>('destination');
   const [showAll, setShowAll] = useState(false);
   const [, navigate] = useLocation();
+  const getObjectPosition = useMediaObjectPosition();
 
   const VISIBLE_COUNT = 6;
 
@@ -134,6 +136,7 @@ const PlanYourTrip: React.FC = () => {
                 src={card.image}
                 alt={card.title}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                style={{ objectPosition: getObjectPosition(card.image) }}
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40" />

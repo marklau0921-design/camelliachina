@@ -16,7 +16,7 @@ import { nanoid } from "nanoid";
 import {
   createMediaAsset, listMediaAssets, listHomepageAssets, getActiveHomepageAsset, getActiveBanners,
   setAssetActive, updateAssetSortOrder, updateAssetOpacity, replaceMediaAsset, deleteMediaAsset, getMediaAsset,
-  findMediaAssetUsages,
+  findMediaAssetUsages, updateAssetObjectPositionByUrl, listMediaObjectPositions,
 } from "./db-media";
 import { storagePut, UPLOADS_ROOT, storageDelete } from "./storage";
 import { generateStaticPages, generateNavData, clearStaticCache, STATIC_CACHE_DIR } from "./staticGenerator";
@@ -1162,6 +1162,10 @@ export const appRouter = router({
         return findMediaAssetUsages({ url: input.url });
       }),
 
+    getObjectPositions: publicProcedure.query(async () => {
+      return listMediaObjectPositions();
+    }),
+
     // 列出 Homepage Assets（按类型）
     listByType: publicProcedure
       .input(z.object({ assetType: z.enum(["logo", "banner", "cta", "page_bg"]) }))
@@ -1209,6 +1213,16 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);
         return updateAssetOpacity(input.id, input.opacity);
+      }),
+
+    updateObjectPosition: publicProcedure
+      .input(z.object({
+        url: z.string().min(1),
+        objectPosition: z.string().regex(/^([0-9]|[1-9][0-9]|100)%\s+([0-9]|[1-9][0-9]|100)%$/),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        return updateAssetObjectPositionByUrl(input.url, input.objectPosition);
       }),
 
     replace: publicProcedure

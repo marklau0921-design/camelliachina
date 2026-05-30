@@ -12,6 +12,7 @@ import PlanYourTrip from '@/pages/PlanYourTrip';
 import ResponsiveImage from '@/components/ResponsiveImage';
 import { Link, useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
+import { useMediaObjectPosition } from '@/lib/media-position';
 
 
 /**
@@ -62,6 +63,7 @@ export default function Home() {
 
   // 动态首页资产
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const getObjectPosition = useMediaObjectPosition();
   // 首页管理模块公开数据（hero/intro/stories/sponsors）
   const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
   
@@ -224,6 +226,7 @@ export default function Home() {
                 src={activeBanners[currentSlide % activeBanners.length]}
                 alt="China countryside landscape"
                 className="w-full h-full object-cover object-center"
+                style={{ objectPosition: getObjectPosition(activeBanners[currentSlide % activeBanners.length]) }}
                 onLoad={() => setHeroBannerLoaded(true)}
                 onError={() => setHeroBannerLoaded(false)}
               />
@@ -285,7 +288,7 @@ export default function Home() {
           paddingBottom: '50px',
           backgroundImage: `url(${activeBanners[0]})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: getObjectPosition(activeBanners[0]),
           backgroundAttachment: 'scroll',
         }}
       >
@@ -347,6 +350,7 @@ export default function Home() {
                     src={trip.image}
                     alt={trip.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    style={{ objectPosition: getObjectPosition(trip.image) }}
                     draggable={false}
                     onLoad={() => setTripImagesLoaded(prev => ({ ...prev, [trip.id]: true }))}
                     onError={() => setTripImagesLoaded(prev => ({ ...prev, [trip.id]: false }))}
