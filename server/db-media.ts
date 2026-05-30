@@ -66,8 +66,19 @@ export async function createMediaAsset(data: {
   return { insertId: result?.insertId ?? null };
 }
 
+async function ensureMediaObjectPositionColumn(pool: any) {
+  if (await mediaHasColumn(pool, "objectPosition")) return;
+  try {
+    await pool.execute("ALTER TABLE media_assets ADD COLUMN objectPosition varchar(32) DEFAULT '50% 50%'");
+  } catch (error: any) {
+    if (!String(error?.message ?? "").includes("Duplicate column")) throw error;
+  }
+}
+
 // ─── 查询所有媒体资产（支持搜索）──────────────────────────────────────────────
 export async function listMediaAssets(search?: string, assetType?: MediaAssetType) {
+  const pool = await getPool();
+  if (pool) await ensureMediaObjectPositionColumn(pool);
   const db = await getDb();
   if (!db) return [];
   const filters = [];
@@ -256,10 +267,15 @@ function isValidObjectPosition(position: string) {
   return /^([0-9]|[1-9][0-9]|100)%\s+([0-9]|[1-9][0-9]|100)%$/.test(position.trim());
 }
 
+function filenameFromUrl(url: string) {
+  const clean = url.split("?")[0].split("#")[0];
+  return clean.split("/").filter(Boolean).pop() || "external-image";
+}
+
 export async function updateAssetObjectPositionByUrl(url: string, objectPosition: string) {
   const pool = await getPool();
   if (!pool) return { saved: false };
-  if (!(await mediaHasColumn(pool, "objectPosition"))) return { saved: false };
+  await ensureMediaObjectPositionColumn(pool);
   const position = objectPosition.trim();
   if (!isValidObjectPosition(position)) return { saved: false };
   const needles = getUrlNeedles({ url });
@@ -270,13 +286,36 @@ export async function updateAssetObjectPositionByUrl(url: string, objectPosition
     `UPDATE media_assets SET objectPosition = ? WHERE ${where}`,
     [position, ...params]
   ) as any;
-  return { saved: Number(result?.affectedRows ?? 0) > 0, objectPosition: position };
+  if (Number(result?.affectedRows ?? 0) > 0) {
+    return { saved: true, objectPosition: position };
+  }
+
+  await pool.execute(
+    `INSERT INTO media_assets (url, storageKey, filename, mimeType, fileSize, source, sourceId, sourceLabel, sourceUrl, assetType, isActive, sortOrder, objectPosition)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      url,
+      url.startsWith("/uploads/") ? url.replace(/^\/uploads\/+/, "") : null,
+      filenameFromUrl(url),
+      null,
+      null,
+      "general",
+      null,
+      "Crop settings",
+      null,
+      "general",
+      0,
+      0,
+      position,
+    ]
+  );
+  return { saved: true, objectPosition: position };
 }
 
 export async function listMediaObjectPositions() {
   const pool = await getPool();
   if (!pool) return [];
-  if (!(await mediaHasColumn(pool, "objectPosition"))) return [];
+  await ensureMediaObjectPositionColumn(pool);
   const [rows] = await pool.query(
     "SELECT url, storageKey, objectPosition FROM media_assets WHERE objectPosition IS NOT NULL AND objectPosition <> '50% 50%'"
   );

@@ -293,7 +293,7 @@ export default function ImageCropPreview({
           </div>
           {saveState === "error" && (
             <div style={{ fontSize: 12, color: "#d33", marginTop: 8 }}>
-              Could not save this crop. Make sure the image is in the media library.
+              Could not save this display position. Please try again after the image finishes loading.
             </div>
           )}
         </div>
