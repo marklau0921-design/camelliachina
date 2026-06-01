@@ -40,6 +40,22 @@ const heroSlides: HeroSlide[] = [
   },
 ];
 
+function normalizeHeroImages(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((url): url is string => typeof url === 'string' && url.length > 0);
+  }
+  if (typeof value !== 'string' || value.length === 0) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((url): url is string => typeof url === 'string' && url.length > 0);
+    }
+  } catch {
+    return [value];
+  }
+  return [];
+}
+
 interface Trip {
   id: string | number;
   nights?: number;
@@ -83,9 +99,9 @@ export default function Home() {
   const apiBanners = homepageAssets?.banners as Array<{ url: string; id: number }> | undefined;
   const activeLogo = '';
   // 若 homepage_hero 有 backgroundImage，优先使用；否则回退到 media assets banners
-  const heroBackgroundImage = homepageData?.hero?.backgroundImage;
-  const activeBanners = heroBackgroundImage
-    ? [heroBackgroundImage]
+  const heroBackgroundImages = normalizeHeroImages(homepageData?.hero?.backgroundImage);
+  const activeBanners = heroBackgroundImages.length > 0
+    ? heroBackgroundImages
     : (apiBanners && apiBanners.length > 0) ? apiBanners.map((b) => b.url) : [FALLBACK_BANNER];
   const heroTitle = homepageData?.hero?.title || 'The Immersive China Experts';
   const heroSubtitle = homepageData?.hero?.subtitle || 'Tailor-made experiences, crafted with local insight.';
@@ -207,11 +223,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (activeBanners.length <= 1) return;
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+      setHeroBannerLoaded(false);
+      setCurrentSlide((prev) => (prev + 1) % activeBanners.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [activeBanners.length]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

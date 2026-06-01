@@ -44,6 +44,22 @@ function normalizeLogoUrls(value: unknown): string[] {
   return [];
 }
 
+function normalizeImageUrls(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((url): url is string => typeof url === "string" && url.length > 0);
+  }
+  if (typeof value !== "string" || value.length === 0) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((url): url is string => typeof url === "string" && url.length > 0);
+    }
+  } catch {
+    return [value];
+  }
+  return [];
+}
+
 // ─── Section Header ───────────────────────────────────────────────────────────
 function SectionHeader({ title, visible, onToggle }: { title: string; visible: boolean; onToggle: () => void }) {
   return (
@@ -206,10 +222,10 @@ export default function AdminHomepage() {
   // ── Hero ──────────────────────────────────────────────────────────────────
   const heroQuery = trpc.homepage.getHero.useQuery();
   const updateHero = trpc.homepage.updateHero.useMutation({ onSuccess: () => { heroQuery.refetch(); toast.success("Hero saved"); } });
-  const [heroForm, setHeroForm] = useState<{ title: string; subtitle: string; backgroundImage: string; isVisible: boolean } | null>(null);
+  const [heroForm, setHeroForm] = useState<{ title: string; subtitle: string; backgroundImages: string[]; isVisible: boolean } | null>(null);
 
   const hero = heroQuery.data;
-  const heroEdit = heroForm ?? { title: hero?.title ?? "", subtitle: hero?.subtitle ?? "", backgroundImage: hero?.backgroundImage ?? "", isVisible: hero?.isVisible ?? true };
+  const heroEdit = heroForm ?? { title: hero?.title ?? "", subtitle: hero?.subtitle ?? "", backgroundImages: normalizeImageUrls(hero?.backgroundImage), isVisible: hero?.isVisible ?? true };
   const setHero = (k: string, v: any) => setHeroForm(f => ({ ...(f ?? heroEdit), [k]: v }));
 
   // ── Intro ─────────────────────────────────────────────────────────────────
@@ -386,8 +402,8 @@ export default function AdminHomepage() {
           visible={heroEdit.isVisible}
           onToggle={() => { setHero("isVisible", !heroEdit.isVisible); updateHero.mutate({ isVisible: !heroEdit.isVisible }); }}
         />
-        <Field label="Background Image">
-          <ImageUploader value={heroEdit.backgroundImage} onChange={v => setHero("backgroundImage", v ?? "")} category="homepage" />
+        <Field label="Background Images">
+          <MultiImageUploader value={heroEdit.backgroundImages} onChange={v => setHero("backgroundImages", v)} category="homepage" label="" />
         </Field>
         <Field label="Main Title">
           <input style={inputStyle} value={heroEdit.title} onChange={e => setHero("title", e.target.value)} placeholder="The Immersive China Experts" />
@@ -396,7 +412,7 @@ export default function AdminHomepage() {
           <input style={inputStyle} value={heroEdit.subtitle} onChange={e => setHero("subtitle", e.target.value)} placeholder="Tailor-made experiences, crafted with local insight." />
         </Field>
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
-          <button style={btnPrimary} onClick={() => updateHero.mutate({ title: heroEdit.title, subtitle: heroEdit.subtitle, backgroundImage: heroEdit.backgroundImage || null, isVisible: heroEdit.isVisible })}>
+          <button style={btnPrimary} onClick={() => updateHero.mutate({ title: heroEdit.title, subtitle: heroEdit.subtitle, backgroundImage: heroEdit.backgroundImages.length > 0 ? JSON.stringify(heroEdit.backgroundImages) : null, isVisible: heroEdit.isVisible })}>
             Save Hero
           </button>
         </div>
