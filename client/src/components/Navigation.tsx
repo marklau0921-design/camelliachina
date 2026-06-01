@@ -105,10 +105,10 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
       route: `/destinations/${city.slug}`,
       experiences: city.experiences
         .filter(e => e.name)
-        .map(e => e.title || e.name || ''),
+        .map(e => e.name || ''),
       experienceRoutes: city.experiences
         .filter(e => e.slug && e.typeName)
-        .map(e => ({ label: e.title || e.name || '', route: `/experiences/${toSlug(e.typeName || '')}/${e.slug}` })),
+        .map(e => ({ label: e.name || '', route: `/experiences/${toSlug(e.typeName || '')}/${e.slug}` })),
     }));
   }, [citiesData]);
 
