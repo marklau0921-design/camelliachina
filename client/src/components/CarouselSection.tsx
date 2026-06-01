@@ -10,6 +10,21 @@ interface CarouselItem {
   videoId?: string;
 }
 
+function extractYouTubeId(value?: string) {
+  const input = (value ?? '').trim();
+  if (!input) return '';
+  if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    /[?&]v=([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const pattern of patterns) {
+    const match = input.match(pattern);
+    if (match?.[1]) return match[1];
+  }
+  return input;
+}
+
 
 
 // ── Shared drag/scroll logic ──────────────────────────────────────────────────
@@ -139,21 +154,23 @@ function StoriesStrip({
       } as React.CSSProperties}
     >
       <div style={{ display: 'flex', flexDirection: 'row', gap: '24px', alignItems: 'flex-start', minWidth: 'max-content', paddingBottom: '8px' }}>
-        {items.map((item) => (
+        {items.map((item) => {
+            const videoId = extractYouTubeId(item.videoId);
+            return (
           <div
             key={item.id}
             className="relative group overflow-hidden flex-shrink-0"
             style={{ width: '600px', aspectRatio: '16/9', userSelect: 'none' }}
           >
-            {showPlayButton && item.videoId ? (
+            {showPlayButton && videoId ? (
               <>
                 <img
-                  src={`https://img.youtube.com/vi/${item.videoId}/maxresdefault.jpg`}
+                  src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
                   alt={item.name}
                   className="w-full h-full object-cover select-none"
                   draggable={false}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg`;
+                    (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
                   }}
                 />
                 {/* Overlay */}
@@ -162,7 +179,7 @@ function StoriesStrip({
                 <div className="absolute inset-0 flex items-center justify-center">
                   <button
                     onClick={() => {
-                      if (!localDragRef.current && item.videoId && onPlayVideo) onPlayVideo(item.videoId);
+                      if (!localDragRef.current && videoId && onPlayVideo) onPlayVideo(videoId);
                     }}
                     className="w-16 h-16 rounded-full bg-[#F5F3EF]/90 group-hover:bg-[#F5F3EF] transition-all duration-300 flex items-center justify-center cursor-pointer hover:scale-110"
                   >
@@ -175,19 +192,20 @@ function StoriesStrip({
             ) : (
               /* Image-only card: no overlay, no play button */
               <img
-                src={item.videoId
-                  ? `https://img.youtube.com/vi/${item.videoId}/maxresdefault.jpg`
+                src={videoId
+                  ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
                   : item.image}
                 alt={item.name}
                 className="w-full h-full object-cover select-none"
                 draggable={false}
-                onError={item.videoId ? (e) => {
-                  (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg`;
+                onError={videoId ? (e) => {
+                  (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
                 } : undefined}
               />
             )}
           </div>
-        ))}
+            );
+          })}
       </div>
     </div>
   );

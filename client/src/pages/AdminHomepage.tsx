@@ -26,6 +26,22 @@ interface SponsorForm {
 const emptyVideoStory: VideoStoryForm = { title: "", youtubeId: "", thumbnailUrl: "", isVisible: true, sortOrder: 0 };
 const emptySponsor: SponsorForm = { name: "", logoUrls: [], websiteUrl: "", isVisible: true, sortOrder: 0 };
 
+function extractYouTubeId(value: string) {
+  const input = value.trim();
+  if (!input) return "";
+  const directId = input.match(/^[a-zA-Z0-9_-]{11}$/);
+  if (directId) return input;
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    /[?&]v=([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const pattern of patterns) {
+    const match = input.match(pattern);
+    if (match?.[1]) return match[1];
+  }
+  return input;
+}
+
 function normalizeLogoUrls(value: unknown): string[] {
   if (Array.isArray(value)) {
     return value.filter((url): url is string => typeof url === "string" && url.length > 0);
@@ -138,10 +154,11 @@ function VideoStoryModal({ initial, onSave, onClose }: {
 }) {
   const [form, setForm] = useState<VideoStoryForm>(initial ?? emptyVideoStory);
   const set = (k: keyof VideoStoryForm, v: any) => setForm(f => ({ ...f, [k]: v }));
+  const parsedVideoId = extractYouTubeId(form.youtubeId);
 
   // Auto-derive YouTube thumbnail when youtubeId changes
-  const youtubeThumbnail = form.youtubeId
-    ? `https://img.youtube.com/vi/${form.youtubeId}/maxresdefault.jpg`
+  const youtubeThumbnail = parsedVideoId
+    ? `https://img.youtube.com/vi/${parsedVideoId}/maxresdefault.jpg`
     : "";
 
   return (
@@ -153,24 +170,24 @@ function VideoStoryModal({ initial, onSave, onClose }: {
         <Field label="Title (internal label)">
           <input style={inputStyle} value={form.title} onChange={e => set("title", e.target.value)} placeholder="e.g. Guilin Journey" />
         </Field>
-        <Field label="YouTube Video ID">
+        <Field label="YouTube Link or Video ID">
           <input
             style={inputStyle}
             value={form.youtubeId}
             onChange={e => set("youtubeId", e.target.value)}
-            placeholder="e.g. dQw4w9WgXcQ"
+            placeholder="Paste a YouTube link or 11-character video ID"
           />
-          {form.youtubeId && (
+          {parsedVideoId && (
             <div style={{ marginTop: 8 }}>
               <div style={{ fontSize: 12, color: "#888", fontFamily: "Lato, sans-serif", marginBottom: 6 }}>
-                Auto-fetched cover:
+                Auto-fetched cover: {parsedVideoId}
               </div>
               <img
                 src={youtubeThumbnail}
                 alt="YouTube thumbnail"
                 style={{ width: "100%", maxWidth: 320, height: "auto", borderRadius: 4, border: "1px solid #eee" }}
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${form.youtubeId}/hqdefault.jpg`;
+                  (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${parsedVideoId}/hqdefault.jpg`;
                 }}
               />
             </div>
@@ -187,7 +204,7 @@ function VideoStoryModal({ initial, onSave, onClose }: {
         </Field>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 8 }}>
           <button style={btnSecondary} onClick={onClose}>Cancel</button>
-          <button style={btnPrimary} onClick={() => { if (!form.title) return; onSave({ ...form, id: initial?.id }); }}>Save</button>
+          <button style={btnPrimary} onClick={() => { if (!form.title) return; onSave({ ...form, youtubeId: parsedVideoId, id: initial?.id }); }}>Save</button>
         </div>
       </div>
     </div>
@@ -376,10 +393,12 @@ export default function AdminHomepage() {
   };
 
   const handleVideoStorySave = (data: VideoStoryForm & { id?: number }) => {
+    const youtubeId = extractYouTubeId(data.youtubeId);
+    const thumbnailUrl = youtubeId ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg` : undefined;
     if (data.id) {
-      updateVideoStory.mutate({ id: data.id, title: data.title, youtubeId: data.youtubeId || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
+      updateVideoStory.mutate({ id: data.id, title: data.title, youtubeId: youtubeId || undefined, thumbnailUrl, isVisible: data.isVisible, sortOrder: data.sortOrder });
     } else {
-      createVideoStory.mutate({ title: data.title, type: "video", youtubeId: data.youtubeId || undefined, isVisible: data.isVisible, sortOrder: data.sortOrder });
+      createVideoStory.mutate({ title: data.title, type: "video", youtubeId: youtubeId || undefined, thumbnailUrl, isVisible: data.isVisible, sortOrder: data.sortOrder });
     }
   };
 
@@ -590,16 +609,16 @@ export default function AdminHomepage() {
           )}
           {videoStories.map(s => (
             <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", border: "1px solid #f0f0f0", borderRadius: 6, background: "#fafafa" }}>
-              {s.videoId && (
+              {extractYouTubeId(s.videoId ?? "") && (
                 <img
-                  src={`https://img.youtube.com/vi/${s.videoId}/mqdefault.jpg`}
+                  src={`https://img.youtube.com/vi/${extractYouTubeId(s.videoId ?? "")}/mqdefault.jpg`}
                   alt={s.name}
                   style={{ width: 80, height: 50, objectFit: "cover", borderRadius: 4, flexShrink: 0 }}
                 />
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontFamily: "Lato, sans-serif", fontSize: 13, fontWeight: 600, color: "#1a1a1a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.name}</div>
-                {s.videoId && <div style={{ fontFamily: "Lato, sans-serif", fontSize: 11, color: "#888", marginTop: 2 }}>YouTube: {s.videoId}</div>}
+                {extractYouTubeId(s.videoId ?? "") && <div style={{ fontFamily: "Lato, sans-serif", fontSize: 11, color: "#888", marginTop: 2 }}>YouTube: {extractYouTubeId(s.videoId ?? "")}</div>}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
                 <span style={{ fontSize: 11, color: s.isVisible ? "#F5569B" : "#aaa", fontFamily: "Lato, sans-serif", fontWeight: 600 }}>
