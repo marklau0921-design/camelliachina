@@ -3,7 +3,7 @@ import { useLocation, useParams } from "wouter";
 import AdminLayout from "@/components/AdminLayout";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { ChevronUp, ChevronDown, Pencil, Trash2, Plus, ArrowLeft, ArrowRight } from "lucide-react";
+import { Pencil, Trash2, Plus, ArrowLeft, ArrowRight, GripVertical } from "lucide-react";
 
 // ─── New Experience Modal ─────────────────────────────────────────────────────
 function NewExperienceModal({
@@ -101,6 +101,7 @@ export default function AdminExperiencesByType() {
   const [, navigate] = useLocation();
   const [showModal, setShowModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [draggedExperienceId, setDraggedExperienceId] = useState<number | null>(null);
 
   const { data: type } = trpc.admin.getExperienceType.useQuery({ id: typeId }, { enabled: !!typeId });
   const { data: experiences = [], refetch, isLoading } = trpc.admin.listExperiencesByType.useQuery({ typeId }, { enabled: !!typeId });
@@ -118,16 +119,26 @@ export default function AdminExperiencesByType() {
     }
   }
 
-  async function handleReorder(id: number, direction: "up" | "down") {
-    const idx = experiences.findIndex(e => e.id === id);
-    if (idx < 0) return;
-    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
-    if (swapIdx < 0 || swapIdx >= experiences.length) return;
-    const current = experiences[idx];
-    const swap = experiences[swapIdx];
-    await reorderMut.mutateAsync({ id: current.id, sortOrder: swap.sortOrder ?? swapIdx });
-    await reorderMut.mutateAsync({ id: swap.id, sortOrder: current.sortOrder ?? idx });
-    refetch();
+  async function handleExperienceDrop(targetId: number) {
+    if (!draggedExperienceId || draggedExperienceId === targetId) {
+      setDraggedExperienceId(null);
+      return;
+    }
+    const fromIndex = experiences.findIndex(e => e.id === draggedExperienceId);
+    const toIndex = experiences.findIndex(e => e.id === targetId);
+    if (fromIndex < 0 || toIndex < 0) {
+      setDraggedExperienceId(null);
+      return;
+    }
+    const next = [...experiences];
+    const [moved] = next.splice(fromIndex, 1);
+    next.splice(toIndex, 0, moved);
+    try {
+      await Promise.all(next.map((experience, index) => reorderMut.mutateAsync({ id: experience.id, sortOrder: index })));
+      refetch();
+    } finally {
+      setDraggedExperienceId(null);
+    }
   }
 
   return (
@@ -191,28 +202,34 @@ export default function AdminExperiencesByType() {
             {experiences.map((exp, idx) => (
               <div
                 key={exp.id}
+                draggable
+                onDragStart={e => {
+                  setDraggedExperienceId(exp.id);
+                  e.dataTransfer.effectAllowed = "move";
+                  e.dataTransfer.setData("text/plain", String(exp.id));
+                }}
+                onDragOver={e => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
+                }}
+                onDrop={e => {
+                  e.preventDefault();
+                  handleExperienceDrop(exp.id);
+                }}
+                onDragEnd={() => setDraggedExperienceId(null)}
                 style={{
                   display: "flex", alignItems: "center", padding: "14px 20px",
                   background: idx % 2 === 0 ? "#f2f2f2" : "#e8e8e8",
                   borderBottom: "1px solid rgba(0,0,0,0.04)",
+                  cursor: "grab",
+                  opacity: draggedExperienceId === exp.id ? 0.55 : 1,
+                  outline: draggedExperienceId === exp.id ? "2px solid #F5569B" : "none",
+                  outlineOffset: -2,
                 }}
               >
-                {/* Reorder */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginRight: "12px", flexShrink: 0 }}>
-                  <button
-                    onClick={() => handleReorder(exp.id, "up")}
-                    disabled={idx === 0}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "#bbb", padding: "2px", opacity: idx === 0 ? 0.2 : 1 }}
-                  >
-                    <ChevronUp size={14} />
-                  </button>
-                  <button
-                    onClick={() => handleReorder(exp.id, "down")}
-                    disabled={idx === experiences.length - 1}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "#bbb", padding: "2px", opacity: idx === experiences.length - 1 ? 0.2 : 1 }}
-                  >
-                    <ChevronDown size={14} />
-                  </button>
+                {/* Drag handle */}
+                <div title="Drag to reorder" style={{ width: "48px", display: "flex", alignItems: "center", color: "#aaa", flexShrink: 0 }}>
+                  <GripVertical size={15} />
                 </div>
 
                 {/* Name — click to edit */}

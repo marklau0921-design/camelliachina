@@ -57,10 +57,21 @@ export async function deleteTag(id: number) {
 export async function listCities(includeInactive = false) {
   const db = await getDb();
   if (!db) return [];
-  if (!includeInactive) {
-    return await db.select().from(cities).where(eq(cities.isActive, true)).orderBy(cities.sortOrder, cities.name);
-  }
-  return await db.select().from(cities).orderBy(cities.sortOrder, cities.name);
+  const cityRows = includeInactive
+    ? await db.select().from(cities).orderBy(cities.sortOrder, cities.name)
+    : await db.select().from(cities).where(eq(cities.isActive, true)).orderBy(cities.sortOrder, cities.name);
+  const counts = await db
+    .select({
+      cityId: cityExperiences.cityId,
+      experienceCount: sql<number>`count(*)`.mapWith(Number),
+    })
+    .from(cityExperiences)
+    .groupBy(cityExperiences.cityId);
+  const countByCity = new Map(counts.map(row => [row.cityId, row.experienceCount]));
+  return cityRows.map(city => ({
+    ...city,
+    experienceCount: countByCity.get(city.id) ?? 0,
+  }));
 }
 
 export async function listCitiesWithExperiences() {
@@ -166,6 +177,12 @@ export async function deleteCity(id: number) {
   if (!db) throw new Error("DB unavailable");
   await db.delete(cityExperiences).where(eq(cityExperiences.cityId, id));
   await db.delete(cities).where(eq(cities.id, id));
+}
+
+export async function reorderCity(id: number, newSortOrder: number) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.update(cities).set({ sortOrder: newSortOrder }).where(eq(cities.id, id));
 }
 
 // ─── City Experiences (城市与体验项目的关联) ────────────────────────────────────────────────────────────────

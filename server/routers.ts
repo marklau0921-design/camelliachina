@@ -22,7 +22,7 @@ import { storagePut, UPLOADS_ROOT, storageDelete } from "./storage";
 import { generateStaticPages, generateNavData, clearStaticCache, STATIC_CACHE_DIR } from "./staticGenerator";
 import {
   listTags, createTag, updateTag, deleteTag,
-  listCities, getCityById, createCity, updateCity, deleteCity, listCitiesWithExperiences,
+  listCities, getCityById, createCity, updateCity, deleteCity, reorderCity, listCitiesWithExperiences,
   listCityExperiences, addCityExperience, updateCityExperience, removeCityExperience,
   listCityWhatToSee, addCityWhatToSee, updateCityWhatToSee, removeCityWhatToSee,
   // Experience types (第一层)
@@ -368,6 +368,14 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);
         await deleteCity(input.id);
+        return { success: true };
+      }),
+
+    reorderCity: publicProcedure
+      .input(z.object({ id: z.number(), sortOrder: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        await reorderCity(input.id, input.sortOrder);
         return { success: true };
       }),
 

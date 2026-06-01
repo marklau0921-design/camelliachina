@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import AdminLayout from "@/components/AdminLayout";
 import ImageUploader from "@/components/ImageUploader";
-import { Plus, Edit2, Trash2, X, Check, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Check, ArrowRight, GripVertical } from "lucide-react";
 
 const ACCENT = "#F5569B";
 
@@ -15,6 +15,7 @@ type City = {
   coverImage: string | null;
   sortOrder: number | null;
   isActive: boolean;
+  experienceCount?: number;
 };
 
 const emptyForm = { name: "", slug: "", description: "", coverImage: "", sortOrder: 0, isActive: true };
@@ -82,18 +83,7 @@ function CityForm({
             label="Cover Image"
           />
         </div>
-        {/* Sort order + active */}
-        <div>
-          <label style={labelStyle}>Sort Order</label>
-          <input
-            type="number"
-            value={form.sortOrder}
-            onChange={e => set("sortOrder", parseInt(e.target.value) || 0)}
-            style={inputStyle}
-            onFocus={e => { e.target.style.borderColor = ACCENT; }}
-            onBlur={e => { e.target.style.borderColor = "#ddd"; }}
-          />
-        </div>
+        {/* Active */}
         <div style={{ display: "flex", alignItems: "flex-end", paddingBottom: "2px" }}>
           <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
             <input
@@ -141,10 +131,12 @@ export default function AdminCities() {
   const createCity = trpc.admin.createCity.useMutation({ onSuccess: () => { utils.admin.listCities.invalidate(); setShowForm(false); } });
   const updateCity = trpc.admin.updateCity.useMutation({ onSuccess: () => { utils.admin.listCities.invalidate(); setEditId(null); } });
   const deleteCity = trpc.admin.deleteCity.useMutation({ onSuccess: () => utils.admin.listCities.invalidate() });
+  const reorderCity = trpc.admin.reorderCity.useMutation({ onSuccess: () => utils.admin.listCities.invalidate() });
 
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [draggedCityId, setDraggedCityId] = useState<number | null>(null);
 
   const handleCreate = (data: typeof emptyForm) => {
     createCity.mutate({ ...data, sortOrder: data.sortOrder ?? 0 });
@@ -152,6 +144,27 @@ export default function AdminCities() {
 
   const handleUpdate = (id: number, data: typeof emptyForm) => {
     updateCity.mutate({ id, ...data, sortOrder: data.sortOrder ?? 0 });
+  };
+
+  const handleCityDrop = async (targetId: number) => {
+    if (!draggedCityId || draggedCityId === targetId) {
+      setDraggedCityId(null);
+      return;
+    }
+    const fromIndex = cities.findIndex(city => city.id === draggedCityId);
+    const toIndex = cities.findIndex(city => city.id === targetId);
+    if (fromIndex < 0 || toIndex < 0) {
+      setDraggedCityId(null);
+      return;
+    }
+    const next = [...cities];
+    const [moved] = next.splice(fromIndex, 1);
+    next.splice(toIndex, 0, moved);
+    try {
+      await Promise.all(next.map((city, index) => reorderCity.mutateAsync({ id: city.id, sortOrder: index })));
+    } finally {
+      setDraggedCityId(null);
+    }
   };
 
   return (
@@ -211,10 +224,11 @@ export default function AdminCities() {
           <div style={{ background: "#fff", border: "1px solid #eee" }}>
             {/* Header row */}
             <div style={{ display: "flex", alignItems: "center", padding: "10px 20px", background: "#e8e8e8", borderBottom: "1px solid #d8d8d8" }}>
+              <span style={{ width: "36px" }} />
               <span style={{ flex: 1, fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#888" }}>City</span>
+              <span style={{ width: "110px", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#888", textAlign: "center" }}>Experiences</span>
               <span style={{ width: "80px", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#888", textAlign: "center" }}>Status</span>
-              <span style={{ width: "80px", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#888", textAlign: "center" }}>Order</span>
-              <span style={{ width: "100px" }} />
+              <span style={{ width: "220px" }} />
             </div>
 
             {cities.map((city, idx) => {
@@ -244,8 +258,32 @@ export default function AdminCities() {
               return (
                 <div
                   key={city.id}
-                  style={{ display: "flex", alignItems: "center", padding: "14px 20px", background: bg, borderBottom: "1px solid rgba(0,0,0,0.04)" }}
+                  draggable
+                  onDragStart={e => {
+                    setDraggedCityId(city.id);
+                    e.dataTransfer.effectAllowed = "move";
+                    e.dataTransfer.setData("text/plain", String(city.id));
+                  }}
+                  onDragOver={e => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = "move";
+                  }}
+                  onDrop={e => {
+                    e.preventDefault();
+                    handleCityDrop(city.id);
+                  }}
+                  onDragEnd={() => setDraggedCityId(null)}
+                  style={{
+                    display: "flex", alignItems: "center", padding: "14px 20px", background: bg, borderBottom: "1px solid rgba(0,0,0,0.04)",
+                    cursor: "grab",
+                    opacity: draggedCityId === city.id ? 0.55 : 1,
+                    outline: draggedCityId === city.id ? "2px solid #F5569B" : "none",
+                    outlineOffset: -2,
+                  }}
                 >
+                  <div title="Drag to reorder" style={{ width: "36px", display: "flex", alignItems: "center", color: "#aaa", flexShrink: 0 }}>
+                    <GripVertical size={15} />
+                  </div>
                   {/* Cover thumb */}
                   <div style={{ width: "48px", height: "32px", background: "#ddd", marginRight: "14px", flexShrink: 0, overflow: "hidden" }}>
                     {city.coverImage && (
@@ -257,15 +295,15 @@ export default function AdminCities() {
                     <div style={{ fontSize: "14px", color: "#1a1a1a" }}>{city.name}</div>
                     <div style={{ fontSize: "11px", color: "#aaa", marginTop: "2px" }}>/{city.slug}</div>
                   </div>
+                  {/* Experience count */}
+                  <div style={{ width: "110px", textAlign: "center", fontSize: "12px", color: "#888", letterSpacing: "0.04em" }}>
+                    {city.experienceCount ?? 0}
+                  </div>
                   {/* Status */}
                   <div style={{ width: "80px", textAlign: "center" }}>
                     <span style={{ fontSize: "11px", color: city.isActive ? "#4caf50" : "#aaa", letterSpacing: "0.05em" }}>
                       {city.isActive ? "Active" : "Hidden"}
                     </span>
-                  </div>
-                  {/* Sort */}
-                  <div style={{ width: "80px", textAlign: "center", fontSize: "13px", color: "#888" }}>
-                    {city.sortOrder ?? 0}
                   </div>
                   {/* Experiences entry */}
                   <div style={{ width: "120px", display: "flex", justifyContent: "center" }}>

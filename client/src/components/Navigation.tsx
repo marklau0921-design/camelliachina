@@ -76,15 +76,19 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
   const { data: aboutSections } = trpc.about.listPublicSections.useQuery();
   const categories: ExperienceCategory[] = useMemo(() => {
     if (!navData || navData.length === 0) return [];
-    return navData.map(type => ({
-      id: String(type.id),
-      name: type.name,
-      previewImage: type.coverImage || '',
-      items: type.items.map(item => ({
-        label: item.name,
-        route: `/experiences/${toSlug(type.name)}/${item.slug}`,
-      })),
-    }));
+    return navData
+      .map(type => ({
+        id: String(type.id),
+        name: type.name,
+        previewImage: type.coverImage || '',
+        items: type.items
+          .filter(item => item.name && item.slug)
+          .map(item => ({
+            label: item.name,
+            route: `/experiences/${toSlug(type.name)}/${item.slug}`,
+          })),
+      }))
+      .filter(type => type.items.length > 0);
   }, [navData]);
   const aboutItems: AboutMenuItem[] = useMemo(() => {
     if (!aboutSections) return DEFAULT_ABOUT_ITEMS;
@@ -98,34 +102,43 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
   const { data: citiesData } = trpc.cms.listCitiesWithExperiences.useQuery();
   const activeDestinations: Destination[] = useMemo(() => {
     if (!citiesData) return []; // 加载中 → 空数组，不显示静态数据
-    return citiesData.map(city => ({
-      id: String(city.id),
-      name: city.name,
-      previewImage: city.coverImage || '',
-      route: `/destinations/${city.slug}`,
-      experiences: city.experiences
-        .filter(e => e.name)
-        .map(e => e.name || ''),
-      experienceRoutes: city.experiences
-        .filter(e => e.slug && e.typeName)
-        .map(e => ({ label: e.name || '', route: `/experiences/${toSlug(e.typeName || '')}/${e.slug}` })),
-    }));
+    return citiesData
+      .map(city => {
+        const experienceRoutes = city.experiences
+          .filter(e => e.name && e.slug && e.typeName)
+          .map(e => ({ label: e.name || '', route: `/experiences/${toSlug(e.typeName || '')}/${e.slug}` }));
+        return {
+          id: String(city.id),
+          name: city.name,
+          previewImage: city.coverImage || '',
+          route: `/destinations/${city.slug}`,
+          experiences: experienceRoutes.map(e => e.label),
+          experienceRoutes,
+        };
+      })
+      .filter(city => city.experienceRoutes.length > 0);
   }, [citiesData]);
 
   const [activeDestination, setActiveDestination] = useState<Destination | null>(null);
 
   // 当动态数据加载完成后，默认选中第一个
   useEffect(() => {
-    if (activeDestinations.length > 0 && !activeDestination) {
+    if (activeDestinations.length > 0 && (!activeDestination || !activeDestinations.some(dest => dest.id === activeDestination.id))) {
       setActiveDestination(activeDestinations[0]);
     }
-  }, [activeDestinations]);
+  }, [activeDestinations, activeDestination]);
   const [activeCategory, setActiveCategory] = useState<ExperienceCategory | null>(null);
   const [destPortraitPage, setDestPortraitPage] = useState<1 | 2>(1);
   const [expPortraitPage, setExpPortraitPage] = useState<1 | 2>(1);
 
   // 当 categories 加载完成后，默认选中第一个
   const effectiveCategory = activeCategory ?? categories[0] ?? null;
+
+  useEffect(() => {
+    if (categories.length > 0 && activeCategory && !categories.some(category => category.id === activeCategory.id)) {
+      setActiveCategory(null);
+    }
+  }, [categories, activeCategory]);
 
   const anyOverlayOpen = activeMenu !== null;
 

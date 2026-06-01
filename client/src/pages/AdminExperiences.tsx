@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import AdminLayout from "@/components/AdminLayout";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { ChevronUp, ChevronDown, Pencil, Trash2, Plus, ArrowRight, Upload, X } from "lucide-react";
+import { Pencil, Trash2, Plus, ArrowRight, Upload, X, GripVertical } from "lucide-react";
 
 // ─── Type Form Modal ──────────────────────────────────────────────────────────
 function TypeFormModal({
@@ -221,6 +221,7 @@ export default function AdminExperiences() {
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<{ id: number; name: string; coverImage?: string | null; sortOrder?: number | null } | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [draggedTypeId, setDraggedTypeId] = useState<number | null>(null);
 
   const { data: types = [], refetch, isLoading } = trpc.admin.listExperienceTypes.useQuery();
   const deleteMut = trpc.admin.deleteExperienceType.useMutation();
@@ -237,17 +238,26 @@ export default function AdminExperiences() {
     }
   }
 
-  async function handleReorder(id: number, direction: "up" | "down") {
-    const idx = types.findIndex(t => t.id === id);
-    if (idx < 0) return;
-    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
-    if (swapIdx < 0 || swapIdx >= types.length) return;
-    const current = types[idx];
-    const swap = types[swapIdx];
-    // 使用实际索引作为排序值，确保唯一性
-    await reorderMut.mutateAsync({ id: current.id, sortOrder: swapIdx });
-    await reorderMut.mutateAsync({ id: swap.id, sortOrder: idx });
-    refetch();
+  async function handleTypeDrop(targetId: number) {
+    if (!draggedTypeId || draggedTypeId === targetId) {
+      setDraggedTypeId(null);
+      return;
+    }
+    const fromIndex = types.findIndex(t => t.id === draggedTypeId);
+    const toIndex = types.findIndex(t => t.id === targetId);
+    if (fromIndex < 0 || toIndex < 0) {
+      setDraggedTypeId(null);
+      return;
+    }
+    const next = [...types];
+    const [moved] = next.splice(fromIndex, 1);
+    next.splice(toIndex, 0, moved);
+    try {
+      await Promise.all(next.map((type, index) => reorderMut.mutateAsync({ id: type.id, sortOrder: index })));
+      refetch();
+    } finally {
+      setDraggedTypeId(null);
+    }
   }
 
   return (
@@ -305,28 +315,34 @@ export default function AdminExperiences() {
             {types.map((type, idx) => (
               <div
                 key={type.id}
+                draggable
+                onDragStart={e => {
+                  setDraggedTypeId(type.id);
+                  e.dataTransfer.effectAllowed = "move";
+                  e.dataTransfer.setData("text/plain", String(type.id));
+                }}
+                onDragOver={e => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
+                }}
+                onDrop={e => {
+                  e.preventDefault();
+                  handleTypeDrop(type.id);
+                }}
+                onDragEnd={() => setDraggedTypeId(null)}
                 style={{
                   display: "flex", alignItems: "center", padding: "14px 20px",
                   background: idx % 2 === 0 ? "#f2f2f2" : "#e8e8e8",
                   borderBottom: "1px solid rgba(0,0,0,0.04)",
+                  cursor: "grab",
+                  opacity: draggedTypeId === type.id ? 0.55 : 1,
+                  outline: draggedTypeId === type.id ? "2px solid #F5569B" : "none",
+                  outlineOffset: -2,
                 }}
               >
-                {/* Reorder buttons */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginRight: "12px", flexShrink: 0 }}>
-                  <button
-                    onClick={() => handleReorder(type.id, "up")}
-                    disabled={idx === 0}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "#bbb", padding: "2px", opacity: idx === 0 ? 0.2 : 1 }}
-                  >
-                    <ChevronUp size={14} />
-                  </button>
-                  <button
-                    onClick={() => handleReorder(type.id, "down")}
-                    disabled={idx === types.length - 1}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "#bbb", padding: "2px", opacity: idx === types.length - 1 ? 0.2 : 1 }}
-                  >
-                    <ChevronDown size={14} />
-                  </button>
+                {/* Drag handle */}
+                <div title="Drag to reorder" style={{ width: "48px", display: "flex", alignItems: "center", color: "#aaa", flexShrink: 0 }}>
+                  <GripVertical size={15} />
                 </div>
 
                 {/* Name — click to enter type */}
