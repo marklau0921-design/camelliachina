@@ -277,7 +277,7 @@ export default function Home() {
             <h1
               style={{
                 fontFamily: "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)",
-                fontSize: 'clamp(54px, 9vw, 116px)',
+                fontSize: 'clamp(36px, 6vw, 77px)',
                 fontWeight: 400,
                 letterSpacing: '0.045em',
                 lineHeight: 0.88,
@@ -291,7 +291,7 @@ export default function Home() {
             <p
               style={{
                 fontFamily: "var(--font-travel-sans, 'Cabin', 'Josefin Sans', 'Helvetica Neue', Arial, sans-serif)",
-                fontSize: 'clamp(15px, 1.55vw, 21px)',
+                fontSize: 'clamp(10px, 1.03vw, 14px)',
                 fontWeight: 500,
                 letterSpacing: '0.13em',
                 lineHeight: 1.45,

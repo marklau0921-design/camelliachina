@@ -145,7 +145,7 @@ const PlanYourTrip: React.FC = () => {
                   className="text-white text-center"
                   style={{
                     fontFamily: "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)",
-                    fontSize: 'clamp(38px, 4.3vw, 56px)',
+                    fontSize: 'clamp(25px, 2.87vw, 37px)',
                     fontWeight: 400,
                     letterSpacing: '0.06em',
                     lineHeight: 0.95,
