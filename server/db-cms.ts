@@ -112,6 +112,7 @@ export async function listCitiesWithExperiences() {
     name: city.name,
     slug: city.slug,
     coverImage: city.coverImage,
+    cityCardImage: city.cityCardImage,
     experiences: expsByCityId.get(city.id) || [],
   }));
 }

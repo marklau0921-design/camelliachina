@@ -110,7 +110,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
         return {
           id: String(city.id),
           name: city.name,
-          previewImage: city.coverImage || '',
+          previewImage: city.cityCardImage || city.coverImage || '',
           route: `/destinations/${city.slug}`,
           experiences: experienceRoutes.map(e => e.label),
           experienceRoutes,
