@@ -614,7 +614,7 @@ export default function CityPage() {
         <div className="mx-auto px-4 md:px-8" style={{ maxWidth: '1320px' }}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Card 1 */}
-            <div className="flex flex-col bg-gray-100" style={{ height: '600px' }}>
+            <div className="flex flex-col bg-gray-100" style={{ minHeight: '600px' }}>
               {(city as any).culinaryTravelSmall1Image && (
                 <img
                   src={(city as any).culinaryTravelSmall1Image}
@@ -623,7 +623,7 @@ export default function CityPage() {
                   style={{ height: '390px', objectFit: 'cover', objectPosition: getObjectPosition((city as any).culinaryTravelSmall1Image) }}
                 />
               )}
-              <div className="p-6" style={{ height: '210px', overflow: 'hidden' }}>
+              <div className="p-6" style={{ minHeight: '210px' }}>
                 <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-4" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
                   {(city as any).culinaryTravelSmall1Title || ''}
                 </h3>
@@ -634,7 +634,7 @@ export default function CityPage() {
             </div>
 
             {/* Card 2 */}
-            <div className="flex flex-col bg-gray-100" style={{ height: '600px' }}>
+            <div className="flex flex-col bg-gray-100" style={{ minHeight: '600px' }}>
               {(city as any).culinaryTravelSmall2Image && (
                 <img
                   src={(city as any).culinaryTravelSmall2Image}
@@ -643,7 +643,7 @@ export default function CityPage() {
                   style={{ height: '390px', objectFit: 'cover', objectPosition: getObjectPosition((city as any).culinaryTravelSmall2Image) }}
                 />
               )}
-              <div className="p-6" style={{ height: '210px', overflow: 'hidden' }}>
+              <div className="p-6" style={{ minHeight: '210px' }}>
                 <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-4" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
                   {(city as any).culinaryTravelSmall2Title || ''}
                 </h3>
