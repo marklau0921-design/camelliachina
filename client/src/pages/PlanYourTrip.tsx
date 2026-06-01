@@ -14,7 +14,7 @@ interface TravelCard {
 }
 
 const PlanYourTrip: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'destination' | 'experience'>('destination');
+  const [activeTab, setActiveTab] = useState<'destination' | 'experience'>('experience');
   const [showAll, setShowAll] = useState(false);
   const [, navigate] = useLocation();
   const getObjectPosition = useMediaObjectPosition();
@@ -60,8 +60,8 @@ const PlanYourTrip: React.FC = () => {
   const travelCards = [...destinationCards, ...experienceCards];
 
   const tabs: { key: 'destination' | 'experience'; label: string }[] = [
-    { key: 'destination', label: 'BY DESTINATION' },
     { key: 'experience', label: 'BY EXPERIENCE' },
+    { key: 'destination', label: 'BY DESTINATION' },
   ];
 
   const filteredCards = travelCards.filter(c => c.category === activeTab);
