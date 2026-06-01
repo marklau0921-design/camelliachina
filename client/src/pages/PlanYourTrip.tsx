@@ -141,7 +141,18 @@ const PlanYourTrip: React.FC = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40" />
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-                <h3 className="text-white text-2xl md:text-3xl lg:text-2xl font-bold tracking-[0.2em] text-center font-sans">
+                <h3
+                  className="text-white text-center"
+                  style={{
+                    fontFamily: "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)",
+                    fontSize: 'clamp(38px, 4.3vw, 56px)',
+                    fontWeight: 400,
+                    letterSpacing: '0.06em',
+                    lineHeight: 0.95,
+                    textTransform: 'uppercase',
+                    maxWidth: '88%',
+                  }}
+                >
                   {card.title}
                 </h3>
                 {card.subtitle && (
