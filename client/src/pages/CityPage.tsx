@@ -709,11 +709,14 @@ function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
   const [lastTime, setLastTime] = React.useState(0);
   const animationRef = React.useRef<number | null>(null);
 
-  // Fetch all cities from database
-  const { data: allCities = [] } = trpc.cms.listCities.useQuery();
+  // Match the main navigation: only show cities with valid experience items.
+  const { data: allCities = [] } = trpc.cms.listCitiesWithExperiences.useQuery();
 
-  // Filter out current city
-  const otherCities = allCities.filter((c: any) => c.slug !== currentSlug);
+  const otherCities = allCities.filter((c: any) => (
+    c.slug !== currentSlug &&
+    Array.isArray(c.experiences) &&
+    c.experiences.some((exp: any) => exp.name && exp.slug && exp.typeName)
+  ));
 
   // Show each city once
   const destinations = otherCities;
