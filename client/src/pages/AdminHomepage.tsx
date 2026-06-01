@@ -390,10 +390,10 @@ export default function AdminHomepage() {
           <ImageUploader value={heroEdit.backgroundImage} onChange={v => setHero("backgroundImage", v ?? "")} category="homepage" />
         </Field>
         <Field label="Main Title">
-          <input style={inputStyle} value={heroEdit.title} onChange={e => setHero("title", e.target.value)} placeholder="THE LUXURY TRAVEL EXPERTS" />
+          <input style={inputStyle} value={heroEdit.title} onChange={e => setHero("title", e.target.value)} placeholder="The Immersive China Experts" />
         </Field>
         <Field label="Subtitle / Description">
-          <input style={inputStyle} value={heroEdit.subtitle} onChange={e => setHero("subtitle", e.target.value)} placeholder="TAILOR-MADE TRIPS, AWARD WINNING SERVICE. EST. 2005." />
+          <input style={inputStyle} value={heroEdit.subtitle} onChange={e => setHero("subtitle", e.target.value)} placeholder="Tailor-made experiences, crafted with local insight." />
         </Field>
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
           <button style={btnPrimary} onClick={() => updateHero.mutate({ title: heroEdit.title, subtitle: heroEdit.subtitle, backgroundImage: heroEdit.backgroundImage || null, isVisible: heroEdit.isVisible })}>

@@ -331,8 +331,8 @@ export const homepageHero = mysqlTable("homepage_hero", {
   id: int("id").autoincrement().primaryKey(),
   isVisible: boolean("isVisible").default(true).notNull(),
   backgroundImage: varchar("backgroundImage", { length: 512 }),
-  title: varchar("title", { length: 300 }).notNull().default("THE LUXURY TRAVEL EXPERTS"),
-  subtitle: varchar("subtitle", { length: 500 }).notNull().default("TAILOR-MADE TRIPS, AWARD WINNING SERVICE. EST. 2005."),
+  title: varchar("title", { length: 300 }).notNull().default("The Immersive China Experts"),
+  subtitle: varchar("subtitle", { length: 500 }).notNull().default("Tailor-made experiences, crafted with local insight."),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 export type HomepageHero = typeof homepageHero.$inferSelect;

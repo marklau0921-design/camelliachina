@@ -80,14 +80,15 @@ export default function Home() {
   }));
   // 始终使用静态图片作为 fallback，只有 API 返回且有数据时才替换
   const FALLBACK_BANNER = '';
-  const FALLBACK_LOGO = '';
   const apiBanners = homepageAssets?.banners as Array<{ url: string; id: number }> | undefined;
-  const activeLogo = homepageAssets?.logo?.url ?? FALLBACK_LOGO;
+  const activeLogo = '';
   // 若 homepage_hero 有 backgroundImage，优先使用；否则回退到 media assets banners
   const heroBackgroundImage = homepageData?.hero?.backgroundImage;
   const activeBanners = heroBackgroundImage
     ? [heroBackgroundImage]
     : (apiBanners && apiBanners.length > 0) ? apiBanners.map((b) => b.url) : [FALLBACK_BANNER];
+  const heroTitle = homepageData?.hero?.title || 'The Immersive China Experts';
+  const heroSubtitle = homepageData?.hero?.subtitle || 'Tailor-made experiences, crafted with local insight.';
 
   const [, navigate] = useLocation();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -267,6 +268,40 @@ export default function Home() {
               />
             )}
             {heroLogoLoaded && <div className="w-32 h-px bg-[#F5F3EF]"></div>}
+          </div>
+        </div>
+
+        {/* Hero Text - Center */}
+        <div className="absolute inset-0 flex items-center justify-center z-30 px-6">
+          <div style={{ width: 'min(980px, 92vw)', textAlign: 'center', color: '#fff', transform: 'translateY(3vh)' }}>
+            <h1
+              style={{
+                fontFamily: "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)",
+                fontSize: 'clamp(54px, 9vw, 116px)',
+                fontWeight: 400,
+                letterSpacing: '0.045em',
+                lineHeight: 0.88,
+                textTransform: 'uppercase',
+                margin: '0 0 18px',
+                textShadow: '0 3px 20px rgba(0,0,0,0.38)',
+              }}
+            >
+              {heroTitle}
+            </h1>
+            <p
+              style={{
+                fontFamily: "var(--font-travel-sans, 'Cabin', 'Josefin Sans', 'Helvetica Neue', Arial, sans-serif)",
+                fontSize: 'clamp(15px, 1.55vw, 21px)',
+                fontWeight: 500,
+                letterSpacing: '0.13em',
+                lineHeight: 1.45,
+                textTransform: 'uppercase',
+                margin: 0,
+                textShadow: '0 2px 14px rgba(0,0,0,0.42)',
+              }}
+            >
+              {heroSubtitle}
+            </p>
           </div>
         </div>
       </section>

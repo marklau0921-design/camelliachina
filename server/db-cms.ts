@@ -790,8 +790,8 @@ export async function getHomepageHero() {
   const defaultData = {
     isVisible: true,
     backgroundImage: null,
-    title: "THE LUXURY TRAVEL EXPERTS",
-    subtitle: "TAILOR-MADE TRIPS, AWARD WINNING SERVICE. EST. 2005.",
+    title: "The Immersive China Experts",
+    subtitle: "Tailor-made experiences, crafted with local insight.",
   };
   await db.insert(homepageHero).values(defaultData);
   const newRows = await db.select().from(homepageHero).limit(1);
@@ -805,8 +805,8 @@ export async function upsertHomepageHero(data: Partial<HomepageHero>) {
     await db.insert(homepageHero).values({
       isVisible: data.isVisible ?? true,
       backgroundImage: data.backgroundImage ?? null,
-      title: data.title ?? "THE LUXURY TRAVEL EXPERTS",
-      subtitle: data.subtitle ?? "TAILOR-MADE TRIPS, AWARD WINNING SERVICE. EST. 2005.",
+      title: data.title ?? "The Immersive China Experts",
+      subtitle: data.subtitle ?? "Tailor-made experiences, crafted with local insight.",
     });
   } else {
     await db.update(homepageHero).set(data).where(eq(homepageHero.id, existing[0].id));
