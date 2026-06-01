@@ -422,7 +422,7 @@ export default function AdminHomepage() {
           onToggle={() => { setHero("isVisible", !heroEdit.isVisible); updateHero.mutate({ isVisible: !heroEdit.isVisible }); }}
         />
         <Field label="Background Images">
-          <MultiImageUploader value={heroEdit.backgroundImages} onChange={v => setHero("backgroundImages", v)} category="homepage" label="" />
+          <MultiImageUploader value={heroEdit.backgroundImages} onChange={v => setHero("backgroundImages", v)} category="homepage" label="" sortable />
         </Field>
         <Field label="Main Title">
           <input style={inputStyle} value={heroEdit.title} onChange={e => setHero("title", e.target.value)} placeholder="The Immersive China Experts" />
