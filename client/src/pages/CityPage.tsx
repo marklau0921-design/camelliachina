@@ -25,6 +25,25 @@ function toSlug(str: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
+interface ExploreExperienceCard {
+  id: string | number;
+  eyebrow?: string;
+  title: string;
+  buttonText: string;
+  image: string;
+  href: string;
+}
+
+function firstGalleryImage(value: unknown): string {
+  if (typeof value !== 'string' || value.length === 0) return '';
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) && typeof parsed[0] === 'string' ? parsed[0] : '';
+  } catch {
+    return '';
+  }
+}
+
 // ExperienceItem component for What to See and Do section
 function ExperienceItem({ item, index, onExplore }: { item: any; index: number; onExplore: () => void }) {
   const isEven = index % 2 === 0;
@@ -155,10 +174,19 @@ export default function CityPage() {
     { enabled: !!city?.id }
   );
 
-  const { data: cityExperiences = [] } = trpc.cms.listCityExperiences.useQuery(
-    { cityId: city?.id ?? 0 },
-    { enabled: !!city?.id }
-  );
+  const { data: experienceNav = [] } = trpc.cms.listExperienceTypesWithNav.useQuery();
+
+  const exploreExperiences: ExploreExperienceCard[] = experienceNav.flatMap((type) => {
+    const categorySlug = toSlug(type.name);
+    return type.items.map((item) => ({
+      id: item.slug,
+      eyebrow: type.name,
+      title: item.recommendationTitle || item.title || item.name,
+      buttonText: 'Explore Experience',
+      image: item.recommendationImage || item.cityDisplayImage || firstGalleryImage(item.gallery) || type.coverImage || '',
+      href: `/experiences/${categorySlug}/${item.slug}`,
+    }));
+  });
 
   // ── Explore Our Trips carousel ──
   const tripsTrackRef = useRef<HTMLDivElement>(null);
@@ -268,7 +296,7 @@ export default function CityPage() {
 
   useEffect(() => {
     requestAnimationFrame(tripsUpdateButtonVisibility);
-  }, [cityExperiences.length, isDesktop]);
+  }, [exploreExperiences.length, isDesktop]);
 
   if (cityLoading) {
     return (
@@ -304,7 +332,7 @@ export default function CityPage() {
   const hiddenItems = whatToSeeItems.slice(3);
   const cityTabs = [
     { label: 'Overview', id: 'overview' },
-    ...(cityExperiences.length > 0 ? [{ label: 'Experiences', id: 'experiences' }] : []),
+    ...(exploreExperiences.length > 0 ? [{ label: 'Experiences', id: 'experiences' }] : []),
     { label: 'See & Do', id: 'see-do' },
     { label: 'Food', id: 'food' }
   ];
@@ -392,7 +420,7 @@ export default function CityPage() {
       </div>
 
       {/* Explore Our Trips Section */}
-      {cityExperiences.length > 0 && (
+      {exploreExperiences.length > 0 && (
         <div
           id="experiences"
           className="w-full relative flex flex-col lg:flex-row lg:items-center"
@@ -451,45 +479,33 @@ export default function CityPage() {
                   </p>
                 </div>
               )}
-              {cityExperiences.map((trip: any) => {
-                const categorySlug = trip.experienceTypeName ? toSlug(trip.experienceTypeName) : '';
-                const href = categorySlug && trip.experienceSlug
-                  ? `/experiences/${categorySlug}/${trip.experienceSlug}`
-                  : `/experience-preview/${trip.experienceSlug}`;
-                const image = trip.displayImage || (city as any).coverImage;
-                return (
+              {exploreExperiences.map((trip) => (
                 <div key={trip.id} className="relative group overflow-hidden flex-shrink-0" style={{ width: '310px', height: '550px', userSelect: 'none', background: '#222' }}>
-                  {image && (
-                    <img src={image} alt={trip.experienceTitle || trip.experienceName} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" style={{ objectPosition: getObjectPosition(image) }} draggable={false} />
+                  {trip.image && (
+                    <img src={trip.image} alt={trip.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" style={{ objectPosition: getObjectPosition(trip.image) }} draggable={false} />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/80" />
                   <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
                     <div className="text-xs font-bold uppercase tracking-wider text-right" style={{ fontFamily: CITY_SANS, color: '#ffffff', fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}>
-                      {trip.experienceTypeName || 'Experience'}
+                      {trip.eyebrow}
                     </div>
                     <div>
                       <h3 className="text-base font-bold uppercase tracking-wider mb-3 leading-tight opacity-90" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28 }}>
-                        {trip.experienceTitle || trip.experienceName}
+                        {trip.title}
                       </h3>
-                      {trip.experienceDescription && (
-                        <p style={{ fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 400, letterSpacing: '0.45px', lineHeight: 1.45, color: 'rgba(255,255,255,0.82)', marginBottom: '16px' }}>
-                          {trip.experienceDescription}
-                        </p>
-                      )}
                       <button
                         className="px-4 py-2 text-white text-xs font-bold uppercase tracking-widest transition-all duration-200 opacity-90"
                         style={{ cursor: 'pointer', background: 'rgba(20,20,20,0.55)', backdropFilter: 'blur(6px)', fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}
-                        onClick={(e) => { e.stopPropagation(); navigate(href); }}
+                        onClick={(e) => { e.stopPropagation(); navigate(trip.href); }}
                         onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,1)'; e.currentTarget.style.color = '#111'; }}
                         onMouseLeave={e => { e.currentTarget.style.background = 'rgba(20,20,20,0.55)'; e.currentTarget.style.color = '#fff'; }}
                       >
-                        Explore Experience
+                        {trip.buttonText}
                       </button>
                     </div>
                   </div>
                 </div>
-                );
-              })}
+              ))}
               <div className="flex-shrink-0" style={{ width: '155px', height: '550px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }} />
             </div>
           </div>
