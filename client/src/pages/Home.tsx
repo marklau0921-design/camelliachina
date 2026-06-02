@@ -75,7 +75,6 @@ export default function Home() {
   // Image loading states
   const [heroBannerLoaded, setHeroBannerLoaded] = useState(false);
   const [heroLogoLoaded, setHeroLogoLoaded] = useState(false);
-  const [heroFading, setHeroFading] = useState(false);
   const [tripImagesLoaded, setTripImagesLoaded] = useState<Record<string | number, boolean>>({});
 
   // 动态首页资产
@@ -226,12 +225,8 @@ export default function Home() {
   useEffect(() => {
     if (activeBanners.length <= 1) return;
     const interval = setInterval(() => {
-      setHeroFading(true);
-      window.setTimeout(() => {
-        setHeroBannerLoaded(false);
-        setCurrentSlide((prev) => (prev + 1) % activeBanners.length);
-        setHeroFading(false);
-      }, 450);
+      setHeroBannerLoaded(false);
+      setCurrentSlide((prev) => (prev + 1) % activeBanners.length);
     }, 5000);
     return () => clearInterval(interval);
   }, [activeBanners.length]);
@@ -250,7 +245,7 @@ export default function Home() {
                 src={activeBanners[currentSlide % activeBanners.length]}
                 alt="China countryside landscape"
                 className="w-full h-full object-cover object-center"
-                style={{ objectPosition: getObjectPosition(activeBanners[currentSlide % activeBanners.length]), opacity: heroFading ? 0 : 1, transition: 'opacity 900ms ease-in-out' }}
+                style={{ objectPosition: getObjectPosition(activeBanners[currentSlide % activeBanners.length]) }}
                 onLoad={() => setHeroBannerLoaded(true)}
                 onError={() => setHeroBannerLoaded(false)}
               />
