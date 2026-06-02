@@ -155,9 +155,9 @@ export default function CityPage() {
     { enabled: !!city?.id }
   );
 
-  const { data: cityTrips = [] } = trpc.cms.listItinerariesByCityTag.useQuery(
-    { cityName: city?.name ?? '', citySlug: city?.slug ?? slug ?? '' },
-    { enabled: !!city?.name && !!city?.slug }
+  const { data: cityExperiences = [] } = trpc.cms.listCityExperiences.useQuery(
+    { cityId: city?.id ?? 0 },
+    { enabled: !!city?.id }
   );
 
   // ── Explore Our Trips carousel ──
@@ -268,7 +268,7 @@ export default function CityPage() {
 
   useEffect(() => {
     requestAnimationFrame(tripsUpdateButtonVisibility);
-  }, [cityTrips.length, isDesktop]);
+  }, [cityExperiences.length, isDesktop]);
 
   if (cityLoading) {
     return (
@@ -304,7 +304,7 @@ export default function CityPage() {
   const hiddenItems = whatToSeeItems.slice(3);
   const cityTabs = [
     { label: 'Overview', id: 'overview' },
-    ...(cityTrips.length > 0 ? [{ label: 'Itineraries', id: 'itineraries' }] : []),
+    ...(cityExperiences.length > 0 ? [{ label: 'Experiences', id: 'experiences' }] : []),
     { label: 'See & Do', id: 'see-do' },
     { label: 'Food', id: 'food' }
   ];
@@ -392,9 +392,9 @@ export default function CityPage() {
       </div>
 
       {/* Explore Our Trips Section */}
-      {cityTrips.length > 0 && (
+      {cityExperiences.length > 0 && (
         <div
-          id="itineraries"
+          id="experiences"
           className="w-full relative flex flex-col lg:flex-row lg:items-center"
           style={{
             minHeight: '680px',
@@ -451,38 +451,45 @@ export default function CityPage() {
                   </p>
                 </div>
               )}
-              {cityTrips.map((trip: any) => (
+              {cityExperiences.map((trip: any) => {
+                const categorySlug = trip.experienceTypeName ? toSlug(trip.experienceTypeName) : '';
+                const href = categorySlug && trip.experienceSlug
+                  ? `/experiences/${categorySlug}/${trip.experienceSlug}`
+                  : `/experience-preview/${trip.experienceSlug}`;
+                const image = trip.displayImage || (city as any).coverImage;
+                return (
                 <div key={trip.id} className="relative group overflow-hidden flex-shrink-0" style={{ width: '310px', height: '550px', userSelect: 'none', background: '#222' }}>
-                  {(trip.coverImage || trip.bannerImage || (city as any).coverImage) && (
-                    <img src={trip.coverImage || trip.bannerImage || (city as any).coverImage} alt={trip.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" style={{ objectPosition: getObjectPosition(trip.coverImage || trip.bannerImage || (city as any).coverImage) }} draggable={false} />
+                  {image && (
+                    <img src={image} alt={trip.experienceTitle || trip.experienceName} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" style={{ objectPosition: getObjectPosition(image) }} draggable={false} />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/80" />
                   <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
                     <div className="text-xs font-bold uppercase tracking-wider text-right" style={{ fontFamily: CITY_SANS, color: '#ffffff', fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}>
-                      {trip.howLong || `${trip.days ?? 1} DAYS`}
+                      {trip.experienceTypeName || 'Experience'}
                     </div>
                     <div>
                       <h3 className="text-base font-bold uppercase tracking-wider mb-3 leading-tight opacity-90" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28 }}>
-                        {trip.name}
+                        {trip.experienceTitle || trip.experienceName}
                       </h3>
-                      {trip.shortDescription && (
+                      {trip.experienceDescription && (
                         <p style={{ fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 400, letterSpacing: '0.45px', lineHeight: 1.45, color: 'rgba(255,255,255,0.82)', marginBottom: '16px' }}>
-                          {trip.shortDescription}
+                          {trip.experienceDescription}
                         </p>
                       )}
                       <button
                         className="px-4 py-2 text-white text-xs font-bold uppercase tracking-widest transition-all duration-200 opacity-90"
                         style={{ cursor: 'pointer', background: 'rgba(20,20,20,0.55)', backdropFilter: 'blur(6px)', fontFamily: CITY_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5 }}
-                        onClick={(e) => { e.stopPropagation(); navigate(`/itinerary/${trip.slug}`); }}
+                        onClick={(e) => { e.stopPropagation(); navigate(href); }}
                         onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,1)'; e.currentTarget.style.color = '#111'; }}
                         onMouseLeave={e => { e.currentTarget.style.background = 'rgba(20,20,20,0.55)'; e.currentTarget.style.color = '#fff'; }}
                       >
-                        Explore Trip
+                        Explore Experience
                       </button>
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
               <div className="flex-shrink-0" style={{ width: '155px', height: '550px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }} />
             </div>
           </div>

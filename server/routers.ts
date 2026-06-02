@@ -952,6 +952,10 @@ export const appRouter = router({
 
     listCitiesWithExperiences: publicProcedure.query(() => listCitiesWithExperiences()),
 
+    listCityExperiences: publicProcedure
+      .input(z.object({ cityId: z.number() }))
+      .query(({ input }) => listCityExperiences(input.cityId)),
+
     getCityBySlug: publicProcedure
       .input(z.object({ slug: z.string() }))
       .query(async ({ input }) => {

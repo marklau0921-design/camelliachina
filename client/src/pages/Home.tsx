@@ -58,10 +58,30 @@ function normalizeHeroImages(value: unknown): string[] {
 
 interface Trip {
   id: string | number;
-  nights?: number;
+  eyebrow?: string;
   title: string;
   buttonText: string;
   image: string;
+  href: string;
+}
+
+function toSlug(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function firstGalleryImage(value: unknown): string {
+  if (typeof value !== 'string' || value.length === 0) return '';
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) && typeof parsed[0] === 'string' ? parsed[0] : '';
+  } catch {
+    return '';
+  }
 }
 
 
@@ -83,17 +103,21 @@ export default function Home() {
   // 首页管理模块公开数据（hero/intro/stories/sponsors）
   const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
   
-  // 从数据库动态加载行程
-  const { data: rawItineraries = [] } = trpc.cms.listItineraries.useQuery();
+  // Load experience cards for Explore Our Trips.
+  const { data: experienceNav = [] } = trpc.cms.listExperienceTypesWithNav.useQuery();
   
-  // 转换数据库行程为 Trip 类型
-  const itineraries: Trip[] = rawItineraries.map((itin) => ({
-    id: itin.slug,
-    nights: itin.days,
-    title: itin.name,
-    buttonText: 'Explore Trip',
-    image: itin.coverImage || '',
-  }));
+  // Convert grouped experience data to the card format used by this section.
+  const exploreExperiences: Trip[] = experienceNav.flatMap((type) => {
+    const categorySlug = toSlug(type.name);
+    return type.items.map((item) => ({
+      id: item.slug,
+      eyebrow: type.name,
+      title: item.recommendationTitle || item.title || item.name,
+      buttonText: 'Explore Experience',
+      image: item.recommendationImage || item.cityDisplayImage || firstGalleryImage(item.gallery) || type.coverImage || '',
+      href: `/experiences/${categorySlug}/${item.slug}`,
+    }));
+  });
   // 始终使用静态图片作为 fallback，只有 API 返回且有数据时才替换
   const FALLBACK_BANNER = '';
   const apiBanners = homepageAssets?.banners as Array<{ url: string; id: number }> | undefined;
@@ -396,7 +420,7 @@ export default function Home() {
               </div>
             )}
             {/* Trip Cards */}
-            {itineraries.map((trip) => (
+            {exploreExperiences.map((trip) => (
               <div key={trip.id} className="relative group overflow-hidden flex-shrink-0" style={{ width: '310px', height: '550px', userSelect: 'none' }}>
                 {tripImagesLoaded[trip.id] && (
                   <img
@@ -422,7 +446,7 @@ export default function Home() {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />
                 <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
-                  {trip.nights && <div className="text-xs font-bold uppercase tracking-wider text-yellow-300 text-right" style={{color: '#ffffff', fontWeight: '500'}}>{trip.nights} NIGHTS</div>}
+                  {trip.eyebrow && <div className="text-xs font-bold uppercase tracking-wider text-yellow-300 text-right" style={{color: '#ffffff', fontWeight: '500'}}>{trip.eyebrow}</div>}
                   <div>
                     <h3 className="text-base font-bold uppercase tracking-wider mb-4 leading-tight opacity-85" style={{fontWeight: '300'}}>{trip.title}</h3>
                     <button
@@ -442,7 +466,7 @@ export default function Home() {
                         btn.appendChild(circle);
                         setTimeout(() => circle.remove(), 600);
                       }}
-                      onClick={(e) => { e.stopPropagation(); navigate(`/itinerary/${trip.id}`); }}
+                      onClick={(e) => { e.stopPropagation(); navigate(trip.href); }}
                     >
                       {trip.buttonText}
                     </button>

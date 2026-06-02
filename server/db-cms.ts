@@ -336,7 +336,16 @@ export async function listExperienceTypesWithNav() {
   const result = await Promise.all(
     types.map(async (type) => {
       const items = await db!
-        .select({ id: experiences.id, name: experiences.name, slug: experiences.slug })
+        .select({
+          id: experiences.id,
+          name: experiences.name,
+          title: experiences.title,
+          slug: experiences.slug,
+          gallery: experiences.gallery,
+          recommendationImage: experiences.recommendationImage,
+          recommendationTitle: experiences.recommendationTitle,
+          cityDisplayImage: experiences.cityDisplayImage,
+        })
         .from(experiences)
         .where(and(eq(experiences.typeId, type.id), eq(experiences.isActive, true)))
         .orderBy(experiences.sortOrder, experiences.name);
