@@ -701,6 +701,8 @@ export default function CityPage() {
 function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
   const [, navigate] = useLocation();
   const destinationsRef = React.useRef<HTMLDivElement>(null);
+  const didDragRef = React.useRef(false);
+  const suppressClickUntilRef = React.useRef(0);
   const [isDragging, setIsDragging] = React.useState(false);
   const [startX, setStartX] = React.useState(0);
   const [scrollLeftState, setScrollLeftState] = React.useState(0);
@@ -742,6 +744,7 @@ function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
   };
 
   const onMouseDown = (e: React.MouseEvent) => {
+    didDragRef.current = false;
     setIsDragging(true);
     setStartX(e.clientX);
     setScrollLeftState(destinationsRef.current?.scrollLeft || 0);
@@ -755,6 +758,10 @@ function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
     if (!isDragging) return;
     const x = e.clientX;
     const walk = (x - startX) * 0.8;
+    if (Math.abs(x - startX) > 8) {
+      didDragRef.current = true;
+      suppressClickUntilRef.current = Date.now() + 180;
+    }
     const currentTime = Date.now();
     const timeDiff = currentTime - lastTime;
     const xDiff = x - lastX;
@@ -768,6 +775,9 @@ function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
   };
 
   const onMouseUp = () => {
+    if (didDragRef.current) {
+      suppressClickUntilRef.current = Date.now() + 180;
+    }
     setIsDragging(false);
     let v = velocity;
     const animate = () => {
@@ -783,6 +793,9 @@ function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
 
   const onMouseLeave = () => {
     if (isDragging) {
+      if (didDragRef.current) {
+        suppressClickUntilRef.current = Date.now() + 180;
+      }
       setIsDragging(false);
       let v = velocity;
       const animate = () => {
@@ -820,7 +833,10 @@ function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
             key={`${dest.id}-${index}`}
             className="flex-shrink-0 relative overflow-hidden group cursor-pointer mr-4"
             style={{ width: '220px', height: '320px' }}
-            onClick={() => { if (!isDragging) navigate(`/destinations/${dest.slug}`); }}
+            onClick={() => {
+              if (didDragRef.current || Date.now() < suppressClickUntilRef.current) return;
+              navigate(`/destinations/${dest.slug}`);
+            }}
           >
             {dest.cityCardImage && (
               <img
