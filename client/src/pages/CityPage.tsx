@@ -701,14 +701,15 @@ export default function CityPage() {
 function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
   const [, navigate] = useLocation();
   const destinationsRef = React.useRef<HTMLDivElement>(null);
+  const isDraggingRef = React.useRef(false);
   const didDragRef = React.useRef(false);
   const suppressClickUntilRef = React.useRef(0);
+  const startXRef = React.useRef(0);
+  const scrollStartRef = React.useRef(0);
+  const lastXRef = React.useRef(0);
+  const lastTimeRef = React.useRef(0);
+  const velocityRef = React.useRef(0);
   const [isDragging, setIsDragging] = React.useState(false);
-  const [startX, setStartX] = React.useState(0);
-  const [scrollLeftState, setScrollLeftState] = React.useState(0);
-  const [velocity, setVelocity] = React.useState(0);
-  const [lastX, setLastX] = React.useState(0);
-  const [lastTime, setLastTime] = React.useState(0);
   const animationRef = React.useRef<number | null>(null);
 
   // Match the main navigation: only show cities with valid experience items.
@@ -722,92 +723,76 @@ function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
 
   // Show each city once
   const destinations = otherCities;
-  const cardWidth = 220 + 16;
-  const totalWidth = otherCities.length * cardWidth;
-
-  React.useEffect(() => {
-    if (destinationsRef.current && totalWidth > 0) {
-      destinationsRef.current.scrollLeft = totalWidth;
-    }
-  }, [totalWidth]);
-
-  const handleScroll = () => {
-    if (!destinationsRef.current || totalWidth === 0) return;
-    const container = destinationsRef.current;
-    const sl = container.scrollLeft;
-    const maxScroll = container.scrollWidth - container.clientWidth;
-    if (sl < totalWidth * 0.3) {
-      container.scrollLeft = totalWidth + sl;
-    } else if (sl > totalWidth * 2.7 || sl >= maxScroll - 10) {
-      container.scrollLeft = sl - totalWidth;
+  const cancelInertia = () => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
     }
   };
 
-  const onMouseDown = (e: React.MouseEvent) => {
-    didDragRef.current = false;
-    setIsDragging(true);
-    setStartX(e.clientX);
-    setScrollLeftState(destinationsRef.current?.scrollLeft || 0);
-    setLastX(e.clientX);
-    setLastTime(Date.now());
-    setVelocity(0);
-    if (animationRef.current) cancelAnimationFrame(animationRef.current);
-  };
+  React.useEffect(() => () => cancelInertia(), []);
 
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    const x = e.clientX;
-    const walk = (x - startX) * 0.8;
-    if (Math.abs(x - startX) > 8) {
-      didDragRef.current = true;
-      suppressClickUntilRef.current = Date.now() + 180;
-    }
-    const currentTime = Date.now();
-    const timeDiff = currentTime - lastTime;
-    const xDiff = x - lastX;
-    setVelocity(timeDiff > 0 ? xDiff / timeDiff : 0);
-    setLastX(x);
-    setLastTime(currentTime);
-    if (destinationsRef.current) {
-      destinationsRef.current.scrollLeft = scrollLeftState - walk;
-      handleScroll();
-    }
-  };
-
-  const onMouseUp = () => {
-    if (didDragRef.current) {
-      suppressClickUntilRef.current = Date.now() + 180;
-    }
-    setIsDragging(false);
-    let v = velocity;
+  const startInertia = () => {
+    let v = velocityRef.current;
     const animate = () => {
-      if (destinationsRef.current && Math.abs(v) > 0.1) {
-        destinationsRef.current.scrollLeft -= v * 30;
-        handleScroll();
-        v *= 0.92;
-        animationRef.current = requestAnimationFrame(animate);
-      }
+      if (!destinationsRef.current || Math.abs(v) <= 0.08) return;
+      destinationsRef.current.scrollLeft -= v * 28;
+      v *= 0.92;
+      animationRef.current = requestAnimationFrame(animate);
     };
     animate();
   };
 
-  const onMouseLeave = () => {
-    if (isDragging) {
-      if (didDragRef.current) {
-        suppressClickUntilRef.current = Date.now() + 180;
-      }
-      setIsDragging(false);
-      let v = velocity;
-      const animate = () => {
-        if (destinationsRef.current && Math.abs(v) > 0.1) {
-          destinationsRef.current.scrollLeft -= v * 30;
-          handleScroll();
-          v *= 0.92;
-          animationRef.current = requestAnimationFrame(animate);
-        }
-      };
-      animate();
+  const onMouseDown = (e: React.MouseEvent) => {
+    cancelInertia();
+    isDraggingRef.current = true;
+    didDragRef.current = false;
+    setIsDragging(true);
+    startXRef.current = e.clientX;
+    scrollStartRef.current = destinationsRef.current?.scrollLeft || 0;
+    lastXRef.current = e.clientX;
+    lastTimeRef.current = Date.now();
+    velocityRef.current = 0;
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingRef.current) return;
+    e.preventDefault();
+    const x = e.clientX;
+    const walk = (x - startXRef.current) * 0.9;
+    if (Math.abs(x - startXRef.current) > 8) {
+      didDragRef.current = true;
+      suppressClickUntilRef.current = Date.now() + 180;
     }
+    const currentTime = Date.now();
+    const timeDiff = currentTime - lastTimeRef.current;
+    const xDiff = x - lastXRef.current;
+    velocityRef.current = timeDiff > 0 ? xDiff / timeDiff : 0;
+    lastXRef.current = x;
+    lastTimeRef.current = currentTime;
+    if (destinationsRef.current) {
+      destinationsRef.current.scrollLeft = scrollStartRef.current - walk;
+    }
+  };
+
+  const onMouseUp = () => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    if (didDragRef.current) {
+      suppressClickUntilRef.current = Date.now() + 180;
+    }
+    setIsDragging(false);
+    startInertia();
+  };
+
+  const onMouseLeave = () => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    if (didDragRef.current) {
+      suppressClickUntilRef.current = Date.now() + 180;
+    }
+    setIsDragging(false);
+    startInertia();
   };
 
   if (otherCities.length === 0) return null;
@@ -824,7 +809,6 @@ function OtherPopularDestinations({ currentSlug }: { currentSlug: string }) {
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseLeave}
-        onScroll={handleScroll}
         style={{ cursor: isDragging ? 'grabbing' : 'grab', userSelect: 'none', scrollBehavior: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <style>{`div::-webkit-scrollbar { display: none; }`}</style>
