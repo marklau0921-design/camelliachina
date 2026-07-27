@@ -44,10 +44,10 @@ export default function Footer() {
             <div className="space-y-6">
               {/* Address */}
               <div>
-                <p className="text-sm font-light mb-2 text-white/80">📍 Address Chengdu:</p>
+                <p className="text-sm font-light mb-2 text-white/80">📍 Address:</p>
                 <p className="text-sm leading-relaxed text-white/70">
-                  26th Floor, No. 1-2 Hangkong Road,<br />
-                  Wuhou District, Chengdu, Sichuan
+                  7th Floor, Unit 1, Building 17, No. 218 Hongshan Road,<br />
+                  Wuhua District, Kunming, Yunnan
                 </p>
               </div>
               

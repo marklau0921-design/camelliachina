@@ -593,47 +593,75 @@ export default function CityPage() {
             {(city as any).culinaryTravelTitle || 'Culinary Travel'}
           </h2>
 
-          <div className="mx-auto px-4 md:px-8" style={{ maxWidth: '1320px', display: 'grid', gap: '48px' }}>
+          <div style={{ display: 'grid', gap: '72px' }}>
             {culinaryTravelSections.map((section, index) => (
-              <div key={`${section.title}-${index}`}>
-                <div className={`hidden xl:flex items-stretch bg-gray-100 ${index % 2 === 1 ? 'flex-row-reverse' : ''}`} style={{ minHeight: '560px' }}>
-                  <div style={{ width: '60%', minHeight: '560px', flex: '0 0 auto' }}>
-                    {section.image && (
+              <div key={index}>
+                {/* One block = original large card plus two small cards. */}
+                <div className="mx-auto px-4 md:px-8 mb-12" style={{ maxWidth: '1320px' }}>
+                  <div className={`hidden xl:flex items-center bg-gray-100 ${index % 2 === 1 ? 'flex-row-reverse' : ''}`} style={{ height: '640px' }}>
+                    <div className="flex items-center bg-gray-100" style={{ width: '60%', height: '640px', flex: '0 0 auto' }}>
+                      {section.large.image && (
+                        <img
+                          src={section.large.image}
+                          alt={section.large.title || `${cityName} Cuisine`}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: getObjectPosition(section.large.image) }}
+                        />
+                      )}
+                    </div>
+                    <div className="flex flex-col justify-center items-center bg-gray-100 px-8" style={{ width: '40%', height: '640px' }}>
+                      <div className="max-w-md">
+                        <h3 className="uppercase mb-6" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
+                          {section.large.title || `${cityName} Cuisine`}
+                        </h3>
+                        <p style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT, whiteSpace: 'pre-line' }}>
+                          {section.large.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="xl:hidden w-full bg-gray-100">
+                    {section.large.image && (
                       <img
-                        src={section.image}
-                        alt={section.title || `${cityName} culinary experience`}
-                        style={{ width: '100%', height: '100%', minHeight: '560px', objectFit: 'cover', objectPosition: getObjectPosition(section.image) }}
+                        src={section.large.image}
+                        alt={section.large.title || `${cityName} Cuisine`}
+                        className="w-full"
+                        style={{ height: '375px', objectFit: 'cover', objectPosition: getObjectPosition(section.large.image) }}
                       />
                     )}
-                  </div>
-                  <div className="flex flex-col justify-center items-center px-8" style={{ width: '40%', minHeight: '560px' }}>
-                    <div className="max-w-md">
-                      <h3 className="uppercase mb-6" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
-                        {section.title}
+                    <div className="p-6">
+                      <h3 className="uppercase mb-4" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
+                        {section.large.title || `${cityName} Cuisine`}
                       </h3>
                       <p style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT, whiteSpace: 'pre-line' }}>
-                        {section.description}
+                        {section.large.description}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="xl:hidden w-full bg-gray-100">
-                  {section.image && (
-                    <img
-                      src={section.image}
-                      alt={section.title || `${cityName} culinary experience`}
-                      className="w-full"
-                      style={{ height: '375px', objectFit: 'cover', objectPosition: getObjectPosition(section.image) }}
-                    />
-                  )}
-                  <div className="p-6">
-                    <h3 className="uppercase mb-4" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
-                      {section.title}
-                    </h3>
-                    <p style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT, whiteSpace: 'pre-line' }}>
-                      {section.description}
-                    </p>
+                <div className="mx-auto px-4 md:px-8" style={{ maxWidth: '1320px' }}>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {([section.small1, section.small2] as const).map((card, cardIndex) => (
+                      <div key={cardIndex} className="flex flex-col bg-gray-100" style={{ minHeight: '600px' }}>
+                        {card.image && (
+                          <img
+                            src={card.image}
+                            alt={card.title}
+                            className="w-full"
+                            style={{ height: '390px', objectFit: 'cover', objectPosition: getObjectPosition(card.image) }}
+                          />
+                        )}
+                        <div className="p-6" style={{ minHeight: '210px' }}>
+                          <h3 className="uppercase mb-4" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
+                            {card.title}
+                          </h3>
+                          <p style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT, whiteSpace: 'pre-line' }}>
+                            {card.description}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
