@@ -301,7 +301,7 @@ export default function TeaMountains() {
           <p style={{ fontSize: 12, color: '#999', marginBottom: 0, textAlign: 'left', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', paddingTop: '20px', paddingBottom: '0' }}>
             <Link href="/" style={{ color: '#999', textDecoration: 'none' }}>Home</Link>
             <span style={{ margin: '0 6px', color: '#ccc' }}>/</span>
-            <Link href="/experiences" style={{ color: '#999', textDecoration: 'none' }}>Experiences</Link>
+            <span style={{ color: '#999', cursor: 'default' }}>Experiences</span>
             <span style={{ margin: '0 6px', color: '#ccc' }}>/</span>
             <Link href="/experiences" style={{ color: '#999', textDecoration: 'none' }}>Nature</Link>
             <span style={{ margin: '0 6px', color: '#ccc' }}>/</span>
