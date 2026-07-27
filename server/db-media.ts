@@ -312,7 +312,7 @@ export async function updateAssetLogoScale(id: number, target: LogoScaleTarget, 
   await ensureMediaLogoScaleColumns(pool);
   const column = logoScaleColumns[target];
   if (!(await mediaHasColumn(pool, column))) return { saved: false };
-  const clamped = Math.max(50, Math.min(150, Math.round(scale / 5) * 5));
+  const clamped = Math.max(50, Math.min(200, Math.round(scale / 5) * 5));
   await pool.execute(`UPDATE media_assets SET \`${column}\` = ? WHERE id = ? AND assetType = 'logo'`, [clamped, id]);
   return { saved: true, scale: clamped, target };
 }

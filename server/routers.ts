@@ -1235,7 +1235,7 @@ export const appRouter = router({
       .input(z.object({
         id: z.number(),
         target: z.enum(["navigation", "footer", "adminLogin", "adminSidebar"]),
-        scale: z.number().min(50).max(150),
+        scale: z.number().min(50).max(200),
       }))
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);

@@ -35,7 +35,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const passwordRef = useRef<HTMLInputElement>(null);
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
   const logoUrl = homepageAssets?.logo?.url || "";
-  const adminLoginLogoScale = Math.max(50, Math.min(150, Number(homepageAssets?.logo?.adminLoginLogoScale ?? 100) || 100));
+  const adminLoginLogoScale = Math.max(50, Math.min(200, Number(homepageAssets?.logo?.adminLoginLogoScale ?? 100) || 100));
   const loginMutation = trpc.admin.login.useMutation({
     onSuccess: () => {
       // Session is stored in httpOnly cookie only — no localStorage
@@ -138,7 +138,7 @@ function Sidebar({ onLogout }: { onLogout: () => void }) {
   const [location] = useLocation();
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
   const logoUrl = homepageAssets?.logo?.url || "";
-  const adminSidebarLogoScale = Math.max(50, Math.min(150, Number(homepageAssets?.logo?.adminSidebarLogoScale ?? 100) || 100));
+  const adminSidebarLogoScale = Math.max(50, Math.min(200, Number(homepageAssets?.logo?.adminSidebarLogoScale ?? 100) || 100));
   const adminSidebarLogoHeight = 36 * adminSidebarLogoScale / 100;
 
   return (

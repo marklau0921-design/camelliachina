@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 export default function Footer() {
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
   const logoUrl = homepageAssets?.logo?.url || '';
-  const footerLogoScale = Math.max(50, Math.min(150, Number(homepageAssets?.logo?.footerLogoScale ?? 100) || 100));
+  const footerLogoScale = Math.max(50, Math.min(200, Number(homepageAssets?.logo?.footerLogoScale ?? 100) || 100));
   const [logoLoaded, setLogoLoaded] = useState(false);
 
   useEffect(() => {

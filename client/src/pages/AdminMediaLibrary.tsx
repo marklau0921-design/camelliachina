@@ -157,7 +157,7 @@ function LogoScaleControls({
             <input
               type="range"
               min={50}
-              max={150}
+              max={200}
               step={5}
               value={scale}
               onChange={(e) => previewScale(setting.target, Number(e.target.value))}
