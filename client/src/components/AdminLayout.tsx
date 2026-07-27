@@ -135,6 +135,8 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
 // ── Sidebar — defined OUTSIDE AdminLayout to prevent remount on route change ──
 function Sidebar({ onLogout }: { onLogout: () => void }) {
   const [location] = useLocation();
+  const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const logoUrl = homepageAssets?.logo?.url || "";
 
   return (
     <div
@@ -150,15 +152,17 @@ function Sidebar({ onLogout }: { onLogout: () => void }) {
     >
       {/* Logo */}
       <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <a href="/" style={{ display: "block", height: "36px" }}>
-          <img
-            src=""
-            alt="Logo"
-            style={{ height: "36px", width: "auto", objectFit: "contain" }}
-            onError={e => { (e.target as HTMLImageElement).style.visibility = "hidden"; }}
-          />
-        </a>
-        <div style={{ marginTop: "8px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#555" }}>
+        {logoUrl && (
+          <a href="/" style={{ display: "block", height: "36px" }}>
+            <img
+              src={logoUrl}
+              alt="Logo"
+              style={{ height: "36px", maxWidth: "180px", width: "auto", objectFit: "contain" }}
+              onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+            />
+          </a>
+        )}
+        <div style={{ marginTop: logoUrl ? "8px" : 0, fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#555" }}>
           Admin Panel
         </div>
       </div>
