@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import AdminLayout from "../components/AdminLayout";
 import { trpc } from "../lib/trpc";
 import ImageCropPreview from "../components/ImageCropPreview";
@@ -80,11 +80,97 @@ type MediaAsset = {
   assetType: "logo" | "banner" | "cta" | "page_bg" | "general";
   isActive: boolean;
   opacity?: number | string | null;
+  navigationLogoScale?: number | string | null;
+  footerLogoScale?: number | string | null;
+  adminLoginLogoScale?: number | string | null;
+  adminSidebarLogoScale?: number | string | null;
   usageCount?: number;
   usageSources?: { label: string; url: string; table: string; column?: string }[];
   sortOrder: number;
   createdAt: Date;
 };
+
+type LogoScaleTarget = "navigation" | "footer" | "adminLogin" | "adminSidebar";
+
+const logoScaleSettings: Array<{
+  target: LogoScaleTarget;
+  field: keyof Pick<MediaAsset, "navigationLogoScale" | "footerLogoScale" | "adminLoginLogoScale" | "adminSidebarLogoScale">;
+  label: string;
+}> = [
+  { target: "navigation", field: "navigationLogoScale", label: "导航栏 Logo 大小" },
+  { target: "footer", field: "footerLogoScale", label: "页脚 Logo 大小" },
+  { target: "adminLogin", field: "adminLoginLogoScale", label: "后台登录页 Logo 大小" },
+  { target: "adminSidebar", field: "adminSidebarLogoScale", label: "后台侧边栏 Logo 大小" },
+];
+
+function LogoScaleControls({
+  logo,
+  onSave,
+}: {
+  logo: MediaAsset;
+  onSave: (target: LogoScaleTarget, scale: number) => void;
+}) {
+  const initialScales = () => Object.fromEntries(
+    logoScaleSettings.map(setting => [setting.target, Number(logo[setting.field] ?? 100)])
+  ) as Record<LogoScaleTarget, number>;
+  const [scales, setScales] = useState<Record<LogoScaleTarget, number>>(initialScales);
+
+  useEffect(() => {
+    setScales(initialScales());
+  }, [
+    logo.id,
+    logo.navigationLogoScale,
+    logo.footerLogoScale,
+    logo.adminLoginLogoScale,
+    logo.adminSidebarLogoScale,
+  ]);
+
+  const previewScale = (target: LogoScaleTarget, scale: number) => {
+    setScales(current => ({ ...current, [target]: scale }));
+  };
+
+  const saveScale = (target: LogoScaleTarget, scale: number) => {
+    previewScale(target, scale);
+    onSave(target, scale);
+  };
+
+  return (
+    <div style={{ marginBottom: 16, padding: "14px 16px", border: "1px solid #f0f0f0", borderRadius: 8, background: "#fafafa", display: "grid", gap: 18 }}>
+      {logoScaleSettings.map(setting => {
+        const scale = scales[setting.target];
+        return (
+          <div key={setting.target}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", color: "#444" }}>{setting.label}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <button
+                  type="button"
+                  disabled={scale === 100}
+                  onClick={() => saveScale(setting.target, 100)}
+                  style={{ border: "none", background: "transparent", padding: 0, color: scale === 100 ? "#bbb" : "#777", fontSize: 11, cursor: scale === 100 ? "default" : "pointer", textDecoration: scale === 100 ? "none" : "underline" }}
+                >
+                  恢复默认
+                </button>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#F5569B", minWidth: 44, textAlign: "right" }}>{scale}%</div>
+              </div>
+            </div>
+            <input
+              type="range"
+              min={50}
+              max={150}
+              step={5}
+              value={scale}
+              onChange={(e) => previewScale(setting.target, Number(e.target.value))}
+              onPointerUp={(e) => saveScale(setting.target, Number(e.currentTarget.value))}
+              onKeyUp={(e) => saveScale(setting.target, Number(e.currentTarget.value))}
+              style={{ width: "100%", accentColor: "#F5569B", cursor: "pointer" }}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 function ImageCard({
   asset,
@@ -188,6 +274,7 @@ function HomepageAssetsTab() {
   const setActiveMut = trpc.media.setActive.useMutation({ onSuccess: () => utils.media.listByType.invalidate() });
   const updateSortMut = trpc.media.updateSortOrder.useMutation({ onSuccess: () => utils.media.listByType.invalidate() });
   const updateOpacityMut = trpc.media.updateOpacity.useMutation({ onSuccess: () => utils.media.listByType.invalidate() });
+  const updateLogoScaleMut = trpc.media.updateLogoScale.useMutation({ onSuccess: () => utils.media.listByType.invalidate() });
   const replaceMut = trpc.media.replace.useMutation({ onSuccess: invalidate });
 
   const handleUpload = async (file: File, assetType: "logo" | "banner" | "cta" | "page_bg") => {
@@ -225,6 +312,13 @@ function HomepageAssetsTab() {
             </div>
           ))}
         </div>
+        {(logos as MediaAsset[]).filter((logo) => logo.isActive).map((logo) => (
+          <LogoScaleControls
+            key={`logo-scales-${logo.id}`}
+            logo={logo}
+            onSave={(target, scale) => updateLogoScaleMut.mutate({ id: logo.id, target, scale })}
+          />
+        ))}
         <UploadZone onUpload={(f) => handleUpload(f, "logo")} loading={uploadMut.isPending} label="Upload new logo (drag & drop or click)" />
       </div>
 

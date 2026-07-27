@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 export default function Footer() {
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
   const logoUrl = homepageAssets?.logo?.url || '';
+  const footerLogoScale = Math.max(50, Math.min(150, Number(homepageAssets?.logo?.footerLogoScale ?? 100) || 100));
   const [logoLoaded, setLogoLoaded] = useState(false);
 
   useEffect(() => {
@@ -29,8 +30,8 @@ export default function Footer() {
               <img
                 src={logoUrl}
                 alt="Logo"
-                className="h-20 object-contain"
-                style={{ backgroundColor: 'transparent', display: logoLoaded ? 'block' : 'none' }}
+                className="object-contain"
+                style={{ height: `${80 * footerLogoScale / 100}px`, width: 'auto', backgroundColor: 'transparent', display: logoLoaded ? 'block' : 'none' }}
                 onLoad={() => setLogoLoaded(true)}
                 onError={() => setLogoLoaded(false)}
               />

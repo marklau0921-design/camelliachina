@@ -4,6 +4,7 @@ import { eq, like, or, desc, and } from "drizzle-orm";
 
 type MediaAssetType = "logo" | "banner" | "cta" | "page_bg" | "general";
 type BrandAssetType = Exclude<MediaAssetType, "general">;
+export type LogoScaleTarget = "navigation" | "footer" | "adminLogin" | "adminSidebar";
 
 type MediaUsage = {
   label: string;
@@ -70,8 +71,10 @@ async function ensureMediaObjectPositionColumn(pool: any) {
   if (await mediaHasColumn(pool, "objectPosition")) return;
   try {
     await pool.execute("ALTER TABLE media_assets ADD COLUMN objectPosition varchar(32) DEFAULT '50% 50%'");
+    cachedMediaColumns?.add("objectPosition");
   } catch (error: any) {
     if (!String(error?.message ?? "").includes("Duplicate column")) throw error;
+    cachedMediaColumns?.add("objectPosition");
   }
 }
 
@@ -193,9 +196,11 @@ export async function findMediaAssetUsages(asset: { url: string; storageKey?: st
 export async function listHomepageAssets(assetType: BrandAssetType) {
   const pool = await getPool();
   if (!pool) return [];
+  await ensureMediaLogoScaleColumns(pool);
   const opacitySelect = await mediaOpacitySelect(pool);
+  const logoScaleSelect = await mediaLogoScaleSelect(pool);
   const [rows] = await pool.query(
-    `SELECT *, ${opacitySelect} FROM media_assets WHERE assetType = ? ORDER BY sortOrder`,
+    `SELECT *, ${opacitySelect}, ${logoScaleSelect} FROM media_assets WHERE assetType = ? ORDER BY sortOrder`,
     [assetType]
   );
   return rows as any[];
@@ -205,9 +210,11 @@ export async function listHomepageAssets(assetType: BrandAssetType) {
 export async function getActiveHomepageAsset(assetType: "logo" | "cta" | "page_bg") {
   const pool = await getPool();
   if (!pool) return null;
+  await ensureMediaLogoScaleColumns(pool);
   const opacitySelect = await mediaOpacitySelect(pool);
+  const logoScaleSelect = await mediaLogoScaleSelect(pool);
   const [rows] = await pool.query(
-    `SELECT *, ${opacitySelect} FROM media_assets WHERE assetType = ? AND isActive = true ORDER BY createdAt DESC LIMIT 1`,
+    `SELECT *, ${opacitySelect}, ${logoScaleSelect} FROM media_assets WHERE assetType = ? AND isActive = true ORDER BY createdAt DESC LIMIT 1`,
     [assetType]
   );
   return (rows as any[])[0] ?? null;
@@ -224,13 +231,50 @@ export async function getActiveBanners() {
   return rows as any[];
 }
 
-async function mediaHasColumn(pool: any, columnName: string) {
+let cachedMediaColumns: Set<string> | null = null;
+
+async function getMediaColumns(pool: any) {
+  if (cachedMediaColumns) return cachedMediaColumns;
   const [columns] = await pool.query("SHOW COLUMNS FROM media_assets");
-  return (columns as any[]).some((column) => column.Field === columnName);
+  cachedMediaColumns = new Set((columns as any[]).map(column => String(column.Field)));
+  return cachedMediaColumns;
+}
+
+async function mediaHasColumn(pool: any, columnName: string) {
+  return (await getMediaColumns(pool)).has(columnName);
 }
 
 async function mediaOpacitySelect(pool: any) {
   return (await mediaHasColumn(pool, "opacity")) ? "opacity" : "28 as opacity";
+}
+
+const logoScaleColumns: Record<LogoScaleTarget, string> = {
+  navigation: "navigationLogoScale",
+  footer: "footerLogoScale",
+  adminLogin: "adminLoginLogoScale",
+  adminSidebar: "adminSidebarLogoScale",
+};
+
+async function ensureMediaLogoScaleColumns(pool: any) {
+  for (const column of Object.values(logoScaleColumns)) {
+    if (await mediaHasColumn(pool, column)) continue;
+    try {
+      await pool.execute(`ALTER TABLE media_assets ADD COLUMN \`${column}\` int DEFAULT 100`);
+      cachedMediaColumns?.add(column);
+    } catch (error: any) {
+      if (!String(error?.message ?? "").includes("Duplicate column")) throw error;
+      cachedMediaColumns?.add(column);
+    }
+  }
+}
+
+async function mediaLogoScaleSelect(pool: any) {
+  const selections = await Promise.all(
+    Object.values(logoScaleColumns).map(async column =>
+      (await mediaHasColumn(pool, column)) ? column : `100 as ${column}`
+    )
+  );
+  return selections.join(", ");
 }
 
 // ─── 设置激活状态（Logo/CTA：单选；Banner：多选）────────────────────────────
@@ -260,6 +304,17 @@ export async function updateAssetOpacity(id: number, opacity: number) {
   const clamped = Math.max(0, Math.min(100, Math.round(opacity)));
   await pool.execute("UPDATE media_assets SET opacity = ? WHERE id = ?", [clamped, id]);
   return { saved: true, opacity: clamped };
+}
+
+export async function updateAssetLogoScale(id: number, target: LogoScaleTarget, scale: number) {
+  const pool = await getPool();
+  if (!pool) return { saved: false };
+  await ensureMediaLogoScaleColumns(pool);
+  const column = logoScaleColumns[target];
+  if (!(await mediaHasColumn(pool, column))) return { saved: false };
+  const clamped = Math.max(50, Math.min(150, Math.round(scale / 5) * 5));
+  await pool.execute(`UPDATE media_assets SET \`${column}\` = ? WHERE id = ? AND assetType = 'logo'`, [clamped, id]);
+  return { saved: true, scale: clamped, target };
 }
 
 // ─── 替换图片（保持 URL 不变，更新 storageKey）──────────────────────────────

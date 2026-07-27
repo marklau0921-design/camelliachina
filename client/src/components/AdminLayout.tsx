@@ -35,6 +35,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const passwordRef = useRef<HTMLInputElement>(null);
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
   const logoUrl = homepageAssets?.logo?.url || "";
+  const adminLoginLogoScale = Math.max(50, Math.min(150, Number(homepageAssets?.logo?.adminLoginLogoScale ?? 100) || 100));
   const loginMutation = trpc.admin.login.useMutation({
     onSuccess: () => {
       // Session is stored in httpOnly cookie only — no localStorage
@@ -55,7 +56,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
             <img
               src={logoUrl}
               alt="Logo"
-              style={{ height: "52px", maxWidth: "280px", width: "auto", objectFit: "contain" }}
+              style={{ height: `${52 * adminLoginLogoScale / 100}px`, maxWidth: "280px", width: "auto", objectFit: "contain" }}
               onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
             />
           </div>
@@ -137,6 +138,8 @@ function Sidebar({ onLogout }: { onLogout: () => void }) {
   const [location] = useLocation();
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
   const logoUrl = homepageAssets?.logo?.url || "";
+  const adminSidebarLogoScale = Math.max(50, Math.min(150, Number(homepageAssets?.logo?.adminSidebarLogoScale ?? 100) || 100));
+  const adminSidebarLogoHeight = 36 * adminSidebarLogoScale / 100;
 
   return (
     <div
@@ -153,11 +156,11 @@ function Sidebar({ onLogout }: { onLogout: () => void }) {
       {/* Logo */}
       <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         {logoUrl && (
-          <a href="/" style={{ display: "block", height: "36px" }}>
+          <a href="/" style={{ display: "block", height: `${adminSidebarLogoHeight}px` }}>
             <img
               src={logoUrl}
               alt="Logo"
-              style={{ height: "36px", maxWidth: "180px", width: "auto", objectFit: "contain" }}
+              style={{ height: `${adminSidebarLogoHeight}px`, maxWidth: "180px", width: "auto", objectFit: "contain" }}
               onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
             />
           </a>

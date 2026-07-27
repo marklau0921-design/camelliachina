@@ -70,6 +70,8 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
   // 动态加载 Brand Assets logo
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
   const logoUrl = homepageAssets?.logo?.url || '';
+  const navigationLogoScale = Math.max(50, Math.min(150, Number(homepageAssets?.logo?.navigationLogoScale ?? 100) || 100));
+  const navigationLogoHeight = `${40 * navigationLogoScale / 100}px`;
 
   // 动态加载体验类型及其子项
   const { data: navData } = trpc.cms.listExperienceTypesWithNav.useQuery();
@@ -353,7 +355,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                   src={logoUrl}
                   alt="Wayseek 未远"
                   className="group-hover:opacity-70 transition-opacity"
-                  style={{ height: '40px', width: 'auto', objectFit: 'contain' }}
+                  style={{ height: navigationLogoHeight, width: 'auto', objectFit: 'contain' }}
                   onLoad={() => setLogoLoaded(true)}
                   onError={() => setLogoLoaded(false)}
                 />
@@ -363,7 +365,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                   src={logoUrl}
                   alt="Wayseek 未远"
                   className="group-hover:opacity-70 transition-opacity"
-                  style={{ height: '40px', width: 'auto', objectFit: 'contain', display: 'none' }}
+                  style={{ height: navigationLogoHeight, width: 'auto', objectFit: 'contain', display: 'none' }}
                   onLoad={() => setLogoLoaded(true)}
                   onError={() => setLogoLoaded(false)}
                 />

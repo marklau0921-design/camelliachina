@@ -15,7 +15,7 @@ import path from "path";
 import { nanoid } from "nanoid";
 import {
   createMediaAsset, listMediaAssets, listHomepageAssets, getActiveHomepageAsset, getActiveBanners,
-  setAssetActive, updateAssetSortOrder, updateAssetOpacity, replaceMediaAsset, deleteMediaAsset, getMediaAsset,
+  setAssetActive, updateAssetSortOrder, updateAssetOpacity, updateAssetLogoScale, replaceMediaAsset, deleteMediaAsset, getMediaAsset,
   findMediaAssetUsages, updateAssetObjectPositionByUrl, listMediaObjectPositions,
 } from "./db-media";
 import { storagePut, UPLOADS_ROOT, storageDelete } from "./storage";
@@ -1229,6 +1229,17 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await requireAdmin(ctx);
         return updateAssetOpacity(input.id, input.opacity);
+      }),
+
+    updateLogoScale: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        target: z.enum(["navigation", "footer", "adminLogin", "adminSidebar"]),
+        scale: z.number().min(50).max(150),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await requireAdmin(ctx);
+        return updateAssetLogoScale(input.id, input.target, input.scale);
       }),
 
     updateObjectPosition: publicProcedure
