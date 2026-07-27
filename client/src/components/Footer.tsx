@@ -54,7 +54,11 @@ export default function Footer() {
               {/* Email */}
               <div>
                 <p className="text-sm font-light mb-2 text-white/80">✉️ Email:</p>
-                <a href="mailto:info@camelliachina.com" className="text-sm text-white/70 hover:text-[#D4AF37] transition-colors">
+                <a
+                  href="mailto:info@camelliachina.com"
+                  className="text-sm text-white/70 hover:text-[#D4AF37] transition-colors"
+                  style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif', letterSpacing: '0.01em' }}
+                >
                   info@camelliachina.com
                 </a>
               </div>
