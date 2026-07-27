@@ -29,6 +29,7 @@ interface AdminLayoutProps {
 
 // ── Login form ──
 function LoginForm({ onSuccess }: { onSuccess: () => void }) {
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -40,7 +41,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
       onSuccess();
     },
     onError: (err) => {
-      setError(err.message || "Invalid password. Please try again.");
+      setError(err.message || "Invalid username or password. Please try again.");
       setPassword("");
       setTimeout(() => passwordRef.current?.focus(), 50);
     },
@@ -63,16 +64,19 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
           <p style={{ color: "#888", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", textAlign: "center", marginBottom: "28px" }}>
             Admin Access
           </p>
-          <form onSubmit={e => { e.preventDefault(); setError(""); loginMutation.mutate({ password }); }}>
+          <form onSubmit={e => { e.preventDefault(); setError(""); loginMutation.mutate({ username, password }); }}>
             <div style={{ marginBottom: "16px" }}>
               <label style={{ display: "block", color: "#666", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "8px" }}>
                 Username
               </label>
               <input
                 type="text"
-                value="Admin"
-                readOnly
-                style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", color: "#555", fontSize: "14px", padding: "10px 14px", outline: "none", boxSizing: "border-box", cursor: "default" }}
+                value={username}
+                onChange={e => { setUsername(e.target.value); setError(""); }}
+                autoFocus
+                autoComplete="username"
+                placeholder="Enter username"
+                style={{ width: "100%", background: "rgba(255,255,255,0.06)", border: `1px solid ${error ? "#e05" : "rgba(255,255,255,0.12)"}`, color: "#fff", fontSize: "14px", padding: "10px 14px", outline: "none", boxSizing: "border-box" }}
               />
             </div>
             <div style={{ marginBottom: "24px" }}>
@@ -84,7 +88,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
                 type="password"
                 value={password}
                 onChange={e => { setPassword(e.target.value); setError(""); }}
-                autoFocus
+                autoComplete="current-password"
                 placeholder="Enter password"
                 style={{
                   width: "100%",
@@ -104,10 +108,10 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
             </div>
             <button
               type="submit"
-              disabled={loginMutation.isPending || !password}
+              disabled={loginMutation.isPending || !username.trim() || !password}
               style={{
                 width: "100%",
-                background: loginMutation.isPending || !password ? "rgba(245,86,155,0.4)" : ACCENT,
+                background: loginMutation.isPending || !username.trim() || !password ? "rgba(245,86,155,0.4)" : ACCENT,
                 color: "#fff",
                 fontSize: "12px",
                 fontWeight: "600",
@@ -115,7 +119,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
                 textTransform: "uppercase",
                 padding: "12px",
                 border: "none",
-                cursor: loginMutation.isPending || !password ? "not-allowed" : "pointer",
+                cursor: loginMutation.isPending || !username.trim() || !password ? "not-allowed" : "pointer",
                 transition: "background 0.2s",
               }}
             >

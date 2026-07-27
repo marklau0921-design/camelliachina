@@ -240,11 +240,15 @@ export const appRouter = router({
     }),
 
     login: publicProcedure
-      .input(z.object({ password: z.string() }))
+      .input(z.object({
+        username: z.string().trim().min(1),
+        password: z.string(),
+      }))
       .mutation(({ ctx, input }) => {
         const correctPassword = ENV.adminPassword;
-        if (!correctPassword || input.password !== correctPassword) {
-          throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid password" });
+        const isAdminUsername = input.username.toLowerCase() === "admin";
+        if (!isAdminUsername || !correctPassword || input.password !== correctPassword) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid username or password" });
         }
         // Create in-memory session (no JWT, no localStorage)
         const sessionId = createAdminSession();
