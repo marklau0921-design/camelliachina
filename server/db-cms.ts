@@ -54,7 +54,25 @@ export async function deleteTag(id: number) {
 }
 
 // ─── Cities ───────────────────────────────────────────────────────────────────
+let cityCulinaryColumnsReady = false;
+
+async function ensureCityCulinaryColumns() {
+  if (cityCulinaryColumnsReady) return;
+  const pool = await getPool();
+  if (!pool) return;
+  const [columns] = await pool.query("SHOW COLUMNS FROM cities");
+  const names = new Set((columns as any[]).map(column => String(column.Field)));
+  if (!names.has("culinaryTravelTitle")) {
+    await pool.execute("ALTER TABLE cities ADD COLUMN culinaryTravelTitle varchar(200) DEFAULT 'Culinary Travel'");
+  }
+  if (!names.has("culinaryTravelSections")) {
+    await pool.execute("ALTER TABLE cities ADD COLUMN culinaryTravelSections text");
+  }
+  cityCulinaryColumnsReady = true;
+}
+
 export async function listCities(includeInactive = false) {
+  await ensureCityCulinaryColumns();
   const db = await getDb();
   if (!db) return [];
   const cityRows = includeInactive
@@ -118,6 +136,7 @@ export async function listCitiesWithExperiences() {
 }
 
 export async function getCityBySlug(slug: string) {
+  await ensureCityCulinaryColumns();
   const db = await getDb();
   if (!db) return null;
   const rows = await db.select().from(cities).where(eq(cities.slug, slug)).limit(1);
@@ -125,6 +144,7 @@ export async function getCityBySlug(slug: string) {
 }
 
 export async function getCityById(id: number) {
+  await ensureCityCulinaryColumns();
   const db = await getDb();
   if (!db) return null;
   const rows = await db.select().from(cities).where(eq(cities.id, id)).limit(1);
@@ -160,6 +180,7 @@ export async function getCityById(id: number) {
 }
 
 export async function createCity(data: Omit<InsertCity, "slug"> & { slug?: string }) {
+  await ensureCityCulinaryColumns();
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");
   const slug = data.slug || toSlug(data.name);
@@ -168,6 +189,7 @@ export async function createCity(data: Omit<InsertCity, "slug"> & { slug?: strin
 }
 
 export async function updateCity(id: number, data: Partial<InsertCity>) {
+  await ensureCityCulinaryColumns();
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");
   await db.update(cities).set({ ...data, updatedAt: new Date() }).where(eq(cities.id, id));

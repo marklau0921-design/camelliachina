@@ -71,6 +71,8 @@ export const cities = mysqlTable("cities", {
   culinaryTravelSmall2Image: varchar("culinaryTravelSmall2Image", { length: 512 }),
   culinaryTravelSmall2Title: varchar("culinaryTravelSmall2Title", { length: 200 }),
   culinaryTravelSmall2Description: text("culinaryTravelSmall2Description"),
+  culinaryTravelTitle: varchar("culinaryTravelTitle", { length: 200 }).default("Culinary Travel"),
+  culinaryTravelSections: text("culinaryTravelSections"),
   // Call to Action section
   ctaBgColor: varchar("ctaBgColor", { length: 7 }).default("#a84900"),
   sortOrder: int("sortOrder").default(0),

@@ -415,7 +415,7 @@ export default function ExperienceDetail() {
       {/* ── Header Info Block ── */}
       <div style={{ paddingTop: '55px', background: '#fff' }}>
         {/* Breadcrumb */}
-        <p style={{ fontFamily: EXP_SANS, fontSize: 12, fontWeight: 600, letterSpacing: '0.85px', textTransform: 'uppercase', color: '#999', marginBottom: 0, textAlign: 'left', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', paddingTop: '20px', paddingBottom: '0' }}>
+        <p style={{ fontFamily: EXP_SANS, fontSize: 14, fontWeight: 600, letterSpacing: '0.85px', textTransform: 'uppercase', color: '#999', marginBottom: 0, textAlign: 'left', paddingLeft: 'clamp(28px, calc(-645px + 49.82vw), 305px)', paddingTop: '20px', paddingBottom: '0' }}>
           <Link href="/" style={{ color: '#999', textDecoration: 'none' }}>Home</Link>
           <span style={{ margin: '0 6px', color: '#ccc' }}>/</span>
           <Link href="/experiences" style={{ color: '#999', textDecoration: 'none' }}>Experiences</Link>
@@ -426,13 +426,13 @@ export default function ExperienceDetail() {
         <div style={{ maxWidth: 900, margin: '0 auto', padding: '28px 32px 36px', textAlign: 'center' }}>
           {/* Category label from tags/labels */}
           {labels.length > 0 && (
-            <p style={{ fontFamily: EXP_SANS, fontSize: 13, fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5, textTransform: 'uppercase', color: '#F5569B', marginBottom: 12, textAlign: 'center' }}>
+            <p style={{ fontFamily: EXP_SANS, fontSize: 15, fontWeight: 700, letterSpacing: '0.85px', lineHeight: 1.5, textTransform: 'uppercase', color: '#F5569B', marginBottom: 12, textAlign: 'center' }}>
               {labels.join(', ')}
             </p>
           )}
 
           {/* Main title */}
-          <h1 style={{ fontFamily: EXP_DISPLAY, fontSize: 'clamp(38px, 5vw, 45px)', fontWeight: 400, lineHeight: 1, letterSpacing: '2.25px', color: '#000', marginBottom: 24, textTransform: 'uppercase', textAlign: 'center' }}>
+          <h1 style={{ fontFamily: EXP_DISPLAY, fontSize: 'clamp(44px, 5.5vw, 52px)', fontWeight: 400, lineHeight: 1, letterSpacing: '2.25px', color: '#000', marginBottom: 24, textTransform: 'uppercase', textAlign: 'center' }}>
             {exp?.name}
           </h1>
 
@@ -443,21 +443,21 @@ export default function ExperienceDetail() {
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px' }}>
             {exp?.when && (
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontFamily: EXP_DISPLAY, fontSize: 30, fontWeight: 400, letterSpacing: '2.6px', lineHeight: 1, textTransform: 'uppercase', color: EXP_ORANGE, marginBottom: 10 }}>When</p>
-                <p style={{ fontFamily: EXP_SANS, fontStyle: 'italic', fontSize: 17, fontWeight: 400, letterSpacing: '0.85px', color: EXP_TEXT, lineHeight: 1.5 }}>{exp?.when}</p>
+                <p style={{ fontFamily: EXP_DISPLAY, fontSize: 35, fontWeight: 400, letterSpacing: '2.6px', lineHeight: 1, textTransform: 'uppercase', color: EXP_ORANGE, marginBottom: 10 }}>When</p>
+                <p style={{ fontFamily: EXP_SANS, fontStyle: 'italic', fontSize: 19, fontWeight: 400, letterSpacing: '0.85px', color: EXP_TEXT, lineHeight: 1.5 }}>{exp?.when}</p>
               </div>
             )}
             {exp?.price && (
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontFamily: EXP_DISPLAY, fontSize: 30, fontWeight: 400, letterSpacing: '2.6px', lineHeight: 1, textTransform: 'uppercase', color: EXP_GREEN, marginBottom: 10 }}>Price</p>
-                <p style={{ fontFamily: EXP_SANS, fontStyle: 'italic', fontSize: 17, fontWeight: 400, letterSpacing: '0.85px', color: EXP_TEXT, lineHeight: 1.5 }}>{exp?.price}</p>
-                <p style={{ fontFamily: EXP_SANS, fontStyle: 'italic', fontSize: 13, color: '#888', marginTop: 4, letterSpacing: '0.85px' }}>(based on 2 sharing)</p>
+                <p style={{ fontFamily: EXP_DISPLAY, fontSize: 35, fontWeight: 400, letterSpacing: '2.6px', lineHeight: 1, textTransform: 'uppercase', color: EXP_GREEN, marginBottom: 10 }}>Price</p>
+                <p style={{ fontFamily: EXP_SANS, fontStyle: 'italic', fontSize: 19, fontWeight: 400, letterSpacing: '0.85px', color: EXP_TEXT, lineHeight: 1.5 }}>{exp?.price}</p>
+                <p style={{ fontFamily: EXP_SANS, fontStyle: 'italic', fontSize: 15, color: '#888', marginTop: 4, letterSpacing: '0.85px' }}>(based on 2 sharing)</p>
               </div>
             )}
             {exp?.duration && (
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ fontFamily: EXP_DISPLAY, fontSize: 30, fontWeight: 400, letterSpacing: '2.6px', lineHeight: 1, textTransform: 'uppercase', color: EXP_BLUE, marginBottom: 10 }}>How long</p>
-                <p style={{ fontFamily: EXP_SANS, fontStyle: 'italic', fontSize: 17, fontWeight: 400, letterSpacing: '0.85px', color: EXP_TEXT, lineHeight: 1.5 }}>{exp?.duration}</p>
+                <p style={{ fontFamily: EXP_DISPLAY, fontSize: 35, fontWeight: 400, letterSpacing: '2.6px', lineHeight: 1, textTransform: 'uppercase', color: EXP_BLUE, marginBottom: 10 }}>How long</p>
+                <p style={{ fontFamily: EXP_SANS, fontStyle: 'italic', fontSize: 19, fontWeight: 400, letterSpacing: '0.85px', color: EXP_TEXT, lineHeight: 1.5 }}>{exp?.duration}</p>
               </div>
             )}
           </div>

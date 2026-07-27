@@ -14,7 +14,7 @@ type MediaUsage = {
 };
 
 const usageTables = [
-  { table: "cities", label: "City", title: "name", route: (row: any) => `/destinations/${row.slug ?? row.id}`, columns: ["coverImage", "cityCardImage", "culinaryTravelLargeImage", "culinaryTravelSmall1Image", "culinaryTravelSmall2Image"] },
+  { table: "cities", label: "City", title: "name", route: (row: any) => `/destinations/${row.slug ?? row.id}`, columns: ["coverImage", "cityCardImage", "culinaryTravelLargeImage", "culinaryTravelSmall1Image", "culinaryTravelSmall2Image", "culinaryTravelSections"] },
   { table: "experience_types", label: "Experience Type", title: "name", route: (row: any) => `/experiences/${row.slug ?? row.id}`, columns: ["coverImage"] },
   { table: "experiences", label: "Experience", title: "name", route: (row: any) => `/experiences/${row.slug ?? row.id}`, columns: ["gallery", "recommendationImage", "cityDisplayImage"] },
   { table: "experience_details", label: "Experience Detail", title: "id", route: (row: any) => `/admin/experiences/edit/${row.experienceId}`, columns: ["imageUrl"] },

@@ -115,6 +115,8 @@ const cityInput = z.object({
   culinaryTravelSmall2Image: z.string().optional(),
   culinaryTravelSmall2Title: z.string().optional(),
   culinaryTravelSmall2Description: z.string().optional(),
+  culinaryTravelTitle: z.string().optional(),
+  culinaryTravelSections: z.string().optional(),
   // Call to Action
   ctaBgColor: z.string().optional(),
   sortOrder: z.number().default(0),

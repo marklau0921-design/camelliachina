@@ -168,9 +168,6 @@ export default function LuxuryTravelExperts() {
           <div className="grid grid-cols-4 gap-6 mb-12">
             {visibleTestimonials.map((testimonial) => (
               <div key={testimonial.id} className="text-center space-y-4">
-                {/* Quote mark */}
-                <div className="text-4xl text-teal-600 leading-none">"</div>
-                
                 {/* Quote text */}
                 <p className="text-sm leading-relaxed text-gray-800 font-medium">
                   {testimonial.quote}
@@ -228,9 +225,6 @@ export default function LuxuryTravelExperts() {
         {/* Mobile: Single testimonial */}
         <div className="md:hidden">
           <div className="text-center space-y-4 mb-8">
-            {/* Quote mark */}
-            <div className="text-4xl text-teal-600 leading-none">"</div>
-            
             {/* Quote text */}
             <p className="text-sm leading-relaxed text-gray-800 font-medium">
               {testimonials[currentIndex % testimonials.length].quote}

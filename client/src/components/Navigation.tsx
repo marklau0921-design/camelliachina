@@ -381,7 +381,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                 <button
                   key={item.key}
                   onClick={() => toggleMenu(item.key)}
-                  style={{ color: textColor, fontFamily: NAV_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                  style={{ color: textColor, fontFamily: NAV_SANS, fontSize: '15px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                 >
                   <span className={`nav-link-underline${activeMenu === item.key ? ' nav-active' : ''}`}>
                     {item.label}
@@ -390,7 +390,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
               ))}
               <button
                 onClick={() => toggleMenu('about')}
-                style={{ color: textColor, fontFamily: NAV_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                style={{ color: textColor, fontFamily: NAV_SANS, fontSize: '15px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
               >
                 <span className={`nav-link-underline${activeMenu === 'about' ? ' nav-active' : ''}`}>About</span>
               </button>
@@ -405,9 +405,9 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                 onClick={() => setLocation('/make-an-enquiry')}
                 style={{
                   background: '#F5569B', color: '#fff',
-                  fontFamily: NAV_SANS, fontSize: '10px',
+                  fontFamily: NAV_SANS, fontSize: '12px',
                   letterSpacing: '0.05em', textTransform: 'uppercase',
-                  padding: '8px 20px', border: '2px solid #F5569B', cursor: 'pointer',
+                  padding: '9px 24px', border: '2px solid #F5569B', cursor: 'pointer',
                   fontWeight: 500, transition: 'all 0.2s',
                 }}
                 onMouseEnter={e => {
@@ -431,9 +431,9 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                 onClick={() => setLocation('/make-an-enquiry')}
                 style={{
                   background: '#F5569B', color: '#fff',
-                  fontFamily: NAV_SANS, fontSize: '10px',
+                  fontFamily: NAV_SANS, fontSize: '12px',
                   letterSpacing: '0.05em', textTransform: 'uppercase',
-                  padding: '6px 12px', border: 'none', cursor: 'pointer', fontWeight: 500,
+                  padding: '7px 14px', border: 'none', cursor: 'pointer', fontWeight: 500,
                 }}
               >
                 Enquire
@@ -470,14 +470,14 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
                   <button
                     key={item.key}
                     onClick={() => { toggleMenu(item.key); setIsOpen(false); }}
-                    style={{ color: '#fff', fontFamily: NAV_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '12px 0' }}
+                    style={{ color: '#fff', fontFamily: NAV_SANS, fontSize: '15px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '12px 0' }}
                   >
                     {item.label}
                   </button>
                 ))}
                 <button
                   onClick={() => { toggleMenu('about'); setIsOpen(false); }}
-                  style={{ color: '#fff', fontFamily: NAV_SANS, fontSize: '13px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '12px 0' }}
+                  style={{ color: '#fff', fontFamily: NAV_SANS, fontSize: '15px', fontWeight: 700, letterSpacing: '0.065em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '12px 0' }}
                 >
                   About
                 </button>

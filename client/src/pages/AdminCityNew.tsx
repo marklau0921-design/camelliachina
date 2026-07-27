@@ -3,6 +3,8 @@ import { useLocation, useParams } from "wouter";
 import { trpc } from "@/lib/trpc";
 import AdminLayout from "@/components/AdminLayout";
 import ImageUploader from "@/components/ImageUploader";
+import CulinaryTravelEditor from "@/components/CulinaryTravelEditor";
+import { parseCulinaryTravelSections } from "@/lib/culinary-travel";
 import { ArrowLeft, Plus, Trash2, GripVertical, Check, X } from "lucide-react";
 
 const ACCENT = "#F5569B";
@@ -132,6 +134,8 @@ export default function AdminCityNew() {
     culinaryTravelSmall2Image: "",
     culinaryTravelSmall2Title: "",
     culinaryTravelSmall2Description: "",
+    culinaryTravelTitle: "Culinary Travel",
+    culinaryTravelSections: "[]",
     ctaBgColor: "#a84900",
     sortOrder: 0,
     isActive: true,
@@ -392,96 +396,12 @@ export default function AdminCityNew() {
         {/* ── Section 4: Culinary Travel ── */}
         <div style={sectionStyle}>
           <SectionTitle>Culinary Travel</SectionTitle>
-
-          {/* Large card */}
-          <div style={{ marginBottom: "28px" }}>
-            <div style={{ fontSize: "12px", color: "#888", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid #f0f0f0" }}>
-              Large Card (Image Left 60% + Text Right 40%)
-            </div>
-            <div style={{ display: "grid", gap: "16px" }}>
-              <ImageUploader
-                value={form.culinaryTravelLargeImage}
-                onChange={url => set("culinaryTravelLargeImage", url)}
-                category="city"
-                label="Large Card Image"
-              />
-              <Field label="Title">
-                <TextInput
-                  value={form.culinaryTravelLargeTitle}
-                  onChange={v => set("culinaryTravelLargeTitle", v)}
-                  placeholder="e.g. Mapo Tofu & Chongqing Chicken"
-                />
-              </Field>
-              <Field label="Description">
-                <TextArea
-                  value={form.culinaryTravelLargeDescription}
-                  onChange={v => set("culinaryTravelLargeDescription", v)}
-                  placeholder="Description of this culinary highlight..."
-                  rows={4}
-                />
-              </Field>
-            </div>
-          </div>
-
-          {/* Small card 1 */}
-          <div style={{ marginBottom: "28px" }}>
-            <div style={{ fontSize: "12px", color: "#888", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid #f0f0f0" }}>
-              Small Card 1 (Image Top 65% + Text Bottom 35%)
-            </div>
-            <div style={{ display: "grid", gap: "16px" }}>
-              <ImageUploader
-                value={form.culinaryTravelSmall1Image}
-                onChange={url => set("culinaryTravelSmall1Image", url)}
-                category="city"
-                label="Small Card 1 Image"
-              />
-              <Field label="Title">
-                <TextInput
-                  value={form.culinaryTravelSmall1Title}
-                  onChange={v => set("culinaryTravelSmall1Title", v)}
-                  placeholder="e.g. Sichuan Hot Pot"
-                />
-              </Field>
-              <Field label="Description">
-                <TextArea
-                  value={form.culinaryTravelSmall1Description}
-                  onChange={v => set("culinaryTravelSmall1Description", v)}
-                  placeholder="Description..."
-                  rows={3}
-                />
-              </Field>
-            </div>
-          </div>
-
-          {/* Small card 2 */}
-          <div>
-            <div style={{ fontSize: "12px", color: "#888", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid #f0f0f0" }}>
-              Small Card 2 (Image Top 65% + Text Bottom 35%)
-            </div>
-            <div style={{ display: "grid", gap: "16px" }}>
-              <ImageUploader
-                value={form.culinaryTravelSmall2Image}
-                onChange={url => set("culinaryTravelSmall2Image", url)}
-                category="city"
-                label="Small Card 2 Image"
-              />
-              <Field label="Title">
-                <TextInput
-                  value={form.culinaryTravelSmall2Title}
-                  onChange={v => set("culinaryTravelSmall2Title", v)}
-                  placeholder="e.g. Wontons & Dumplings"
-                />
-              </Field>
-              <Field label="Description">
-                <TextArea
-                  value={form.culinaryTravelSmall2Description}
-                  onChange={v => set("culinaryTravelSmall2Description", v)}
-                  placeholder="Description..."
-                  rows={3}
-                />
-              </Field>
-            </div>
-          </div>
+          <CulinaryTravelEditor
+            title={form.culinaryTravelTitle}
+            sections={parseCulinaryTravelSections(form.culinaryTravelSections)}
+            onTitleChange={title => set("culinaryTravelTitle", title)}
+            onSectionsChange={sections => set("culinaryTravelSections", JSON.stringify(sections))}
+          />
         </div>
 
         {/* ── Section 5: Call to Action ── */}

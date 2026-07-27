@@ -276,6 +276,7 @@ function HomepageAssetsTab() {
   const updateOpacityMut = trpc.media.updateOpacity.useMutation({ onSuccess: () => utils.media.listByType.invalidate() });
   const updateLogoScaleMut = trpc.media.updateLogoScale.useMutation({ onSuccess: () => utils.media.listByType.invalidate() });
   const replaceMut = trpc.media.replace.useMutation({ onSuccess: invalidate });
+  const deleteLogoMut = trpc.media.delete.useMutation({ onSuccess: invalidate, onError: (error) => alert(error.message) });
 
   const handleUpload = async (file: File, assetType: "logo" | "banner" | "cta" | "page_bg") => {
     const base64 = await fileToBase64(file);
@@ -308,6 +309,18 @@ function HomepageAssetsTab() {
               style={{ width: 120, border: `2px solid ${logo.isActive ? "#F5569B" : "#e8e8e8"}`, borderRadius: 8, overflow: "hidden", cursor: "pointer", background: logo.isActive ? "#fff0f6" : "#fafafa", position: "relative", transition: "all 0.2s" }}>
               <img src={logo.url} alt={logo.filename} style={{ width: "100%", height: 80, objectFit: "contain", padding: 8 }} />
               {logo.isActive && <div style={{ position: "absolute", top: 4, right: 4, background: "#F5569B", color: "#fff", fontSize: 10, borderRadius: 4, padding: "1px 5px" }}>Active</div>}
+              <button
+                type="button"
+                disabled={logo.isActive || deleteLogoMut.isPending}
+                title={logo.isActive ? "Deactivate this logo before deleting it." : "Delete logo"}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  if (confirm(`Delete logo "${logo.filename}"?`)) deleteLogoMut.mutate({ id: logo.id });
+                }}
+                style={{ position: "absolute", top: 4, left: 4, width: 22, height: 22, borderRadius: "50%", border: "none", background: logo.isActive ? "rgba(0,0,0,0.18)" : "rgba(190,35,35,0.88)", color: "#fff", cursor: logo.isActive ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, lineHeight: 1 }}
+              >
+                ×
+              </button>
               <div style={{ fontSize: 10, color: "#888", padding: "4px 6px", textAlign: "center", borderTop: "1px solid #f0f0f0" }}>{logo.filename.length > 16 ? logo.filename.slice(0, 14) + "…" : logo.filename}</div>
             </div>
           ))}

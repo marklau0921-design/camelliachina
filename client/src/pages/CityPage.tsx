@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import { useMediaObjectPosition } from '@/lib/media-position';
+import { legacyCulinaryTravelSections, parseCulinaryTravelSections } from '@/lib/culinary-travel';
 
 const CITY_DISPLAY = "var(--font-travel-condensed, 'League Gothic', 'Arial Narrow', Impact, sans-serif)";
 const CITY_SANS = "var(--font-travel-sans, 'Cabin', 'Josefin Sans', 'Helvetica Neue', Arial, sans-serif)";
@@ -326,6 +327,10 @@ export default function CityPage() {
   const ctaBgColor = (city as any).ctaBgColor || '#a84900';
   const ctaBgImage = (homepageAssets as any)?.cta?.url || null;
   const ctaTextureOpacity = Math.max(0, Math.min(1, Number((homepageAssets as any)?.cta?.opacity ?? 28) / 100));
+  const culinaryTravelSections = parseCulinaryTravelSections(
+    (city as any).culinaryTravelSections,
+    legacyCulinaryTravelSections(city)
+  );
 
   // Visible items (first 3) and hidden items (rest)
   const visibleItems = whatToSeeItems.slice(0, 3);
@@ -334,7 +339,7 @@ export default function CityPage() {
     { label: 'Overview', id: 'overview' },
     ...(exploreExperiences.length > 0 ? [{ label: 'Experiences', id: 'experiences' }] : []),
     { label: 'See & Do', id: 'see-do' },
-    { label: 'Food', id: 'food' }
+    ...(culinaryTravelSections.length > 0 ? [{ label: 'Food', id: 'food' }] : [])
   ];
 
   return (
@@ -582,102 +587,60 @@ export default function CityPage() {
       )}
 
       {/* Culinary Travel Section */}
-      <div id="food" className="w-full bg-white" style={{ paddingTop: '100px', paddingBottom: '80px' }}>
-        <h2 className="text-center text-2xl md:text-4xl font-bold uppercase tracking-wider mb-16 px-4" style={{ fontFamily: CITY_DISPLAY, fontSize: 'clamp(36px, 4vw, 45px)', fontWeight: 400, letterSpacing: '2.25px', lineHeight: 1, color: '#000' }}>
-          Culinary Travel
-        </h2>
+      {culinaryTravelSections.length > 0 && (
+        <div id="food" className="w-full bg-white" style={{ paddingTop: '100px', paddingBottom: '80px' }}>
+          <h2 className="text-center uppercase mb-16 px-4" style={{ fontFamily: CITY_DISPLAY, fontSize: 'clamp(36px, 4vw, 45px)', fontWeight: 400, letterSpacing: '2.25px', lineHeight: 1, color: '#000' }}>
+            {(city as any).culinaryTravelTitle || 'Culinary Travel'}
+          </h2>
 
-        {/* Large Card */}
-        <div className="mx-auto px-4 md:px-8 mb-12" style={{ maxWidth: '1320px' }}>
-          <div className="hidden xl:flex items-center bg-gray-100" style={{ height: '640px' }}>
-            <div className="flex items-center bg-gray-100" style={{ width: '60%', height: '640px', flex: '0 0 auto' }}>
-              {(city as any).culinaryTravelLargeImage && (
-                <img
-                  src={(city as any).culinaryTravelLargeImage}
-                  alt={`${cityName} Cuisine`}
-                  className="object-cover"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: getObjectPosition((city as any).culinaryTravelLargeImage) }}
-                />
-              )}
-            </div>
-            <div className="flex flex-col justify-center items-center bg-gray-100 pl-8 pr-8" style={{ width: '40%', height: '640px' }}>
-              <div className="max-w-md">
-                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
-                  {(city as any).culinaryTravelLargeTitle || `${cityName} Cuisine`}
-                </h3>
-                <p className="text-base md:text-lg text-gray-600 leading-relaxed" style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT }}>
-                  {(city as any).culinaryTravelLargeDescription || ''}
-                </p>
+          <div className="mx-auto px-4 md:px-8" style={{ maxWidth: '1320px', display: 'grid', gap: '48px' }}>
+            {culinaryTravelSections.map((section, index) => (
+              <div key={`${section.title}-${index}`}>
+                <div className={`hidden xl:flex items-stretch bg-gray-100 ${index % 2 === 1 ? 'flex-row-reverse' : ''}`} style={{ minHeight: '560px' }}>
+                  <div style={{ width: '60%', minHeight: '560px', flex: '0 0 auto' }}>
+                    {section.image && (
+                      <img
+                        src={section.image}
+                        alt={section.title || `${cityName} culinary experience`}
+                        style={{ width: '100%', height: '100%', minHeight: '560px', objectFit: 'cover', objectPosition: getObjectPosition(section.image) }}
+                      />
+                    )}
+                  </div>
+                  <div className="flex flex-col justify-center items-center px-8" style={{ width: '40%', minHeight: '560px' }}>
+                    <div className="max-w-md">
+                      <h3 className="uppercase mb-6" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
+                        {section.title}
+                      </h3>
+                      <p style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT, whiteSpace: 'pre-line' }}>
+                        {section.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="xl:hidden w-full bg-gray-100">
+                  {section.image && (
+                    <img
+                      src={section.image}
+                      alt={section.title || `${cityName} culinary experience`}
+                      className="w-full"
+                      style={{ height: '375px', objectFit: 'cover', objectPosition: getObjectPosition(section.image) }}
+                    />
+                  )}
+                  <div className="p-6">
+                    <h3 className="uppercase mb-4" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
+                      {section.title}
+                    </h3>
+                    <p style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT, whiteSpace: 'pre-line' }}>
+                      {section.description}
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-
-          {/* Mobile Layout */}
-          <div className="xl:hidden w-full bg-gray-100">
-            {(city as any).culinaryTravelLargeImage && (
-              <img
-                src={(city as any).culinaryTravelLargeImage}
-                alt={`${cityName} Cuisine`}
-                className="w-full object-cover"
-                style={{ height: '375px', objectFit: 'cover', objectPosition: getObjectPosition((city as any).culinaryTravelLargeImage) }}
-              />
-            )}
-            <div className="p-6">
-              <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-6" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
-                {(city as any).culinaryTravelLargeTitle || `${cityName} Cuisine`}
-              </h3>
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed" style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT }}>
-                {(city as any).culinaryTravelLargeDescription || ''}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Two Small Cards */}
-        <div className="mx-auto px-4 md:px-8" style={{ maxWidth: '1320px' }}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Card 1 */}
-            <div className="flex flex-col bg-gray-100" style={{ minHeight: '600px' }}>
-              {(city as any).culinaryTravelSmall1Image && (
-                <img
-                  src={(city as any).culinaryTravelSmall1Image}
-                  alt={(city as any).culinaryTravelSmall1Title || ''}
-                  className="w-full object-cover"
-                  style={{ height: '390px', objectFit: 'cover', objectPosition: getObjectPosition((city as any).culinaryTravelSmall1Image) }}
-                />
-              )}
-              <div className="p-6" style={{ minHeight: '210px' }}>
-                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-4" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
-                  {(city as any).culinaryTravelSmall1Title || ''}
-                </h3>
-                <p className="text-base md:text-lg text-gray-600 leading-relaxed" style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT }}>
-                  {(city as any).culinaryTravelSmall1Description || ''}
-                </p>
-              </div>
-            </div>
-
-            {/* Card 2 */}
-            <div className="flex flex-col bg-gray-100" style={{ minHeight: '600px' }}>
-              {(city as any).culinaryTravelSmall2Image && (
-                <img
-                  src={(city as any).culinaryTravelSmall2Image}
-                  alt={(city as any).culinaryTravelSmall2Title || ''}
-                  className="w-full object-cover"
-                  style={{ height: '390px', objectFit: 'cover', objectPosition: getObjectPosition((city as any).culinaryTravelSmall2Image) }}
-                />
-              )}
-              <div className="p-6" style={{ minHeight: '210px' }}>
-                <h3 className="text-sm md:text-base font-semibold uppercase tracking-widest text-gray-800 mb-4" style={{ fontFamily: CITY_SANS, fontSize: '18px', fontWeight: 700, letterSpacing: '1.8px', lineHeight: 1.28, color: '#000' }}>
-                  {(city as any).culinaryTravelSmall2Title || ''}
-                </h3>
-                <p className="text-base md:text-lg text-gray-600 leading-relaxed" style={{ fontFamily: CITY_SANS, fontSize: '17px', fontWeight: 400, letterSpacing: '0.85px', lineHeight: 1.5, color: CITY_TEXT }}>
-                  {(city as any).culinaryTravelSmall2Description || ''}
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
-      </div>
+      )}
 
       {/* CTA Section */}
       <section
