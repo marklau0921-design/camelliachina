@@ -6,6 +6,19 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import CustomSelect from '@/components/CustomSelect';
 
+function WhatsAppLogo({ className = '' }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M12.04 2A9.84 9.84 0 0 0 3.5 16.73L2 22l5.4-1.42A9.92 9.92 0 1 0 12.04 2Zm0 17.98a8 8 0 0 1-4.08-1.12l-.3-.18-3.2.84.86-3.12-.2-.32a7.93 7.93 0 1 1 6.92 3.9Zm4.35-5.94c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18a7.2 7.2 0 0 1-1.33-1.66c-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.58.18 1.1.16 1.51.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z" />
+    </svg>
+  );
+}
+
 // ── Contact Partner Logos with drag scroll ──
 function ContactPartnerLogos() {
   const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
@@ -740,8 +753,16 @@ export default function Contact() {
                 <div className="w-full flex flex-col items-center px-8 pt-6 pb-4">
                   <Phone className="w-6 h-6 text-[#1a1a1a] mb-2" />
                   <h3 className="font-bold uppercase tracking-widest text-sm mb-2 text-[#1a1a1a]">Call Us Today</h3>
-                  <a href="tel:+8613008122836" className="font-bold text-lg hover:underline block mb-2" style={{color:'#e0457b', fontFamily: 'Brandon Grotesque', letterSpacing: '0.12em'}}>
-                    +86 130 0812 2836
+                  <a
+                    href="https://wa.me/8618287170228"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Contact us on WhatsApp at +86 18287170228"
+                    className="font-bold text-lg hover:underline flex items-center justify-center gap-2 mb-2"
+                    style={{color:'#e0457b', fontFamily: 'Brandon Grotesque', letterSpacing: '0.12em'}}
+                  >
+                    <WhatsAppLogo className="w-5 h-5 shrink-0" />
+                    <span>+86 18287170228</span>
                   </a>
                   <p className="text-sm text-[#666666]" style={{letterSpacing: '0.03em'}}>
                     We're open at 9.00am

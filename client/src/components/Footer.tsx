@@ -90,7 +90,7 @@ export default function Footer() {
               
               {/* Instagram */}
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/camelliayunnan/"
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-white/60 hover:text-[#D4AF37] transition-colors"
