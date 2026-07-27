@@ -32,6 +32,8 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const passwordRef = useRef<HTMLInputElement>(null);
+  const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const logoUrl = homepageAssets?.logo?.url || "";
   const loginMutation = trpc.admin.login.useMutation({
     onSuccess: () => {
       // Session is stored in httpOnly cookie only — no localStorage
@@ -47,14 +49,16 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   return (
     <div style={{ minHeight: "100vh", background: "#1a1a1a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 16px" }}>
       <div style={{ width: "100%", maxWidth: "360px" }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: "40px" }}>
-          <img
-            src=""
-            alt="Logo"
-            style={{ height: "52px", width: "auto", objectFit: "contain" }}
-            onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
-          />
-        </div>
+        {logoUrl && (
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "40px" }}>
+            <img
+              src={logoUrl}
+              alt="Logo"
+              style={{ height: "52px", maxWidth: "280px", width: "auto", objectFit: "contain" }}
+              onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+            />
+          </div>
+        )}
         <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", padding: "36px 32px" }}>
           <p style={{ color: "#888", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", textAlign: "center", marginBottom: "28px" }}>
             Admin Access
