@@ -1,4 +1,5 @@
 import React from "react";
+import { trpc } from "@/lib/trpc";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
@@ -42,6 +43,25 @@ import ExperienceCategoryPage from "./pages/ExperienceCategoryPage";
 import CityPage from "./pages/CityPage";
 import CMSAdmin from "./pages/CMSAdmin";
 import ItineraryDetail from "./pages/ItineraryDetail";
+
+function BrandFavicon() {
+  const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
+  const logoUrl = homepageAssets?.logo?.url || "";
+
+  React.useEffect(() => {
+    if (!logoUrl) return;
+
+    let favicon = document.querySelector<HTMLLinkElement>('link[rel~="icon"]');
+    if (!favicon) {
+      favicon = document.createElement("link");
+      favicon.rel = "icon";
+      document.head.appendChild(favicon);
+    }
+    favicon.href = logoUrl;
+  }, [logoUrl]);
+
+  return null;
+}
 
 /**
  * App Router & Layout
@@ -108,6 +128,7 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
+          <BrandFavicon />
           <Toaster />
           <Router />
           </TooltipProvider>
