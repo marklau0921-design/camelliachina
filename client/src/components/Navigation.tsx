@@ -353,7 +353,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
               {logoLoaded && (
                 <img
                   src={logoUrl}
-                  alt="Wayseek 未远"
+                  alt="CamelliaChina"
                   className="group-hover:opacity-70 transition-opacity"
                   style={{ height: navigationLogoHeight, width: 'auto', objectFit: 'contain' }}
                   onLoad={() => setLogoLoaded(true)}
@@ -363,7 +363,7 @@ export default function Navigation({ forceHide = false }: NavigationProps) {
               {!logoLoaded && logoUrl && (
                 <img
                   src={logoUrl}
-                  alt="Wayseek 未远"
+                  alt="CamelliaChina"
                   className="group-hover:opacity-70 transition-opacity"
                   style={{ height: navigationLogoHeight, width: 'auto', objectFit: 'contain', display: 'none' }}
                   onLoad={() => setLogoLoaded(true)}

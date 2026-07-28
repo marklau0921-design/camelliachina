@@ -40,7 +40,7 @@ export default function CMSAdmin() {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">CMS Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage all Wayseek content</p>
+          <p className="text-muted-foreground">Manage all CamelliaChina content</p>
         </div>
 
         <Tabs defaultValue="team" className="w-full">
