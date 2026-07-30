@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "wouter";
 
 const SITE_URL = "https://camelliachina.com";
-const DEFAULT_TITLE = "CamelliaChina | Tailor-Made Luxury Travel in China";
+const DEFAULT_TITLE = "CamelliaChina";
 const DEFAULT_DESCRIPTION =
   "CamelliaChina creates tailor-made private journeys across China, connecting discerning travellers with local culture, landscapes and meaningful experiences.";
 
