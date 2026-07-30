@@ -2,9 +2,9 @@ import mysql from 'mysql2/promise';
 
 const connection = await mysql.createConnection({
   host: 'localhost',
-  user: 'wayseek_local',
-  password: 'wayseek_local_pass',
-  database: 'wayseek_local',
+  user: 'camellia_local',
+  password: 'camellia_local_pass',
+  database: 'camellia_local',
 });
 
 try {

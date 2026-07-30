@@ -43,6 +43,7 @@ import ExperienceCategoryPage from "./pages/ExperienceCategoryPage";
 import CityPage from "./pages/CityPage";
 import CMSAdmin from "./pages/CMSAdmin";
 import ItineraryDetail from "./pages/ItineraryDetail";
+import Seo from "./components/Seo";
 
 function BrandFavicon() {
   const { data: homepageAssets } = trpc.media.getHomepageAssets.useQuery();
@@ -129,6 +130,7 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <BrandFavicon />
+          <Seo />
           <Toaster />
           <Router />
           </TooltipProvider>

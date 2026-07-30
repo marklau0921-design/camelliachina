@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /experience-preview/
+Disallow: /template/
+
+Sitemap: https://camelliachina.com/sitemap.xml
