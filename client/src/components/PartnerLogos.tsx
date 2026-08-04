@@ -16,6 +16,10 @@ const fallbackLogos = [
 export default function PartnerLogos() {
   const { data: homepageData } = trpc.homepage.getPublicData.useQuery();
 
+  if (homepageData && (!homepageData.sponsors || homepageData.sponsors.length === 0)) {
+    return null;
+  }
+
   // 使用 DB sponsors，若无数据则 fallback
   const logos = (homepageData?.sponsors && homepageData.sponsors.length > 0)
     ? homepageData.sponsors.flatMap(sp => {
@@ -61,12 +65,6 @@ export default function PartnerLogos() {
   };
 
   useEffect(() => () => cancelInertia(), []);
-
-  // Keep every hook above conditional rendering so the hook order remains
-  // stable while the homepage query transitions from loading to loaded.
-  if (homepageData && (!homepageData.sponsors || homepageData.sponsors.length === 0)) {
-    return null;
-  }
 
   const onMouseDown = (e: React.MouseEvent) => {
     cancelInertia();
