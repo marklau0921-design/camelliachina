@@ -19,20 +19,14 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// uploads 目录位于 nodejs 文件夹外（与 nodejs 同级）
-// Hostinger 结构：
-//   /home/u932753542/domains/morachinatravel.com/
-//     ├── nodejs/          ← 项目代码
-//     │   └── server/      ← __dirname 在这里
-//     └── uploads/         ← 目标位置
-//
-// __dirname = .../nodejs/server
-// 向上一级 = nodejs
-// 向上两级 = morachinatravel.com
-// 加上 uploads = morachinatravel.com/uploads ✅
+// Hostinger production should set UPLOADS_ROOT explicitly, for example:
+// /home/u932753542/domains/camelliachina.com/uploads
+// The derived path remains as a local/development fallback.
 const projectRoot = path.resolve(__dirname, "..");       // nodejs/
-const domainRoot = path.resolve(projectRoot, "..");      // morachinatravel.com/
-export const UPLOADS_ROOT = path.join(domainRoot, "uploads");
+const domainRoot = path.resolve(projectRoot, "..");      // domain root
+export const UPLOADS_ROOT = process.env.UPLOADS_ROOT
+  ? path.resolve(process.env.UPLOADS_ROOT)
+  : path.join(domainRoot, "uploads");
 console.log(`[Storage] __dirname: ${__dirname}`);
 console.log(`[Storage] projectRoot: ${projectRoot}`);
 console.log(`[Storage] domainRoot: ${domainRoot}`);
