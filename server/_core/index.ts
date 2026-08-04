@@ -10,7 +10,6 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -68,12 +67,7 @@ async function startServer() {
   try {
     const publicHtmlDir = path.resolve(process.cwd(), "..", "public_html");
     const symlinkPath = path.join(publicHtmlDir, "uploads");
-    if (fs.existsSync(publicHtmlDir)) {
-      // Remove existing symlink or directory if it exists
-      const symlinkExists = fs.existsSync(symlinkPath) || (() => { try { return fs.lstatSync(symlinkPath).isSymbolicLink(); } catch { return false; } })();
-      if (symlinkExists) {
-        fs.rmSync(symlinkPath, { recursive: true, force: true });
-      }
+    if (fs.existsSync(publicHtmlDir) && !fs.existsSync(symlinkPath)) {
       fs.symlinkSync(uploadsRoot, symlinkPath);
       console.log(`[Startup] Symlink created: ${symlinkPath} -> ${uploadsRoot}`);
     }
@@ -84,7 +78,6 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  registerStorageProxy(app);
   // OAuth routes removed - using admin password login only
 
   app.get("/sitemap.xml", async (_req, res) => {
@@ -100,7 +93,7 @@ async function startServer() {
   // Admin and API routes always bypass this and use dynamic handling
   const staticCacheDir = path.resolve(process.cwd(), "static-cache");
   app.use((req, res, next) => {
-    if (req.path.startsWith("/admin") || req.path.startsWith("/api") || req.path.startsWith("/manus-storage") || req.path.startsWith("/uploads")) {
+    if (req.path.startsWith("/admin") || req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
       return next();
     }
     const routePath = req.path === "/" ? "/index.html" : `${req.path.replace(/\/$/, "")}/index.html`;
