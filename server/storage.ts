@@ -32,7 +32,9 @@ const __dirname = path.dirname(__filename);
 // 加上 uploads = morachinatravel.com/uploads ✅
 const projectRoot = path.resolve(__dirname, "..");       // nodejs/
 const domainRoot = path.resolve(projectRoot, "..");      // morachinatravel.com/
-export const UPLOADS_ROOT = path.join(domainRoot, "uploads");
+export const UPLOADS_ROOT = path.resolve(
+  process.env.UPLOADS_ROOT?.trim() || path.join(domainRoot, "uploads"),
+);
 console.log(`[Storage] __dirname: ${__dirname}`);
 console.log(`[Storage] projectRoot: ${projectRoot}`);
 console.log(`[Storage] domainRoot: ${domainRoot}`);
