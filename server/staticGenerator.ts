@@ -15,7 +15,6 @@ import puppeteer from "puppeteer-core";
 import {
   listCities,
   listExperienceTypesWithNav,
-  listItineraries,
   toSlug,
 } from "./db-cms";
 
@@ -44,48 +43,6 @@ function ensureDir(dir: string) {
 function writeHtml(filePath: string, html: string) {
   ensureDir(path.dirname(filePath));
   fs.writeFileSync(filePath, html, "utf-8");
-}
-
-function escapeXml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
-
-export async function generateSitemapXml(): Promise<string> {
-  const siteUrl = "https://camelliachina.com";
-  const paths = new Set([
-    "/",
-    "/destinations",
-    "/experiences",
-    "/about",
-    "/about/our-team",
-    "/about/why-us",
-    "/make-an-enquiry",
-    "/plan-your-trip",
-  ]);
-
-  const [cities, experienceTypes, itineraries] = await Promise.all([
-    listCities(false).catch(() => []),
-    listExperienceTypesWithNav().catch(() => []),
-    listItineraries(false).catch(() => []),
-  ]);
-
-  cities.forEach(city => paths.add(`/destinations/${city.slug}`));
-  experienceTypes.forEach(type => {
-    const typeSlug = toSlug(type.name);
-    paths.add(`/experiences/${typeSlug}`);
-    type.items.forEach(item => paths.add(`/experiences/${typeSlug}/${item.slug}`));
-  });
-  itineraries.forEach(itinerary => paths.add(`/itinerary/${itinerary.slug}`));
-
-  const urls = Array.from(paths)
-    .map(route => `  <url><loc>${escapeXml(`${siteUrl}${route}`)}</loc></url>`)
-    .join("\n");
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
 
 /**
@@ -258,7 +215,7 @@ export async function generateStaticPages(
       await new Promise((r) => setTimeout(r, 1500));
 
       const html = await page.content();
-      const finalHtml = injectBase(html, "/");
+      const finalHtml = injectBase(html, serverBaseUrl + "/");
       writeHtml(filePath, finalHtml);
       pagesGenerated++;
       console.log(`[StaticGen] ✓ ${url}`);

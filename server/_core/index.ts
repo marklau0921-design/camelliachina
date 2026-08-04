@@ -15,7 +15,6 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { UPLOADS_ROOT } from "../storage.js";
-import { generateSitemapXml } from "../staticGenerator";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -86,15 +85,6 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   // OAuth routes removed - using admin password login only
-
-  app.get("/sitemap.xml", async (_req, res) => {
-    try {
-      res.type("application/xml").send(await generateSitemapXml());
-    } catch (error) {
-      console.error("[SEO] Failed to generate sitemap:", error);
-      res.status(500).type("text/plain").send("Unable to generate sitemap");
-    }
-  });
 
   // Serve pre-generated static pages from static-cache/ with priority over SPA
   // Admin and API routes always bypass this and use dynamic handling

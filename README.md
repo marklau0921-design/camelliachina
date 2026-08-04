@@ -485,7 +485,7 @@ Note: All TODO comments are remarks for the agent (you), not for the user.
 `package.json`
 ```ts
 {
-  "name": "camelliachina-travel-web",
+  "name": "wayseek-china-travel-webdev",
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
